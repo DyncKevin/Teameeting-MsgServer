@@ -93,8 +93,7 @@
     NSString *sqlInsert = [NSString stringWithFormat:@"insert into %@(%@) values(%@);", name, key, value];
     NSLog(@"insertSeqnSeqnId was called, sqlInsert:%@", sqlInsert);
     
-    int code = [self runSql:sqlInsert];
-    NSLog(@"func:%@ code:%d", [NSString stringWithCString:__FUNCTION__ encoding:NSASCIIStringEncoding], code);
+    [self runSql:sqlInsert];
     return true;
 }
 
@@ -109,8 +108,7 @@
     NSString *sqlUpdate = [NSString stringWithFormat:@"update %@ set seqn=%@ where userId=%@ and seqnId=%@;", name, value, key1, key2];
     NSLog(@"updateSeqnSeqnId was called, sqlUpdate:%@", sqlUpdate);
     
-    int code = [self runSql:sqlUpdate];
-    NSLog(@"func:%@ code:%d", [NSString stringWithCString:__FUNCTION__ encoding:NSASCIIStringEncoding], code);
+    [self runSql:sqlUpdate];
     return true;
 }
 
@@ -127,8 +125,7 @@
     NSString *sqlUpdate = [NSString stringWithFormat:@"update %@ set seqn=%@, isfetched=%@ where userId=%@ and seqnId=%@;", name, value, value2, key1, key2];
     NSLog(@"updateSeqnSeqnId with fetched was called, sqlUpdate:%@", sqlUpdate);
     
-    int code = [self runSql:sqlUpdate];
-    NSLog(@"func:%@ code:%d", [NSString stringWithCString:__FUNCTION__ encoding:NSASCIIStringEncoding], code);
+    [self runSql:sqlUpdate];
     return true;
 }
 
@@ -143,7 +140,6 @@
     NSLog(@"selectSeqnSeqnId was called, sqlSelect:%@", sqlSelect);
     int code = 0;
     *seqn = (NSNumber*)[self runSqlSelect:sqlSelect dbName:name type:1 code:&code];
-    NSLog(@"func:%@ code:%d", [NSString stringWithCString:__FUNCTION__ encoding:NSASCIIStringEncoding], code);
     return true;
 }
 
@@ -155,8 +151,7 @@
     NSString *sqlDelete = [NSString stringWithFormat:@"delete from %@ where %@;", name, key];
     NSLog(@"deleteSeqnSeqnId was called, sqlInsert:%@", sqlDelete);
     
-    int code = [self runSql:sqlDelete];
-    NSLog(@"func:%@ code:%d", [NSString stringWithCString:__FUNCTION__ encoding:NSASCIIStringEncoding], code);
+    [self runSql:sqlDelete];
     return true;
 }
 
@@ -170,8 +165,7 @@
     NSString *sqlInsert = [NSString stringWithFormat:@"insert into %@(%@) values(%@);", name, key, value];
     NSLog(@"insertGroupIdGrpId was called, sqlInsert:%@", sqlInsert);
     
-    int code = [self runSql:sqlInsert];
-    NSLog(@"func:%@ code:%d", [NSString stringWithCString:__FUNCTION__ encoding:NSASCIIStringEncoding], code);
+    [self runSql:sqlInsert];
     return true;
 }
 
@@ -195,7 +189,6 @@
     NSLog(@"selectGroupIds was called, sqlSelect:%@", sqlSelect);
     int code = 0;
     *Info = (NSMutableArray*)[self runSqlSelect:sqlSelect dbName:name type:2 code:&code];
-    NSLog(@"func:%@ code:%d", [NSString stringWithCString:__FUNCTION__ encoding:NSASCIIStringEncoding], code);
     return true;
 }
 
@@ -207,8 +200,7 @@
     NSString *sqlDelete = [NSString stringWithFormat:@"delete from %@ where %@;", name, key];
     NSLog(@"deleteGroupIdGrpId was called, sqlDelete:%@", sqlDelete);
     
-    int code = [self runSql:sqlDelete];
-    NSLog(@"func:%@ code:%d", [NSString stringWithCString:__FUNCTION__ encoding:NSASCIIStringEncoding], code);
+    [self runSql:sqlDelete];
     return true;
 }
 
@@ -259,8 +251,6 @@
     {
         if (errmsg)
         NSLog(@"run Sql code :%d, errmsg %@", code, [NSString stringWithCString:errmsg encoding:NSUTF8StringEncoding]);
-        else
-        NSLog(@"run Sql code :%d, error", code);
     }
     return code;
 }
@@ -278,8 +268,6 @@
     {
         if (errmsg)
             NSLog(@"run Sql with cb code :%d, errmsg %@", code, [NSString stringWithCString:errmsg encoding:NSUTF8StringEncoding]);
-        else
-            NSLog(@"run Sql with cb code :%d, error", code);
         complete(code);
     } else {
         complete(SQLITE_OK);
@@ -302,7 +290,6 @@
     {
         NSLog(@"run Sql Select err code %d", *code);
     } else {
-        NSLog(@"run Sql Select SQLITE_OK");
         if ([dbName isEqualToString:@MC_MSG_SQL_TABLE_STOREID_SEQN])
         {
             if (type == 1)// seqn
@@ -311,7 +298,6 @@
                 while(sqlite3_step(stmt) == SQLITE_ROW)
                 {
                     sqlite3_int64 seqn = sqlite3_column_int64(stmt, 0);
-                    NSLog(@"select seqn :%lld", seqn);
                     num = [NSNumber numberWithLongLong:seqn];
                     break;
                 }
@@ -337,7 +323,6 @@
                     
                     NSMutableDictionary *item = [NSMutableDictionary dictionaryWithDictionary:@{@"userId":nsUserId, @"seqnId":nsGrpId, @"seqn":nsSeqn, @"isfetched":nsFetched}];
                     [arr addObject:item];
-                    NSLog(@"select userid:%@, grpid:%@, seqn:%lld, isfetched:%d", nsUserId, nsGrpId, [nsSeqn longLongValue], [nsFetched intValue]);
                 }
                 sqlite3_finalize(stmt);
                 stmt = nil;
@@ -352,7 +337,6 @@
                 char *grpid = (char*)sqlite3_column_text(stmt, 0);
                 NSString *nsGrpId = [NSString stringWithCString:grpid encoding:NSUTF8StringEncoding];
                 [arr addObject:nsGrpId];
-                NSLog(@"select get grpid:%@", nsGrpId);
             }
             sqlite3_finalize(stmt);
             stmt = nil;
@@ -382,7 +366,6 @@
         while(sqlite3_step(stmt) == SQLITE_ROW)
         {
             count = sqlite3_column_int(stmt, 0);
-            NSLog(@"runSqlSelectCount count:%d", count);
         }
         sqlite3_finalize(stmt);
         stmt = nil;

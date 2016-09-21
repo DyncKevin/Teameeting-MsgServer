@@ -61,7 +61,6 @@
 		E6415BAB1D4302A500572DB5 /* MSClientType.h in Headers */ = {isa = PBXBuildFile; fileRef = E6415A571D4302A500572DB5 /* MSClientType.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E6415BAC1D4302A500572DB5 /* MsgClient.h in Headers */ = {isa = PBXBuildFile; fileRef = E6415A581D4302A500572DB5 /* MsgClient.h */; };
 		E6415BAD1D4302A500572DB5 /* MsgClient.mm in Sources */ = {isa = PBXBuildFile; fileRef = E6415A591D4302A500572DB5 /* MsgClient.mm */; };
-		E6415BAE1D4302A500572DB5 /* MsgClientProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = E6415A5A1D4302A500572DB5 /* MsgClientProtocol.h */; };
 		E6415BAF1D4302A500572DB5 /* MSGroupDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = E6415A5B1D4302A500572DB5 /* MSGroupDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E6415BB01D4302A500572DB5 /* MSGroupManager.h in Headers */ = {isa = PBXBuildFile; fileRef = E6415A5C1D4302A500572DB5 /* MSGroupManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E6415BB11D4302A500572DB5 /* MSGroupManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = E6415A5D1D4302A500572DB5 /* MSGroupManager.mm */; };
@@ -71,8 +70,6 @@
 		E6415BB51D4302A500572DB5 /* MSMessageManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = E6415A611D4302A500572DB5 /* MSMessageManager.mm */; };
 		E6415BB61D4302A500572DB5 /* MSMsgUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = E6415A621D4302A500572DB5 /* MSMsgUtil.h */; };
 		E6415BB71D4302A500572DB5 /* MSMsgUtil.mm in Sources */ = {isa = PBXBuildFile; fileRef = E6415A631D4302A500572DB5 /* MSMsgUtil.mm */; };
-		E6415BB81D4302A500572DB5 /* MSSharedSeqnConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = E6415A641D4302A500572DB5 /* MSSharedSeqnConfig.h */; };
-		E6415BB91D4302A500572DB5 /* MSSharedSeqnConfig.mm in Sources */ = {isa = PBXBuildFile; fileRef = E6415A651D4302A500572DB5 /* MSSharedSeqnConfig.mm */; };
 		E6415BBA1D4302A500572DB5 /* MSSqlite3.h in Headers */ = {isa = PBXBuildFile; fileRef = E6415A661D4302A500572DB5 /* MSSqlite3.h */; };
 		E6415BBB1D4302A500572DB5 /* MSSqlite3.mm in Sources */ = {isa = PBXBuildFile; fileRef = E6415A671D4302A500572DB5 /* MSSqlite3.mm */; };
 		E6415BBC1D4302A500572DB5 /* MSSqlite3ClientSql.h in Headers */ = {isa = PBXBuildFile; fileRef = E6415A681D4302A500572DB5 /* MSSqlite3ClientSql.h */; };
@@ -429,7 +426,6 @@
 		E6415A571D4302A500572DB5 /* MSClientType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MSClientType.h; sourceTree = "<group>"; };
 		E6415A581D4302A500572DB5 /* MsgClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MsgClient.h; sourceTree = "<group>"; };
 		E6415A591D4302A500572DB5 /* MsgClient.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MsgClient.mm; sourceTree = "<group>"; };
-		E6415A5A1D4302A500572DB5 /* MsgClientProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MsgClientProtocol.h; sourceTree = "<group>"; };
 		E6415A5B1D4302A500572DB5 /* MSGroupDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MSGroupDelegate.h; sourceTree = "<group>"; };
 		E6415A5C1D4302A500572DB5 /* MSGroupManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MSGroupManager.h; sourceTree = "<group>"; };
 		E6415A5D1D4302A500572DB5 /* MSGroupManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MSGroupManager.mm; sourceTree = "<group>"; };
@@ -439,8 +435,6 @@
 		E6415A611D4302A500572DB5 /* MSMessageManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MSMessageManager.mm; sourceTree = "<group>"; };
 		E6415A621D4302A500572DB5 /* MSMsgUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MSMsgUtil.h; sourceTree = "<group>"; };
 		E6415A631D4302A500572DB5 /* MSMsgUtil.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MSMsgUtil.mm; sourceTree = "<group>"; };
-		E6415A641D4302A500572DB5 /* MSSharedSeqnConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MSSharedSeqnConfig.h; sourceTree = "<group>"; };
-		E6415A651D4302A500572DB5 /* MSSharedSeqnConfig.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MSSharedSeqnConfig.mm; sourceTree = "<group>"; };
 		E6415A661D4302A500572DB5 /* MSSqlite3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MSSqlite3.h; sourceTree = "<group>"; };
 		E6415A671D4302A500572DB5 /* MSSqlite3.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MSSqlite3.mm; sourceTree = "<group>"; };
 		E6415A681D4302A500572DB5 /* MSSqlite3ClientSql.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MSSqlite3ClientSql.h; sourceTree = "<group>"; };
@@ -814,7 +808,6 @@
 				E6415A571D4302A500572DB5 /* MSClientType.h */,
 				E6415A581D4302A500572DB5 /* MsgClient.h */,
 				E6415A591D4302A500572DB5 /* MsgClient.mm */,
-				E6415A5A1D4302A500572DB5 /* MsgClientProtocol.h */,
 				E6415A5B1D4302A500572DB5 /* MSGroupDelegate.h */,
 				E6415A5C1D4302A500572DB5 /* MSGroupManager.h */,
 				E6415A5D1D4302A500572DB5 /* MSGroupManager.mm */,
@@ -824,8 +817,6 @@
 				E6415A611D4302A500572DB5 /* MSMessageManager.mm */,
 				E6415A621D4302A500572DB5 /* MSMsgUtil.h */,
 				E6415A631D4302A500572DB5 /* MSMsgUtil.mm */,
-				E6415A641D4302A500572DB5 /* MSSharedSeqnConfig.h */,
-				E6415A651D4302A500572DB5 /* MSSharedSeqnConfig.mm */,
 				E6415A661D4302A500572DB5 /* MSSqlite3.h */,
 				E6415A671D4302A500572DB5 /* MSSqlite3.mm */,
 				E6415A681D4302A500572DB5 /* MSSqlite3ClientSql.h */,
@@ -1380,7 +1371,6 @@
 				E6415DFF1D45E82000572DB5 /* NSObject+MJClass.h in Headers */,
 				E6415DFB1D45E82000572DB5 /* MJPropertyKey.h in Headers */,
 				E6415D4F1D43062500572DB5 /* sharedexclusivelock.h in Headers */,
-				E6415BB81D4302A500572DB5 /* MSSharedSeqnConfig.h in Headers */,
 				E6415BB61D4302A500572DB5 /* MSMsgUtil.h in Headers */,
 				E6415D321D43062500572DB5 /* pathutils.h in Headers */,
 				E6415D491D43062500572DB5 /* scoped_ref_ptr.h in Headers */,
@@ -1401,7 +1391,6 @@
 				E6415D821D43062500572DB5 /* virtualsocketserver.h in Headers */,
 				E6415D7D1D43062500572DB5 /* trace_event.h in Headers */,
 				E6415BF81D43057600572DB5 /* criticalsection.h in Headers */,
-				E6415BAE1D4302A500572DB5 /* MsgClientProtocol.h in Headers */,
 				E6415CC91D43062500572DB5 /* asyncfile.h in Headers */,
 				E6415D6C1D43062500572DB5 /* systeminfo.h in Headers */,
 				E6415CE81D43062500572DB5 /* common.h in Headers */,
@@ -1766,7 +1755,6 @@
 				E6415DBF1D45E35600572DB5 /* checks.cc in Sources */,
 				E6415BBB1D4302A500572DB5 /* MSSqlite3.mm in Sources */,
 				E6415DCB1D45E35700572DB5 /* networkmonitor.cc in Sources */,
-				E6415BB91D4302A500572DB5 /* MSSharedSeqnConfig.mm in Sources */,
 				E6415BB31D4302A500572DB5 /* MSMessage.mm in Sources */,
 				E6415DFE1D45E82000572DB5 /* MJPropertyType.m in Sources */,
 				E6415DBA1D45E35600572DB5 /* asyncresolverinterface.cc in Sources */,

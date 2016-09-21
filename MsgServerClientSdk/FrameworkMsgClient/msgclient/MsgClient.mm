@@ -110,10 +110,8 @@ int MsgClient::MCSyncMsg()
 {
     if (m_isFetched)
     {
-        NSLog(@"MCSyncMsg sync all seqns");
         SyncAllSeqns();
     } else {
-        NSLog(@"MCSyncMsg should be fetched before called");
         FetchAllSeqns();
     }
     return 0;
@@ -284,13 +282,11 @@ int MsgClient::MCNotifySettedMgr(std::string& outmsgid, MSMgrMessage *mgrMsg, co
 
 void MsgClient::OnSndMsg(int code, const std::string& msgid)
 {
-    std::cout << "MsgClient::OnSndMsg msgid:" << msgid << ", code:" << code << std::endl;
     [m_subMsgDelegate OnSendMessageId:[NSString stringWithCString:msgid.c_str() encoding:NSASCIIStringEncoding] code:code];
 }
 
 void MsgClient::OnCmdCallback(int code, int cmd, const std::string& groupid, const MSCbData& data)
 {
-    NSLog(@"MsgClient::OnCmdCallback cmd:%d, groupid.length:%lu, result:%d, seqn:%lld", cmd, groupid.length(), data.result, data.seqn);
     switch (cmd)
     {
         case MSADD_GROUP:
@@ -298,7 +294,6 @@ void MsgClient::OnCmdCallback(int code, int cmd, const std::string& groupid, con
             if (code == 0)
             {
                 NSString *nsGrpId = [NSString stringWithCString:groupid.c_str() encoding:NSUTF8StringEncoding];
-                NSLog(@"OnCmdCallback add group ok, insert groupid and seqn, toggle callback");
                 if (![m_sqlite3Manager isGroupExistsUserId:m_nsUserId GrpId:nsGrpId])
                 {
                     [m_sqlite3Manager addGroupIdUserId:m_nsUserId GrpId:nsGrpId];
@@ -321,7 +316,6 @@ void MsgClient::OnCmdCallback(int code, int cmd, const std::string& groupid, con
             if (code == 0)
             {
                 NSString *nsGrpId = [NSString stringWithCString:groupid.c_str() encoding:NSUTF8StringEncoding];
-                NSLog(@"OnCmdCallback del group ok, del groupid and seqn, toggle callback");
                 [m_sqlite3Manager delGroupIdUserId:m_nsUserId GrpId:nsGrpId];
                 RemoveLocalSeqn(groupid);
                 //Update seqn from db 2 core
@@ -371,8 +365,6 @@ void MsgClient::OnCmdCallback(int code, int cmd, const std::string& groupid, con
 
 void MsgClient::OnRecvMsg(int64 seqn, const std::string& msg)
 {
-    std::cout << "MsgClient::OnRecvMsg was called, seqn:" << seqn << ", msg.length:" << msg.length() << std::endl;
-    
     UpdateLocalSeqn(m_strUserId, seqn);
     UpdateSeqnToDb(m_strUserId, seqn);
     
@@ -398,14 +390,10 @@ void MsgClient::OnRecvMsg(int64 seqn, const std::string& msg)
         b = nil;
         return;
     }
-    NSLog(@"MsgClient::OnRecvMsg entityByte tag:%d, cont:%@, romid:%@, usr_from:%@", [entityByte msgTag], [entityByte msgCont], [entityByte romId], [entityByte usrFrom]);
     
     MSMessage *mMsg = [MSMsgUtil DecodeDictToMessageWithDict:[MSMsgUtil NSStringToJSONWithString:[entityByte msgCont]]];
-    NSDate *dateNow = [NSDate dateWithTimeIntervalSince1970:[entityByte msgTime]];
     [mMsg setMillSec:[entityByte msgTime]];
     [mMsg setMsgId:[entityByte cmsgId]];
-    NSLog(@"MsgClient::OnRecvMsg dateNow:%@, msg_time:%u"\
-          , dateNow, [entityByte msgTime]);
     
     switch ([entityByte msgType])
     {
@@ -472,8 +460,6 @@ void MsgClient::OnRecvMsg(int64 seqn, const std::string& msg)
 
 void MsgClient::OnRecvGroupMsg(int64 seqn, const std::string& seqnid, const std::string& msg)
 {
-    std::cout << "MsgClient::OnRecvGroupMsg was called, seqn:" << seqn << ", seqnid:" << seqnid << ", msg.length:" << msg.length() << std::endl;
-    
     UpdateLocalSeqn(seqnid, seqn);
     UpdateSeqnToDb(seqnid, seqn);
     
@@ -500,14 +486,10 @@ void MsgClient::OnRecvGroupMsg(int64 seqn, const std::string& seqnid, const std:
         b = nil;
         return;
     }
-    NSLog(@"MsgClient::OnRecvGroupMsg entityByte tag:%d, cont:%@, romid:%@, usr_from:%@", [entityByte msgTag], [entityByte msgCont], [entityByte romId], [entityByte usrFrom]);
     
     MSMessage *mMsg = [MSMsgUtil DecodeDictToMessageWithDict:[MSMsgUtil NSStringToJSONWithString:[entityByte msgCont]]];
-    NSDate *dateNow = [NSDate dateWithTimeIntervalSince1970:[entityByte msgTime]];
     [mMsg setMillSec:[entityByte msgTime]];
     [mMsg setMsgId:[entityByte cmsgId]];
-    NSLog(@"MsgClient::OnRecvGroupMsg dateNow:%@, msg_time:%u"\
-          , dateNow, [entityByte msgTime]);
     
     switch ([entityByte msgType])
     {
@@ -620,7 +602,6 @@ void MsgClient::OnNotifyOtherLogin(int code)
 
 void MsgClient::OnMsgServerConnected()
 {
-    std::cout << "MsgClient::OnMsgServerConnected was called, fetchallseqn once" << std::endl;
     FetchAllSeqns();
     [m_clientDelegate OnMsgServerConnected];
     [m_clientDelegate OnMsgClientInitializing];

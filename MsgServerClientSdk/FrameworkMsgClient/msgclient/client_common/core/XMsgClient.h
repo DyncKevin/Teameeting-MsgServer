@@ -115,11 +115,6 @@ public:
 
     void InitUserSeqns(const std::string& seqnid, int64 seqn)
     {
-#if WEBRTC_ANDROID
-        LOGI("InitUserSeqns seqnid:%s, seqn:%lld\n", seqnid.c_str(), seqn);
-#else
-        LOG(INFO) << "InitUserSeqns seqnid:" << seqnid << ", seqn:" << seqn;
-#endif
         if (seqnid.compare(m_uid)==0)
         {
             m_uUserSeqnMap.insert(make_pair(seqnid, seqn));
@@ -130,11 +125,6 @@ public:
 
     void UpdateUserSeqns(const std::string& seqnid, int64 seqn)
     {
-#if WEBRTC_ANDROID
-        LOGI("UpdateUserSeqns seqnid:%s, seqn:%lld\n", seqnid.c_str(), seqn);
-#else
-        LOG(INFO) << "UpdateUserSeqns seqnid:" << seqnid << ", seqn:" << seqn;
-#endif
          if (seqnid.compare(m_uid)==0)
          {
             m_uUserSeqnMap[seqnid] = seqn;
@@ -230,11 +220,6 @@ private:
     bool UUpdateUserSeqn()
     {
         UserSeqnMapIt  itCurSeqn = m_uUserSeqnMap.find(m_uid);
-#if WEBRTC_ANDROID
-        LOGI("UUpdateUserSeqn get here, itCurSeqn is:%lld\n", itCurSeqn->second);
-#else
-        LOG(INFO) << "UUpdateUserSeqn get here, itCurSeqn is:" << itCurSeqn->second;
-#endif
         if (itCurSeqn->second<0)
         {
 #if WEBRTC_ANDROID
@@ -246,11 +231,6 @@ private:
         }
         while(1)
         {
-#if WEBRTC_ANDROID
-            LOGI("UUpdateUserSeqn m_uSyncedMsgMap.size:%u\n", m_uSyncedMsgMap.size());
-#else
-            LOG(INFO) << "UUpdateUserSeqn m_uSyncedMsgMap.size:" << m_uSyncedMsgMap.size();
-#endif
             if (m_uSyncedMsgMap.size()==0) break;
             char sk[256] = {0};
             sprintf(sk, "%s:%lld", m_uid.c_str(), itCurSeqn->second +1);
@@ -270,28 +250,13 @@ private:
                 }
                 // find curSeqn+1 msg, update curSeqn, and callback this msg, and continue
                 itCurSeqn->second += 1;
-#if WEBRTC_ANDROID
-                LOGI("UUpdateUserSeqn update here, itCurSeqn is:%lld\n", itCurSeqn->second);
-#else
-                LOG(INFO) << "UUpdateUserSeqn update here, itCurSeqn is:" << itCurSeqn->second;
-#endif
                 if (m_uid.compare(en.usr_from())==0)
                 {
                     // recv the msg you send to other
                     // erase the msg in Wait4AckMsgMap by entity.cmsg_id
                     m_uWait4AckMsgMap.erase(en.cmsg_id());
-#if WEBRTC_ANDROID
-                    LOGI("UUpdateUserSeqn update the msg you send to other, msgid is:%s\n", en.cmsg_id().c_str());
-#else
-                    LOG(INFO) << "UUpdateUserSeqn update the msg you send to other, msgid is:" << en.cmsg_id();
-#endif
                 } else {
                     // recv the msg other send to you
-#if WEBRTC_ANDROID
-                    LOGI("UUpdateUserSeqn update the msg other send to you, seqnkey is:%s\n", sk);
-#else
-                    LOG(INFO) << "UUpdateUserSeqn update the msg other send ot you, seqnkey is:" << sk;
-#endif
                 }
                 CachedMsgInfo cmi;
                 cmi.seqn = itCurSeqn->second;
@@ -301,11 +266,6 @@ private:
                 m_uSyncedMsgMap.erase(sk);
                 continue;
             } else {
-#if WEBRTC_ANDROID
-                LOGI("UUpdateUserSeqn break here, itCurSeqn is:%lld\n", itCurSeqn->second);
-#else
-                LOG(INFO) << "UUpdateUserSeqn break here, itCurSeqn is:" << itCurSeqn->second;
-#endif
                 UserSeqnMapIt uit = m_MaxSeqnMap.find(m_uid);
                 if (uit==m_MaxSeqnMap.end()) {
                     break;
@@ -318,22 +278,12 @@ private:
                     }
                     break;
                 } else { // int waitCheckMap find sk
-#if WEBRTC_ANDROID
-                LOGI("UUpdateUserSeqn find sk:%s, sk time:%d\n", sk, skit->second);
-#else
-                LOG(INFO) << "UUpdateUserSeqn find sk:" << sk << ", sk time:" << skit->second;
-#endif
                     if (skit->second > 5) { // has try sync data 5 times
                         // if curseqn < maxseqn, drop current seqn sync, itCurSeqn->second += 1;
                         // sync the next one
                         // if curseqn equal maxseqn, just drop current seqn sync
                         // do not make itCurSeqn + 1
                         if (itCurSeqn->second < uit->second) {
-#if WEBRTC_ANDROID
-                            LOGI("------------------UUpdateUserSeqn update curseqn :%lld\n", itCurSeqn->second);
-#else
-                            LOG(INFO) << "-----------------UUpdateUserSeqn update curseqn :" << itCurSeqn->second;
-#endif
                             itCurSeqn->second += 1;
                         }
                         {
@@ -373,11 +323,6 @@ private:
         SyncedMsgMapIt it = m_gSyncedMsgMap.find(seqnKey);
         if (it == m_gSyncedMsgMap.end())
         {
-#if WEBRTC_ANDROID
-            LOGI("GAddSyncedMsg seqnKey:%s insert into map\n", seqnKey.c_str());
-#else
-            LOG(INFO) << "GAddSyncedMsg seqnKey:" << seqnKey << " insert into map";
-#endif
             m_gSyncedMsgMap.insert(make_pair(seqnKey, pmsMsg));
         }
         return true;
@@ -387,11 +332,6 @@ private:
     {
         // storeid here should be one groupid
         UserSeqnMapIt  itCurSeqn = m_gUserSeqnMap.find(storeid);
-#if WEBRTC_ANDROID
-        LOGI("GUpdateUserSeqn get here, itCurSeqn is:%lld, storeid:%s, storeid.len:%u\n", itCurSeqn->second, storeid.c_str(), storeid.length());
-#else
-        LOG(INFO) << "GUpdateUserSeqn get here, itCurSeqn is:" << itCurSeqn->second << ", storeid:" << storeid << ", storeid.len:" << storeid.length();
-#endif
         if (itCurSeqn->second<0)
         {
 #if WEBRTC_ANDROID
@@ -403,20 +343,7 @@ private:
         }
         while(1)
         {
-#if WEBRTC_ANDROID
-            LOGI("GUpdateUserSeqn m_gSyncedMsgMap.size:%u\n", m_gSyncedMsgMap.size());
-#else
-            LOG(INFO) << "GUpdateUserSeqn m_gSyncedMsgMap.size:" << m_gSyncedMsgMap.size();
-#endif
             if (m_gSyncedMsgMap.size()==0) break;
-            for (auto &it : m_gSyncedMsgMap)
-            {
-#if WEBRTC_ANDROID
-                LOGI("GUpdateUserSeqn SyncedMsgMap key:%s\n", it.first.c_str());
-#else
-                LOG(INFO) << "GUpdateUserSeqn SyncedMsgMap key:" << it.first;
-#endif
-            }
             char sk[256] = {0};
             sprintf(sk, "%s:%lld", storeid.c_str(), itCurSeqn->second +1);
             SyncedMsgMapIt it = m_gSyncedMsgMap.find(sk);
@@ -448,11 +375,6 @@ private:
                     m_gSyncedMsgMap.erase(sk);
                     continue;
                 }
-#if WEBRTC_ANDROID
-                LOGI("GUpdateUserSeqn update here, itCurSeqn is:%lld, ruserid:%s, fromid:%s, it.groupid:%s, en.romid:%s\n", itCurSeqn->second, it->second.ruserid().c_str(), en.usr_from().c_str(), it->second.groupid().c_str(), en.rom_id().c_str());
-#else
-                LOG(INFO) << "GUpdateUserSeqn update here, itCurSeqn:" << itCurSeqn->second << ", ruserid:" << it->second.ruserid() << ", fromid:" << en.usr_from() << ", it.groupid:" << it->second.groupid() << ", en.romid:" << en.rom_id();
-#endif
                 if(it->second.groupid().compare(en.rom_id())!=0)
                 {
 #if WEBRTC_ANDROID
@@ -468,18 +390,8 @@ private:
                     // recv the msg you send to other
                     // erase the msg in Wait4AckMsgMap by entity.cmsg_id
                     m_gWait4AckMsgMap.erase(en.cmsg_id());
-#if WEBRTC_ANDROID
-                    LOGI("GUpdateUserSeqn update the msg you send to other, msgid is:%s\n", en.cmsg_id().c_str());
-#else
-                    LOG(INFO) << "GUpdateUserSeqn update the msg you send to other, msgid is:" << en.cmsg_id();
-#endif
                 } else {
                     // recv the msg other send to you
-#if WEBRTC_ANDROID
-                    LOGI("GUpdateUserSeqn update the msg other send to you, seqnkey is:%s\n", sk);
-#else
-                    LOG(INFO) << "GUpdateUserSeqn update the msg other send to you, sendkey is:" << sk;
-#endif
                 }
                 CachedMsgInfo cmi;
                 cmi.seqn = itCurSeqn->second;
@@ -490,11 +402,6 @@ private:
                 
                 continue;
             } else {
-#if WEBRTC_ANDROID
-                LOGI("GUpdateUserSeqn break here, itCurSeqn is:%lld\n", itCurSeqn->second);
-#else
-                LOG(INFO) << "GUpdateUserSeqn break here, itCurSeqn is:" << itCurSeqn->second;
-#endif
                 UserSeqnMapIt uit = m_MaxSeqnMap.find(storeid);
                 if (uit==m_MaxSeqnMap.end()) {
                     break;
@@ -507,22 +414,12 @@ private:
                     }
                     break;
                 } else { // find sk
-#if WEBRTC_ANDROID
-                    LOGI("GUpdateUserSeqn find sk:%s, sk time:%d\n", sk, skit->second);
-#else
-                    LOG(INFO) << "GUpdateUserSeqn find sk:" << sk << ", sk time:" << skit->second;
-#endif
                     if (skit->second > 5) { // has try sync data 5 times
                         // if curseqn < maxseqn, drop current seqn sync, itCurSeqn->second += 1;
                         // sync the next one
                         // if curseqn equal maxseqn, just drop current seqn sync
                         // do not make itCurSeqn + 1
                         if (itCurSeqn->second < uit->second) {
-#if WEBRTC_ANDROID
-                            LOGI("------------------GUpdateUserSeqn update curseqn :%lld\n", itCurSeqn->second);
-#else
-                            LOG(INFO) << "-----------------GUpdateUserSeqn update curseqn :" << itCurSeqn->second;
-#endif
                             itCurSeqn->second += 1;
                         }
                         m_gSyncedMsgMap.erase(sk);

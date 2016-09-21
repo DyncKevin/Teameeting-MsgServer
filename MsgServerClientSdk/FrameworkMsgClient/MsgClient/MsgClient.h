@@ -83,7 +83,6 @@ public:
         NSString *jsonStr = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
         
         UpdateSetting(setType, [jsonStr cStringUsingEncoding:NSASCIIStringEncoding]);
-        NSLog(@"UpdateSetting token jsonStr is:%@", jsonStr);
     }
     void MCSetNickName(const std::string& nickname) {
         m_nsNname = [NSString stringWithCString:nickname.c_str() encoding:NSUTF8StringEncoding];
@@ -108,7 +107,6 @@ public:
         
         SetEnablePush(push);
         UpdateSetting(setType, [jsonStr cStringUsingEncoding:NSASCIIStringEncoding]);
-        NSLog(@"UpdateSetting push jsonStr is:%@", jsonStr);
     }
     
     void MCMuteNotify(int mute) {
@@ -125,7 +123,6 @@ public:
         
         SetMuteNotify(mute);
         UpdateSetting(setType, [jsonStr cStringUsingEncoding:NSASCIIStringEncoding]);
-        NSLog(@"UpdateSetting mute jsonStr is:%@", jsonStr);
     }
     
     NSString* MCGetNsUserId() { return m_nsUserId; }
@@ -230,7 +227,6 @@ private:
     
     void UpdateGroupInfoToDb(NSString* nsSeqnId, NSNumber* nsSeqn, NSNumber* nsIsFetched)
     {
-        NSLog(@"UpdateGroupInfoToDb nsSeqnId:%@, nsSeqn:%lld, nsIsFetched:%d", nsSeqnId, [nsSeqn longLongValue], [nsIsFetched intValue]);
         // update NSMutableArray
         for (int i=0;i < [m_nsGroupInfo count];i++)
         {
@@ -270,9 +266,7 @@ private:
             for (NSMutableDictionary *item in arr) {
                 NSString *seqnId = [item objectForKey:@"seqnId"];
                 NSNumber *seqn = [item objectForKey:@"seqn"];
-                NSNumber *isfetched = [item objectForKey:@"isfetched"];
-                NSLog(@"get group info seqnid:%@, seqn:%lld, isfetch:%d", seqnId, [seqn longLongValue], [isfetched intValue]);
-                //assert([isfetched intValue]);
+                //NSNumber *isfetched = [item objectForKey:@"isfetched"];
                 m_groupSeqn.insert(make_pair([seqnId cStringUsingEncoding:NSUTF8StringEncoding], [seqn longLongValue]));
                 [m_nsGroupInfo addObject:item];
             }
@@ -281,13 +275,10 @@ private:
     
     void PutLocalSeqnsToDb()
     {
-        NSLog(@"PutLocalSeqnsToDb was called");
         if (m_sqlite3Manager)
         {
-            NSLog(@"updateGroupSeqnUserId will be call...");
             for (auto &item : m_groupSeqn)
             {
-                NSLog(@"updateGroupSeqnGrpId will be call...");
                 [m_sqlite3Manager updateGroupSeqnUserId:m_nsUserId GrpId:[NSString stringWithUTF8String:item.first.c_str()] seqn:[NSNumber numberWithLongLong:item.second]];
             }
         }
@@ -299,11 +290,9 @@ private:
         GroupSeqnMapIt it = m_groupSeqn.find(seqnId);
         if (it != m_groupSeqn.end())
         {
-            printf("UpdateLocalSeqn call., find seqnid:%s, seqn:%lld, befreo seqn:%lld\n", seqnId.c_str(), seqn, it->second);
             if (seqn > it->second)
                 it->second = seqn;
         } else {
-            printf("UpdateLocalSeqn call., not find seqnid:%s, seqn:%lld so insert\n", seqnId.c_str(), seqn);
             m_groupSeqn.insert(make_pair(seqnId, seqn));
         }
         [m_recurLock unlock];
@@ -332,10 +321,8 @@ private:
             GroupSeqnMapIt it = m_groupSeqn.find(seqnId);
             if (it != m_groupSeqn.end())
             {
-                printf("UpdateLocalSeqn call., find seqnid:%s, seqn:%lld\n", seqnId.c_str(), it->second);
                 lseqn = it->second;
             } else {
-                printf("UpdateLocalSeqn call., not find seqnid:%s\n", seqnId.c_str());
             }
             [m_recurLock unlock];    
         }
@@ -346,7 +333,6 @@ private:
     {
         for (auto &item : m_groupSeqn)
         {
-            NSLog(@"SyncSeqnFromDb2Core will call InitUserSeqns...");
             InitUserSeqns(item.first, item.second);
         }
     }
@@ -355,7 +341,6 @@ private:
     {
         for (auto &item : m_groupSeqn)
         {
-            NSLog(@"UpdateSeqnFromDb2Core will call UpdateUserSeqns...");
             UpdateUserSeqns(item.first, item.second);
         }
     }

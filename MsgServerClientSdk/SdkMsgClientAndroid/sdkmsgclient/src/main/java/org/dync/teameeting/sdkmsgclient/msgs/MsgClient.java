@@ -233,10 +233,8 @@ public class MsgClient implements JMClientHelper{
 
     public int MCSyncMsg() {
         if (mIsFetched) {
-            System.out.println("MCSyncMsg sync all seqn");
             this.SyncAllSeqns();
         } else {
-            System.out.println("MCSyncMsg should be fetched before called");
             this.FetchAllSeqns();
         }
         return 0;
@@ -410,7 +408,6 @@ public class MsgClient implements JMClientHelper{
         if (null != jobj && null != mMApp) {
             mMApp.EnablePush(push);
             mMApp.UpdateSetting(setType, jobj.toString());
-            System.out.println("UpdateSetting push jsonStr is:"+jobj.toString());
         }
     }
 
@@ -427,7 +424,6 @@ public class MsgClient implements JMClientHelper{
         if (null != jobj && null != mMApp) {
             mMApp.MuteNotify(mute);
             mMApp.UpdateSetting(setType, jobj.toString());
-            System.out.println("UpdateSetting mute jsonStr is:"+jobj.toString());
         }
     }
 
@@ -450,7 +446,6 @@ public class MsgClient implements JMClientHelper{
         for (GroupInfo it : mGroupInfo) {
             String seqnId = it.getmSeqnId();
             int isfetched = it.getmIsFetched();
-            System.out.println("IsFetchedAll seqnid:"+seqnId+", isfetched:"+isfetched);
             if (isfetched==0) {
                 yes = false;
                 break;
@@ -465,7 +460,6 @@ public class MsgClient implements JMClientHelper{
         for (GroupInfo it : mGroupInfo) {
             String seqnId = it.getmSeqnId();
             int isfetched = it.getmIsFetched();
-            System.out.println("IsFetchedAll seqnid:"+seqnId+", isfetched:"+isfetched);
             if (isfetched==0) {
                 if (seqnId.compareTo(mStrUserId)==0) {
                     mMApp.FetchSeqn();
@@ -480,7 +474,6 @@ public class MsgClient implements JMClientHelper{
         for (GroupInfo it : mGroupInfo) {
             String seqnId = it.getmSeqnId();
             long seqn = it.getmSeqn();
-            System.out.println("IsFetchedAll seqnid:" + seqnId + ", seqn:" + seqn);
                 if (seqnId.compareTo(mStrUserId)==0) {
                     if (null != mMApp)
                         mMApp.SyncSeqn(seqn, CommonMsg.EMsgRole.RSENDER_VALUE);
@@ -500,7 +493,6 @@ public class MsgClient implements JMClientHelper{
     }
 
     private void UpdateGroupInfoToDb(String strSeqnId, long seqn, int isFetched) {
-        System.out.println("UpdateGroupInfoToDb seqn:"+strSeqnId+", isfetched:"+isFetched+", seqn:"+seqn);
         // update NSMutableArray
         for (int i=0;i<mGroupInfo.size();i++) {
             GroupInfo it = mGroupInfo.get(i);
@@ -529,7 +521,6 @@ public class MsgClient implements JMClientHelper{
                 String seqnId = in.getmSeqnId();
                 long   seqn = in.getmSeqn();
                 int    isfetched = in.getmIsFetched();
-                System.out.println("get group info seqnid:"+seqnId+", isfetched:"+isfetched+", seqn:"+seqn);
                 mGroupSeqn.put(seqnId, seqn);
                 mGroupInfo.add(in);
             }
@@ -537,9 +528,7 @@ public class MsgClient implements JMClientHelper{
     }
 
     private void PutLocalSeqnsToDb() {
-        System.out.println("PubLocalSeqnsToDb was called");
         if (mSqlite3Manager!=null) {
-            System.out.println("UpdateUserSeqn will be called...");
             for (String k  : mGroupSeqn.keySet())
             {
                 mSqlite3Manager.UpdateGroupSeqn(mStrUserId, k, mGroupSeqn.get(k));
@@ -579,7 +568,6 @@ public class MsgClient implements JMClientHelper{
     {
         for (String k  : mGroupSeqn.keySet())
         {
-            System.out.println("SyncSeqnFromDb2Core will call InitUserSeqns...");
             mMApp.InitUserSeqns(k, mGroupSeqn.get(k));
         }
     }
@@ -588,7 +576,6 @@ public class MsgClient implements JMClientHelper{
     {
         for (String k  : mGroupSeqn.keySet())
         {
-            System.out.println("UpdateSeqnFromDb2Core will call UpdateUserSeqns...");
             mMApp.UpdateUserSeqns(k, mGroupSeqn.get(k));
         }
     }
@@ -600,7 +587,6 @@ public class MsgClient implements JMClientHelper{
 
     @Override
     public void OnSndMsg(int code, String msgid) {
-        System.out.println("MsgClient::OnSndMsg msgid:"+msgid+", code:"+code);
         if (null != mSubMsgDelegate) {
             mSubMsgDelegate.OnSendMessage(msgid, code);
         }
@@ -608,7 +594,6 @@ public class MsgClient implements JMClientHelper{
 
     @Override
     public void OnCmdCallback(int code, int cmd, String groupid, JMSCbData data) {
-        System.out.println("MsgClient::OnCmdCallback cmd:"+cmd+", groupid.length:"+groupid.length()+", result:"+data.type+", data.result:" + data.result + ", seqn:"+data.seqn+", data.data is:"+data.data);
         EnumMsgClient.EMSCmd ecmd = EnumMsgClient.EMSCmd.forNumber(cmd);
         switch (ecmd)
         {
@@ -616,7 +601,6 @@ public class MsgClient implements JMClientHelper{
             {
                 if (code == 0)
                 {
-                    System.out.println("OnCmdCallback add group ok, insert groupid and seqn, toggle callback");
                     if (null != mSqlite3Manager && null != mGroupDelegate) {
                         if (false == mSqlite3Manager.IsGroupExistsInDb(mStrUserId, groupid)) {
                             mSqlite3Manager.AddGroup(mStrUserId, groupid);
@@ -640,7 +624,6 @@ public class MsgClient implements JMClientHelper{
             {
                 if (code == 0)
                 {
-                    System.out.println("OnCmdCallback del group ok, del groupid and seqn, toggle callback");
                     if (null != mSqlite3Manager && null != mGroupDelegate) {
                         mSqlite3Manager.DelGroup(mStrUserId, groupid);
                         RemoveLocalSeqn(groupid);
@@ -691,7 +674,6 @@ public class MsgClient implements JMClientHelper{
 
     @Override
     public void OnRecvMsg(long seqn, byte[] msg) {
-        System.out.println("MsgClient::OnRecvMsg was called, seqn:" + seqn + ",msg.length:" + msg.length);
         UpdateLocalSeqn(mStrUserId, seqn);
         UpdateSeqnToDb(mStrUserId, seqn);
 
@@ -709,7 +691,6 @@ public class MsgClient implements JMClientHelper{
             System.out.println("MsgClient::OnRecvMsg recv the msg you just send!!!, so return\n");
             return;
         }
-        System.out.println("OnRecvMsg EntityMsg.Entity msg tag:" + ee.getMsgTag() + ", cont:" + ee.getMsgCont() + ", romid:" + ee.getRomId() + ", usr_from:" + ee.getUsrFrom() + ", msgtype:" + ee.getMsgType());
         MSMessage mMsg = MsMsgUtil.DecodeJsonToMessage(ee.getMsgCont());
         if (null == mMsg) {
             System.err.println("OnRecvMsg Decode Json To Message msg is null, error return");
@@ -787,7 +768,6 @@ public class MsgClient implements JMClientHelper{
 
     @Override
     public void OnRecvGroupMsg(long seqn, String seqnid, byte[] msg) {
-        System.out.println("MsgClient::OnRecvGroupMsg was called seqn:" + seqn + ", seqnid:" + seqnid + ", msg.length:" + msg.length);
         UpdateLocalSeqn(seqnid, seqn);
         UpdateSeqnToDb(seqnid, seqn);
 
@@ -805,7 +785,6 @@ public class MsgClient implements JMClientHelper{
             System.out.println("MsgClient::OnRecvMsg recv the msg you just send!!!, so return\n");
             return;
         }
-        System.out.println("EntityMsg.Entity msg tag:" + ee.getMsgTag() + ", cont:" + ee.getMsgCont() + ", romid:" + ee.getRomId() + ", usr_from:" + ee.getUsrFrom() + ", msgtype:" + ee.getMsgType());
         MSMessage mMsg = MsMsgUtil.DecodeJsonToMessage(ee.getMsgCont());
         if (null == mMsg) {
             System.err.println("OnRecvGroupMsg Decode Json To Message msg is null, error return");
@@ -927,7 +906,6 @@ public class MsgClient implements JMClientHelper{
 
     @Override
     public void OnMsgServerConnected() {
-        System.out.println("OnMsgServerConnected was called, fetchallseqn once");
         FetchAllSeqns();
         if (null != mClientDelegate) {
             mClientDelegate.OnMsgServerConnected();
@@ -958,7 +936,6 @@ public class MsgClient implements JMClientHelper{
 
     @Override
     public void OnMsgServerConnecting() {
-        System.out.println("OnMsgServerConnecting was called");
         if (null != mClientDelegate) {
             mClientDelegate.OnMsgServerConnecting();
         }
@@ -966,7 +943,6 @@ public class MsgClient implements JMClientHelper{
 
     @Override
     public void OnMsgServerDisconnect() {
-        System.out.println("OnMsgServerDisconnect was called");
         if (null != mClientDelegate) {
             mClientDelegate.OnMsgServerDisconnect();
         }
@@ -974,7 +950,6 @@ public class MsgClient implements JMClientHelper{
 
     @Override
     public void OnMsgServerConnectionFailure() {
-        System.out.println("OnMsgServerConnectionFailer was called");
         if (null != mClientDelegate) {
             mClientDelegate.OnMsgServerConnectionFailure();
         }

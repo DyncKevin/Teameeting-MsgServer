@@ -38,7 +38,6 @@ static std::string GetStrMicroSecond()
     gettimeofday(&tv, NULL);
     long long micro = (long long)tv.tv_sec + (long long)tv.tv_usec/1000;
     sprintf(ct, "%lld", micro);
-    printf("gettime ct:%s\n", ct);
     return std::string(ct);
 }
 
@@ -86,11 +85,9 @@ int XMsgProcesser::EncodeSndMsg(std::string& outstr, std::string& outmsgid, cons
     entity.set_cmsg_id(GetStrMicroSecond());
     outmsgid = entity.cmsg_id();
 
-    printf("XMsgProcesser::EncodeSndMsg to.size:%u\n", to.size());
     if (to.size()>0) {
         pms::ToUser *touser = entity.mutable_usr_toto();
         for(int i=0;i<(int)to.size();++i) {
-            printf("XMsgProcesser::EncodeSndMsg to.name:%s\n", to.at(i).c_str());
             touser->add_users(to.at(i));
         }
     }
@@ -98,7 +95,6 @@ int XMsgProcesser::EncodeSndMsg(std::string& outstr, std::string& outmsgid, cons
     req.set_mod_type((pms::EModuleType)module);
     req.set_content(entity.SerializeAsString());
     outstr = req.SerializeAsString();
-    //printf("XMsgProcesser::EncodeSndMsg usr_toto.size:%d\n", entity.usr_toto().users_size());
 #else
 #endif
     return 0;
@@ -374,11 +370,6 @@ int XMsgProcesser::DecodeRecvData(const char* pData, int nLen)
         LOG(LS_ERROR) << "RecvData resp.ParseFromString error!";
         return -1;
     }
-#if WEBRTC_ANDROID
-    LOGI("XMsgProcesser::DecodeRecvData resp.svr_cmds:%d!!\n", resp.svr_cmds());
-#else
-    LOG(INFO) << "XMsgProcesser::DecodeRecvData resp.svr_cmds:" << resp.svr_cmds() << " ok!!";
-#endif
     switch (resp.svr_cmds()) {
         case pms::EServerCmd::CLOGIN:
             DecodeLogin(resp.rsp_code(), resp.rsp_cont());
