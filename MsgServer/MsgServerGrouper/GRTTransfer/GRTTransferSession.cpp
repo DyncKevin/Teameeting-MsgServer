@@ -192,7 +192,6 @@ int GRTTransferSession::CreateGroupSeqn(const std::string& cltUserid, const std:
         return -1;
     }
 
-    LI("GRTTransferSession CreateGroupSeqn ok!!\n");
     SendTransferData(outstr);
     return 0;
 }
@@ -209,7 +208,6 @@ int GRTTransferSession::DeleteGroupSeqn(const std::string& cltUserid, const std:
         return -1;
     }
 
-    LI("GRTTransferSession DeleteGroupSeqn ok!!\n");
     SendTransferData(outstr);
     return 0;
 }
@@ -226,7 +224,6 @@ int GRTTransferSession::GenGrpSyncSeqnNotify(const std::string& userid, const st
         return -1;
     }
 
-    LI("GRTTransferSession GenGrpSyncSeqnNotify ok!!\n");
     SendTransferData(outstr);
     return 0;
 }
@@ -244,7 +241,6 @@ int GRTTransferSession::GenGrpSyncSeqnNotifys(const std::vector<std::string>& us
         return -1;
     }
 
-    LI("GRTTransferSession GenGrpSyncSeqnNotifys ok!!\n");
     SendTransferData(outstr);
     return 0;
 }
@@ -262,7 +258,6 @@ int GRTTransferSession::GenGrpSyncDataNotify(const std::string& userid, const st
         return -1;
     }
 
-    LI("GRTTransferSession GenGrpSyncDataNotify ok!!\n");
     SendTransferData(outstr);
     return 0;
 }
@@ -280,7 +275,6 @@ int GRTTransferSession::GenGrpSyncDataNotifys(const std::vector<std::string>& us
         return -1;
     }
 
-    LI("GRTTransferSession GenGrpSyncDataNotifys ok!!\n");
     SendTransferData(outstr);
     return 0;
 }
@@ -339,7 +333,6 @@ void GRTTransferSession::OnTypeConn(const std::string& str)
         LE("OnTypeConn c_msg ParseFromString error\n");
         return;
     }
-    LI("OnTypeConn connmsg--->:\n");
 
     if ((c_msg.conn_tag() == pms::EConnTag::THI)) {
         // when other connect to ME:
@@ -436,7 +429,6 @@ void GRTTransferSession::OnTypeConn(const std::string& str)
 
 void GRTTransferSession::OnTypeTrans(const std::string& str)
 {
-    LI("%s was called, str:%s\n", __FUNCTION__, str.c_str());
     GRTGrouperManager::Instance().RecvRequestCounter();
     if (m_pGrpMsgProcesser) {
         m_pGrpMsgProcesser->DecodeRecvData(str.c_str(), str.length());
@@ -475,15 +467,7 @@ void GRTTransferSession::OnGroupNotify(int code, const std::string& cont)
 {
     pms::StorageMsg store;
     if (!store.ParseFromString(cont)) return;
-    LI("GRTTransferSession::OnGroupNotify ruserid:%s, groupid:%s, mflag:%d, rsvrcmd:%d, push:%s, mtype:%s, store.sequence:%lld, store.version:%s\n\n"\
-            , store.ruserid().c_str()\
-            , store.groupid().c_str()\
-            , store.mflag()\
-            , store.rsvrcmd()\
-            , store.ispush().c_str()\
-            , store.mtype().c_str()\
-            , store.sequence()\
-            , store.version().c_str());
+
     if (store.groupid().compare("wocaowocaowocao")==0)
     {
         std::string u1("8ca64d158a505876");
@@ -508,7 +492,6 @@ void GRTTransferSession::OnGroupNotify(int code, const std::string& cont)
     for(auto & l : *puset)
     {
         //group22222
-        LI("GRTTransferSession::OnGroupNotify userid:%s, groupid:%s, seqn:%lld\n", l.c_str(), store.groupid().c_str(), store.sequence());
         GenGrpSyncSeqnNotify(l, store.groupid(), store.mtype(), store.ispush(), store.version(), store.sequence());
     }
 
@@ -519,8 +502,6 @@ void GRTTransferSession::OnCreateGroupSeqn(int code, const std::string& cont)
 {
     pms::StorageMsg store;
     if (!store.ParseFromString(cont)) return;
-    LI("GRTTransferSession::OnCreateGroupSeqn =====>code:%d, cont.length:%lu, store.result:%d\n\n"\
-            , code, cont.length(), store.result());
     return;
 }
 
@@ -528,8 +509,6 @@ void GRTTransferSession::OnDeleteGroupSeqn(int code, const std::string& cont)
 {
     pms::StorageMsg store;
     if (!store.ParseFromString(cont)) return;
-    LI("GRTTransferSession::OnDeleteGroupSeqn =====>code:%d, cont.length:%lu, store.result:%d\n\n"\
-            , code, cont.length(), store.result());
     return;
 }
 

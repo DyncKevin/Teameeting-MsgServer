@@ -86,7 +86,6 @@ void SRTSequenceRedis::OnPostEvent(const char*pData, int nSize)
             std::string str("");
             char key[512] = {'\0'};
             sprintf(key, "grp:%s", request.storeid().c_str());
-            LI("SRTSequenceRedis::OnPostEvent msgid:%s, key:%s\n", request.msgid().c_str(), key);
             switch (request.tsvrcmd())
             {
                 case pms::EServerCmd::CSYNCSEQN:
@@ -99,12 +98,10 @@ void SRTSequenceRedis::OnPostEvent(const char*pData, int nSize)
                             if (m_xRedisClient.get(*m_RedisDBIdx, key, str))
                             {
                                 seq = std::stoll(str);
-                                LI("SRTSequenceRedis::OnPostEvent g read seqn:%s, seq:%lld\n", str.c_str(), seq);
                                 request.set_result(Err_Redis_Ok);
                                 ReadResponse(request, seq);
                             } else {
-                                LI("SRTSequenceRedis::OnPostEvent g read seqn: get error, key:%s\n", key);
-                                assert(false);
+                                LE("SRTSequenceRedis::OnPostEvent g read seqn: get error, key:%s\n", key);
                             }
                         } else {
 #if 0
@@ -138,7 +135,6 @@ void SRTSequenceRedis::OnPostEvent(const char*pData, int nSize)
             std::string str("");
             char key[512] = {'\0'};
             sprintf(key, "sgl:%s", request.storeid().c_str());
-            LI("SRTSequenceRedis::OnPostEvent msgid:%s, key:%s\n", request.msgid().c_str(), key);
             switch (request.tsvrcmd())
             {
                 case pms::EServerCmd::CSYNCSEQN:
@@ -151,18 +147,15 @@ void SRTSequenceRedis::OnPostEvent(const char*pData, int nSize)
                             if (m_xRedisClient.get(*m_RedisDBIdx, key, str))
                             {
                                 seq = std::stoll(str);
-                                LI("SRTSequenceRedis::OnPostEvent s read seqn:%s, seq:%lld\n", str.c_str(), seq);
                                 request.set_result(Err_Redis_Ok);
                                 ReadResponse(request, seq);
                             } else {
-                                LI("SRTSequenceRedis::OnPostEvent s read seqn: get error, key:%s\n", key);
-                                assert(false);
+                                LE("SRTSequenceRedis::OnPostEvent s read seqn: get error, key:%s\n", key);
                             }
                         } else {
                             m_RedisDBIdx->CreateDBIndex(key, APHash, CACHE_TYPE_1);
                             m_xRedisClient.set(*m_RedisDBIdx, key, "0");
                             request.set_result(Err_Redis_Ok);
-                            LI("SRTSequenceRedis::OnPostEvent s read seqn key not exists, so set 0\n", key);
                             ReadResponse(request, 0);
                         }
                     }
@@ -187,10 +180,9 @@ void SRTSequenceRedis::OnPostEvent(const char*pData, int nSize)
 // push for write
 void SRTSequenceRedis::OnPushEvent(const char*pData, int nSize)
 {
-    LI("SRTSequenceRedis::OnPushEvent was called\n");
     if (!pData || nSize<=0)
     {
-        LI("SRTSequenceRedis::OnPushEvent pData is null or nSize:%d", nSize);
+        LE("SRTSequenceRedis::OnPushEvent pData is null or nSize:%d", nSize);
         return;
     }
     std::string str(pData, nSize);
@@ -201,7 +193,6 @@ void SRTSequenceRedis::OnPushEvent(const char*pData, int nSize)
         {
             char key[512] = {'\0'};
             sprintf(key, "grp:%s", request.storeid().c_str());
-            LI("SRTSequenceRedis::OnPushEvent msgid:%s, key:%s\n", request.msgid().c_str(), key);
             switch (request.tsvrcmd())
             {
                 case pms::EServerCmd::CNEWMSGSEQN:
@@ -224,7 +215,6 @@ void SRTSequenceRedis::OnPushEvent(const char*pData, int nSize)
                         int64_t seq = 0;
                         m_RedisDBIdx->CreateDBIndex(key, APHash, CACHE_TYPE_1);
                         m_xRedisClient.incr(*m_RedisDBIdx, key, seq);
-                        LI("OnPushEvent group newmsg IncrSeq is:%ld\n", seq);
                         request.set_result(Err_Redis_Ok);
                         WriteResponse(request, seq);
 #endif
@@ -236,11 +226,9 @@ void SRTSequenceRedis::OnPushEvent(const char*pData, int nSize)
                         {
                             m_RedisDBIdx->CreateDBIndex(key, APHash, CACHE_TYPE_1);
                             m_xRedisClient.set(*m_RedisDBIdx, key, "0");
-                            LI("OnPushEvent group createSeq is:%ld\n", 0);
                             request.set_result(Err_Redis_Ok);
                             WriteResponse(request, 0);
                         } else {
-                            LI("SRTSequenceRedis::OnPushEvent group create seqn key is already exists!!!\n");
                             request.set_result(Err_Redis_Key_Exist); // groupid already exists
                             WriteResponse(request, 0);
                         }
@@ -250,7 +238,6 @@ void SRTSequenceRedis::OnPushEvent(const char*pData, int nSize)
                     {
                         m_RedisDBIdx->CreateDBIndex(key, APHash, CACHE_TYPE_1);
                         m_xRedisClient.del(*m_RedisDBIdx, key);
-                        LI("SRTSequenceRedis::OnPushEvent group delete key:%s\n", key);
                         request.set_result(Err_Redis_Ok);
                         WriteResponse(request, 0);
                     }
@@ -271,7 +258,6 @@ void SRTSequenceRedis::OnPushEvent(const char*pData, int nSize)
         {
             char key[512] = {'\0'};
             sprintf(key, "sgl:%s", request.storeid().c_str());
-            LI("SRTSequenceRedis::OnPushEvent msgid:%s, key:%s\n", request.msgid().c_str(), key);
             switch (request.tsvrcmd())
             {
                 case pms::EServerCmd::CNEWMSGSEQN:
@@ -279,7 +265,6 @@ void SRTSequenceRedis::OnPushEvent(const char*pData, int nSize)
                         int64_t seq = 0;
                         m_RedisDBIdx->CreateDBIndex(key, APHash, CACHE_TYPE_1);
                         m_xRedisClient.incr(*m_RedisDBIdx, key, seq);
-                        LI("OnPushEvent single newmsg IncrSeq is:%ld\n", seq);
                         request.set_result(Err_Redis_Ok);
                         WriteResponse(request, seq);
                     }

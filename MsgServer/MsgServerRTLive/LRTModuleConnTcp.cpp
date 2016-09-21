@@ -30,7 +30,6 @@ int LRTModuleConnTcp::DoProcessData(const char* pData, int nLen)
         return nLen;
     }
 
-    LI("LRTModuleConnTcp::DoProcessData request.svr_cmds:%d\n", request.svr_cmds());
     if (request.svr_cmds() == pms::EServerCmd::CGROUPNOTIFY) {
         OnGroupNotify(request.svr_cmds(), request.mod_type(), request.content());
     } else if (request.svr_cmds() == pms::EServerCmd::CPGETDATA) {

@@ -37,7 +37,6 @@ const char* MSMessageManager::SendTxtMsg(MSTxtMessage* txtMsg)
         LI("sendTxtMsg txtMsg is null\n");
         return nullptr;
     }
-    LI("send grpid:%s, content:%s\n", txtMsg->GetGroupId().c_str(), txtMsg->GetContent().c_str());
     if ((0==txtMsg->GetGroupId().length()) || 0==txtMsg->GetContent().length())
     {
         LI("sendTxtMsg params is null\n");

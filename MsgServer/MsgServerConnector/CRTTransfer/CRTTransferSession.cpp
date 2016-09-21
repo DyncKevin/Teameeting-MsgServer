@@ -214,7 +214,6 @@ void CRTTransferSession::OnTypeConn(const std::string& str)
     if (!c_msg.ParseFromString(str)) {
         LE("OnTypeConn c_msg.ParseFromString error\n");
     }
-    LI("OnTypeConn connmsg--->:\n");
     //c_msg.PrintDebugString();
 
     if ((c_msg.conn_tag() == pms::EConnTag::THI)) {
@@ -257,7 +256,6 @@ void CRTTransferSession::OnTypeConn(const std::string& str)
                 //c_msg._moduleid: store other's module id
                 CRTConnManager::Instance().AddTypeModuleSession(c_msg.tr_module(), c_msg.moduleid(), m_transferSessId);
 
-                LI("store the module :%d, id:%s, transfersessid:%s\n", (int)c_msg.tr_module(), c_msg.moduleid().c_str(), c_msg.transferid().c_str());
             } else {
                 LE("new ModuleInfo error!!!\n");
             }
@@ -292,12 +290,8 @@ void CRTTransferSession::OnTypeDispatch(const std::string& str)
     }
     pms::ToUser to = dmsg.touser();
 
-    LI("OnTypeDispatch dmsg--->transfer module:%d, content module:%d\n\n", dmsg.tr_module(), dmsg.cont_module());
     {
         for(int i = 0;i < to.users_size(); ++i) {
-            LI("OnTypeDispatch dmsg--->:to.user:%s\n", to.users(i).c_str());
-            LI("CRTTransferSession::OnTypeDispatch handle_cmd:%s, handle_mtype:%s, handle_data:%s\n", dmsg.handle_cmd().c_str(), dmsg.handle_mtype().c_str(), dmsg.handle_data().c_str());
-            //m_dispatchConnection.DispatchMsg(to.users(i), dmsg.content());
             m_dispatchConnection.DispatchMsg(to.users(i), dmsg);
         }
     }

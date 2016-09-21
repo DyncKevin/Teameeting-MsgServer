@@ -23,11 +23,8 @@ bool MSSqlite3DB::OpenDb(const std::string& dirUserId)
 {
     std::string path("./client_dbs/");
     std::string dir = path.append(dirUserId);
-    if (access(dir.c_str(), NULL)==F_OK)
+    if (access(dir.c_str(), NULL)!=F_OK)
     {
-        LI("MSSqlite3DB::OpenDb dir:%s already exists\n", dir.c_str());
-    } else {
-        LI("MSSqlite3DB::OpenDb dir:%s not exists\n", dir.c_str());
         if (mkdir(dir.c_str(), 0775)==-1)
         {
             LI("MSSqlite3DB::OpenDb mkdir:%s failed\n", dir.c_str());
@@ -117,8 +114,7 @@ bool MSSqlite3DB::InsertSeqn(const std::string& userId, const std::string& seqnI
     std::string sqlInsert = oss.str();
     LI("insertSeqnSeqnId was called, sqlInsert:%s\n", sqlInsert.c_str());
 
-    int code = RunSql(sqlInsert);
-    LI("func:%s code:%d\n", __FUNCTION__, code);
+    RunSql(sqlInsert);
     return true;
 }
 
@@ -130,8 +126,7 @@ bool MSSqlite3DB::UpdateSeqn(const std::string& userId, const std::string& seqnI
     std::string sqlUpdate = oss.str();
     LI("updateSeqnSeqnId was called, sqlUpdate:%s\n", sqlUpdate.c_str());
 
-    int code = RunSql(sqlUpdate);
-    LI("func:%s code:%d\n", __FUNCTION__, code);
+    RunSql(sqlUpdate);
     return true;
 }
 
@@ -143,8 +138,7 @@ bool MSSqlite3DB::UpdateSeqnWithFetched(const std::string& userId, const std::st
     std::string sqlUpdate = oss.str();
     LI("updateSeqnSeqnId with fetched was called, sqlUpdate:%s\n", sqlUpdate.c_str());
 
-    int code = RunSql(sqlUpdate);
-    LI("func:%s code:%d\n", __FUNCTION__, code);
+    RunSql(sqlUpdate);
     return true;
 }
 
@@ -156,13 +150,13 @@ bool MSSqlite3DB::SelectSeqn(const std::string& userId, const std::string& seqnI
     oss << "select seqn from " << name << " where userId='" << userId << "' and seqnId='" << seqnId << "';";
     std::string sqlSelect = oss.str();
     LI("selectSeqnSeqnId was called, sqlSelect:%s\n", sqlSelect.c_str());
+
     int code = 0;
     DbResultVector vec;
     code = RunSqlSelect(sqlSelect, name, 1, vec);
     DbFieldMap map = vec[0];
     ::google::protobuf::int64 st = std::stoll(map.begin()->second);
     *seqn = st;
-    LI("func:%s code:%d\n", __FUNCTION__, code);
     return true;
 }
 
@@ -174,8 +168,7 @@ bool MSSqlite3DB::DeleteSeqn(const std::string& userId, const std::string& seqnI
     std::string sqlDelete = oss.str();
     LI("deleteSeqnSeqnId was called, sqlInsert:%s\n", sqlDelete.c_str());
 
-    int code = RunSql(sqlDelete);
-    LI("func:%s code:%d\n", __FUNCTION__, code);
+    RunSql(sqlDelete);
     return true;
 }
 
@@ -188,8 +181,7 @@ bool MSSqlite3DB::InsertGroupId(const std::string& userId, const std::string& gr
     std::string sqlInsert = oss.str();
     LI("insertGroupIdGrpId was called, sqlInsert:%s\n", sqlInsert.c_str());
 
-    int code = RunSql(sqlInsert);
-    LI("func:%s code:%d\n", __FUNCTION__, code);
+    RunSql(sqlInsert);
     return true;
 }
 
@@ -200,6 +192,7 @@ bool MSSqlite3DB::IsGroupExists(const std::string& userId, const std::string& gr
     oss << "select count(*) from " << name << " where userId='" << userId << "';";
     std::string sqlSelectCount = oss.str();
     LI("isGroupExistsInDb was called, sqlSelectCount:%s\n", sqlSelectCount.c_str());
+
     int code = 0;
     int res = RunSqlSelectCount(sqlSelectCount, MC_MSG_SQL_TABLE_GROUPS_ID, &code);
     return ((res==0)?false:true);
@@ -212,9 +205,8 @@ bool MSSqlite3DB::SelectGroupInfo(const std::string& userId, DbResultVector& inf
     oss << "select * from " << name << " where userId='" << userId << "';";
     std::string sqlSelect = oss.str();
     LI("selectGroupIds was called, sqlSelect:%s\n", sqlSelect.c_str());
-    int code = 0;
-    code = RunSqlSelect(sqlSelect, name, 2, info);
-    LI("func:%s code:%d\n", __FUNCTION__, code);
+
+    RunSqlSelect(sqlSelect, name, 2, info);
     return true;
 }
 
@@ -226,8 +218,7 @@ bool MSSqlite3DB::DeleteGroupId(const std::string& userId, const std::string& gr
     std::string sqlDelete = oss.str();
     LI("deleteGroupIdGrpId was called, sqlDelete:%s\n", sqlDelete.c_str());
 
-    int code = RunSql(sqlDelete);
-    LI("func:%s code:%d\n", __FUNCTION__, code);
+    RunSql(sqlDelete);
     return true;
 }
 
@@ -260,8 +251,8 @@ void MSSqlite3DB::CreateTable(const std::string& name, DbResultVector& keyValues
     oss << "create table if not exists " << name << "(" << keys << ");";
     std::string sqlCreateTable = oss.str();
     LI("createTable was called, sqlCreateTable:%s\n", sqlCreateTable.c_str());
-    int code = RunSql(sqlCreateTable);
-    LI("func:%s code:%d\n", __FUNCTION__, code);
+
+    RunSql(sqlCreateTable);
 }
 
 void MSSqlite3DB::DropTable(const std::string& name)
@@ -270,8 +261,8 @@ void MSSqlite3DB::DropTable(const std::string& name)
     oss << "drop table " << name << ";";
     std::string sqlDropTable = oss.str();
     LI("dropTable was called, sqlDropTable:%s\n", sqlDropTable.c_str());
-    int code = RunSql(sqlDropTable);
-    LI("func:%s code:%d\n", __FUNCTION__, code);
+
+    RunSql(sqlDropTable);
 }
 
 int MSSqlite3DB::RunSql(const std::string& sql)
@@ -286,9 +277,7 @@ int MSSqlite3DB::RunSql(const std::string& sql)
     if (code != SQLITE_OK)
     {
         if (errmsg)
-        LI("run Sql code :%d, errmsg: %s\n", code, errmsg);
-        else
-        LI("run Sql code :%d, ok\n", code);
+            LI("run Sql code :%d, errmsg: %s\n", code, errmsg);
     }
     return code;
 }
@@ -308,7 +297,6 @@ int MSSqlite3DB::RunSqlSelect(const std::string& sql, const std::string& dbName,
         LI("run Sql Select err code %d\n", code);
         return -1;
     } else {
-        LI("run Sql Select SQLITE_OK\n");
         if (dbName.compare(MC_MSG_SQL_TABLE_STOREID_SEQN)==0)
         {
             if (type == 1)// seqn
@@ -349,8 +337,6 @@ int MSSqlite3DB::RunSqlSelect(const std::string& sql, const std::string& dbName,
                     map.insert(std::make_pair("isfetched" , nsFetched));
 
                     result.push_back(map);
-
-                    LI("select userid:%s, grpid:%s, seqn:%s, isfetched:%s\n", nsUserId.c_str(), nsGrpId.c_str(), nsSeqn.c_str(), nsFetched.c_str());
                 }
                 sqlite3_finalize(stmt);
                 stmt = nullptr;
@@ -366,7 +352,6 @@ int MSSqlite3DB::RunSqlSelect(const std::string& sql, const std::string& dbName,
                 DbFieldMap map;
                 map.insert(std::make_pair("grpid", nsGrpId));
                 result.push_back(map);
-                LI("select get grpid:%s\n", nsGrpId.c_str());
             }
             sqlite3_finalize(stmt);
             stmt = nullptr;
@@ -394,7 +379,6 @@ int MSSqlite3DB::RunSqlSelectCount(const std::string& sql, const std::string& db
         while(sqlite3_step(stmt) == SQLITE_ROW)
         {
             count = sqlite3_column_int(stmt, 0);
-            LI("runSqlSelectCount count:%d\n", count);
         }
         sqlite3_finalize(stmt);
         stmt = nullptr;

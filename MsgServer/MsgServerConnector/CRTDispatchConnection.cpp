@@ -18,8 +18,6 @@ void CRTDispatchConnection::DispatchMsg(const std::string& uid, pms::RelayMsg& r
     //find connector
     CRTConnManager::ConnectionInfo* pci = CRTConnManager::Instance().findConnectionInfoById(uid);
     if (!pci) {
-        LE("CRTDispatchConnection::DispatchMsg not find user:%s connection\n", uid.c_str());
-        LI("CRTDispatchConnection::DispatchMsg handle_cmd:%s, handle_mtype:%s, handle_data:%s\n", r_msg.handle_cmd().c_str(), r_msg.handle_mtype().c_str(), r_msg.handle_data().c_str());
         // not set push in this msg
         if (r_msg.handle_cmd().length()==0 \
                 || r_msg.handle_cmd().compare("push")!=0 \
@@ -30,7 +28,6 @@ void CRTDispatchConnection::DispatchMsg(const std::string& uid, pms::RelayMsg& r
             return;
         }
 
-        LI("CRTDispatchConnection::DispatchMsg userid:%s, r_msg.cont_module:%d\n\n", uid.c_str(), r_msg.cont_module());
         // user set not accept push
         // user set mute notification
         if (!CRTConnManager::Instance().CouldPush(uid, r_msg.cont_module()))
@@ -54,7 +51,6 @@ void CRTDispatchConnection::DispatchMsg(const std::string& uid, pms::RelayMsg& r
 
             std::string s = t_msg.SerializeAsString();
             pmodule->pModule->SendTransferData(s.c_str(), (int)s.length());
-            LI("CRTDispatchConnection::DispatchMsg has send push msg to pusher, module type:%d, module id:%s!!!\n\n", pmodule->othModuleType, pmodule->othModuleId.c_str());
         } else {
             LE("CRTDispatchConnection::DispatchMsg module pusher is not liveeeeeeeeeeee!!!\n");
         }

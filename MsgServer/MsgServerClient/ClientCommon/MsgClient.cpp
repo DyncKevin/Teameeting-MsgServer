@@ -107,10 +107,8 @@ int MsgClient::MCSyncMsg()
 {
     if (m_isFetched)
     {
-        LI("MCSyncMsg sync all seqns");
         SyncAllSeqns();
     } else {
-        LI("MCSyncMsg should be fetched before called");
         FetchAllSeqns();
     }
     return 0;
@@ -355,21 +353,18 @@ int MsgClient::MCNotifySettedMgr(std::string& outmsgid, MSMgrMessage *mgrMsg, co
 
 void MsgClient::OnSndMsg(int code, const std::string& msgid)
 {
-    std::cout << "MsgClient::OnSndMsg msgid:" << msgid << ", code:" << code << std::endl;
     if (m_subMsgDelegate)
         m_subMsgDelegate->OnSendMessage(msgid, code);
 }
 
 void MsgClient::OnCmdCallback(int code, int cmd, const std::string& groupid, const MSCbData& data)
 {
-    LI("MsgClient::OnCmdCallback cmd:%d, groupid.length:%lu, result:%d, seqn:%lld", cmd, groupid.length(), data.result, data.seqn);
     switch (cmd)
     {
         case MSADD_GROUP:
         {
             if (code == 0)
             {
-                LI("OnCmdCallback add group ok, insert groupid and seqn, toggle callback");
                 if (!m_sqlite3Manager->IsGroupExists(m_nsUserId, groupid))
                 {
                     m_sqlite3Manager->AddGroupId(m_nsUserId, groupid);
@@ -391,7 +386,6 @@ void MsgClient::OnCmdCallback(int code, int cmd, const std::string& groupid, con
         {
             if (code == 0)
             {
-                LI("OnCmdCallback del group ok, del groupid and seqn, toggle callback");
                 m_sqlite3Manager->DelGroupId(m_nsUserId, groupid);
                 RemoveLocalSeqn(groupid);
                 //Update seqn from db 2 core
@@ -441,8 +435,6 @@ void MsgClient::OnCmdCallback(int code, int cmd, const std::string& groupid, con
 
 void MsgClient::OnRecvMsg(int64 seqn, const std::string& msg)
 {
-    std::cout << "MsgClient::OnRecvMsg was called, seqn:" << seqn << ", msg.length:" << msg.length() << std::endl;
-
     UpdateLocalSeqn(m_strUserId, seqn);
     UpdateSeqnToDb(m_strUserId, seqn);
 
@@ -525,8 +517,6 @@ void MsgClient::OnRecvMsg(int64 seqn, const std::string& msg)
 
 void MsgClient::OnRecvGroupMsg(int64 seqn, const std::string& seqnid, const std::string& msg)
 {
-    std::cout << "MsgClient::OnRecvGroupMsg was called, seqn:" << seqn << ", seqnid:" << seqnid << ", msg.length:" << msg.length() << std::endl;
-
     UpdateLocalSeqn(seqnid, seqn);
     UpdateSeqnToDb(seqnid, seqn);
 
@@ -540,7 +530,6 @@ void MsgClient::OnRecvGroupMsg(int64 seqn, const std::string& seqnid, const std:
         LI("MsgClient::OnRecvGroupMsg recv the msg you just send!!!, so return");
         return;
     }
-    LI("MsgClient::OnRecvGroupMsg entity tag:%d, cont:%s, romid:%s, usr_from:%s", entity.msg_tag(), entity.msg_cont().c_str(), entity.rom_id().c_str(), entity.usr_from().c_str());
 
     MSMessage *mMsg = MSMsgUtil::JsonToMessage(entity.msg_cont());
     mMsg->SetMillSec(entity.msg_time());
@@ -656,7 +645,6 @@ void MsgClient::OnNotifyOtherLogin(int code)
 
 void MsgClient::OnMsgServerConnected()
 {
-    std::cout << "MsgClient::OnMsgServerConnected was called, fetchallseqn once" << std::endl;
     FetchAllSeqns();
     m_clientDelegate->OnMsgServerConnected();
     m_clientDelegate->OnMsgClientInitializing();
@@ -668,7 +656,7 @@ void MsgClient::OnMsgServerConnected()
     dispatch_source_t _timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0));
     dispatch_source_set_timer(_timer, dispatch_walltime(NULL, 0), period * NSEC_PER_SEC, 0); //每秒执行
     dispatch_source_set_event_handler(_timer, ^{
-        LI(@"MsgClient::OnMsgServerConnected timer was called...............");
+        LI("MsgClient::OnMsgServerConnected timer was called...............");
         //在这里执行事件
         if (IsFetchedAll())
         {
@@ -679,7 +667,7 @@ void MsgClient::OnMsgServerConnected()
             [m_clientDelegate OnMsgClientInitialized];
             dispatch_source_set_cancel_handler(_timer, ^{
 
-                LI(@"MsgClient::OnMsgServerConnected dispatch_source_cancel...ok");
+                LI("MsgClient::OnMsgServerConnected dispatch_source_cancel...ok");
             });
             dispatch_source_cancel(_timer);
         } else {
@@ -693,21 +681,18 @@ void MsgClient::OnMsgServerConnected()
 
 void MsgClient::OnMsgServerConnecting()
 {
-    //std::cout << "MsgClient::OnMsgServerConnecting was called" << std::endl;
     if (m_clientDelegate)
         m_clientDelegate->OnMsgServerConnecting();
 }
 
 void MsgClient::OnMsgServerDisconnect()
 {
-    //std::cout << "MsgClient::OnMsgServerDisconnect was called" << std::endl;
     if (m_clientDelegate)
         m_clientDelegate->OnMsgServerDisconnect();
 }
 
 void MsgClient::OnMsgServerConnectionFailure()
 {
-    //std::cout << "MsgClient::OnMsgServerConnectionFailer was called" << std::endl;
     if (m_clientDelegate)
         m_clientDelegate->OnMsgServerConnectionFailure();
 }

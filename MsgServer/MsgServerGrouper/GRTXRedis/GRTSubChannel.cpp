@@ -132,7 +132,6 @@ void GRTSubChannel::Run(void* data)
     GRTSubChannel* pch = (GRTSubChannel*)data;
     if (!pch) return;
     pch->Subscribe();
-    LI("GRTSubChannel::Run was called...pid:%d, tid:%d, pthread_self:%d\n", getpid(), gettidv1(), pthread_self());
     m_isRun = true;
     ReplyData vReply;
     while(m_isRun) {
@@ -140,7 +139,6 @@ void GRTSubChannel::Run(void* data)
             vReply.clear();
         }
         if (0==m_xRedisClient.GetReply(&m_RedisContext, vReply)) {
-            LI("GRTSubChannel::Run GetReply ok...vReply.size:%lu, m_channel:%s\n", vReply.size(), m_channel.c_str());
 
             if (vReply.size()!=3) continue;
             if (vReply[0].str.compare("message")!=0) continue;
@@ -156,7 +154,6 @@ void GRTSubChannel::Run(void* data)
                 if (jsonMsgDoc.HasMember("groupid"))
                 {
                     grpid = jsonMsgDoc["groupid"].GetString();
-                    LI("Channel groupid:%s\n", grpid.c_str());
                 } else {
                     LE("in jsonMsgDoc not has member groupid, jstr:%s\n", vReply[2].str.c_str());
                     continue;
@@ -164,7 +161,6 @@ void GRTSubChannel::Run(void* data)
                 if (jsonMsgDoc.HasMember("userid"))
                 {
                     usrid = jsonMsgDoc["userid"].GetString();
-                    LI("Channel usrid:%s\n", usrid.c_str());
                 } else {
                     LE("in jsonMsgDoc not has member userid, jstr:%s\n", vReply[2].str.c_str());
                     continue;
@@ -187,9 +183,7 @@ void GRTSubChannel::Run(void* data)
             }
         }
     }
-    LI("GRTSubChannel::Run while over...\n");
     pch->Unsubscribe();
-    LI("GRTSubChannel::Run finished over...\n");
 }
 
 
@@ -202,7 +196,6 @@ void GRTSubChannel::Subscribe()
     KEYS key;
     key.push_back(m_channel);
     if (m_xRedisClient.subscribe(*m_RedisDBIdx, key, m_RedisContext)) {
-        LI("GRTSubChannel::Subscribe channel:%s success\n", m_channel.c_str());
     } else {
         LE("GRTSubChannel::Subscribe channel:%s failed\n", m_channel.c_str());
         return;
@@ -214,7 +207,6 @@ void GRTSubChannel::Unsubscribe()
     KEYS key;
     key.push_back(m_channel);
     if (m_xRedisClient.unsubscribe(*m_RedisDBIdx, key, m_RedisContext)) {
-        LI("GRTSubChannel::Unsubscribe channel:%s success\n", m_channel.c_str());
     } else {
         LE("GRTSubChannel::Unsubscribe failed\n");
         return;

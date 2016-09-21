@@ -90,7 +90,6 @@ void SRTStorageRedis::OnWakeupEvent(const void*pData, int nSize)
             std::string keyType;
             if (m_xRedisClient.type(*m_RedisDBIdx, key, keyType))
             {
-                LI("!!!!!group read key type is:%s\n", keyType.c_str());
                 VDATA vdata;
                 vdata.push_back("ispush");
                 vdata.push_back("mtype");
@@ -130,14 +129,6 @@ void SRTStorageRedis::OnWakeupEvent(const void*pData, int nSize)
             store.set_result(Err_Redis_Key_Not_Exist);// key is not exists
             *store.mutable_content() = str;
         }
-        LI("SRTStorageRedis::OnWakeupEvent g read key:%s, msgid:%s, storeid:%s, seqn:%lld, maxseqn:%lld, result:%d\n"\
-                , key\
-                , store.msgid().c_str()\
-                , store.storeid().c_str()\
-                , store.sequence()\
-                , store.maxseqn()\
-                , store.result());
-
     } else if (store.mflag()==pms::EMsgFlag::FSINGLE)
     {
         std::string str("");
@@ -149,7 +140,6 @@ void SRTStorageRedis::OnWakeupEvent(const void*pData, int nSize)
             std::string keyType;
             if (m_xRedisClient.type(*m_RedisDBIdx, key, keyType))
             {
-                LI("!!!!!!single read key type is:%s\n", keyType.c_str());
                 VDATA vdata;
                 vdata.push_back("ispush");
                 vdata.push_back("mtype");
@@ -175,7 +165,7 @@ void SRTStorageRedis::OnWakeupEvent(const void*pData, int nSize)
                     } else {
                         char* err = m_RedisDBIdx->GetErrInfo();
                         if (err) {
-                            LI("SRTStorageRedis::OnTickEvent s write single msg error, hmset err:%s\n", err);
+                            LE("SRTStorageRedis::OnTickEvent s write single msg error, hmset err:%s\n", err);
                         }
                         store.set_result(Err_Redis_Key_Expire_Or_Not_Exist);
                     }
@@ -188,16 +178,8 @@ void SRTStorageRedis::OnWakeupEvent(const void*pData, int nSize)
             store.set_result(Err_Redis_Key_Not_Exist);// key is not exists
             *store.mutable_content() = str;
         }
-        LI("SRTStorageRedis::OnWakeupEvent s read key:%s, msgid:%s, storeid:%s, seqn:%lld, maxseqn:%lld, result:%d\n"\
-                , key\
-                , store.msgid().c_str()\
-                , store.storeid().c_str()\
-                , store.sequence()\
-                , store.maxseqn()\
-                , store.result());
     } else {
-        LI("SRTStorageRedis::OnWakeupEvent mflag:%d error\n", store.mflag());
-        assert(false);
+        LE("SRTStorageRedis::OnWakeupEvent mflag:%d error\n", store.mflag());
     }
     if (m_RedisGroup)
     {
@@ -216,7 +198,6 @@ void SRTStorageRedis::OnWakeupEvent(const void*pData, int nSize)
 // for write
 void SRTStorageRedis::OnTickEvent(const void*pData, int nSize)
 {
-    LI("SRTStorageRedis::OnTickEvent for write...\n");
     if (m_QueuePushMsg.size()==0) return;
     pms::StorageMsg store = m_QueuePushMsg.front();
     if (store.mflag()==pms::EMsgFlag::FGROUP)
@@ -225,21 +206,8 @@ void SRTStorageRedis::OnTickEvent(const void*pData, int nSize)
         sprintf(key, "grp:%s:%lld", store.storeid().c_str(), store.sequence());
         m_RedisDBIdx->CreateDBIndex(key, APHash, CACHE_TYPE_1);
 
-        LI("SRTStorageRedis::OnTickEvent g result:%d, storeid:%s, msgid:%s, key:%s, content.len:%d\n"\
-                , store.result()\
-                , store.storeid().c_str()\
-                , store.msgid().c_str()\
-                , key\
-                , store.content().length());
-
-        if (store.version().c_str()) {
-             LI("version is:%s, store.version().length:%d\n", store.version().c_str(), store.version().length());
-        } else {
-            LI("version is null\n");
-        }
         {
             if (store.version().compare("1.0.1")==0) {
-                LI("group write store.version is:%s\n", store.version().c_str());
                 VDATA vdata;
                 vdata.push_back("ispush");
                 vdata.push_back(store.ispush());
@@ -257,11 +225,9 @@ void SRTStorageRedis::OnTickEvent(const void*pData, int nSize)
                     if (err) {
                         LE("m_xRedisClient.hmset err:%s\n", err);
                     }
-                    LE("SRTStorageRedis::OnTickEvent g write group msg error\n");
                     store.set_result(Err_Redis_Hmset);
                 }
             } else if (store.version().compare("")==0) { // else if store.version.compare
-                LI("group write store.version is: nulllllllll\n");
                 if (m_xRedisClient.setex(*m_RedisDBIdx, key, MAX_MESSAGE_EXPIRE_TIME, store.content().c_str()))
                 {
                     store.set_result(Err_Redis_Ok);
@@ -270,36 +236,22 @@ void SRTStorageRedis::OnTickEvent(const void*pData, int nSize)
                     if (err) {
                         LE("m_xRedisClient.setex err:%s\n", err);
                     }
-                    LE("SRTStorageRedis::OnTickEvent g write group msg error\n");
                     store.set_result(Err_Redis_Setex);
                     //assert(false);
                 }
             } else {
-                LI("group write store.version not suppoort\n");
                 store.set_result(Err_Vsersion_Not_Support);
             }
         }
-        LI("SRTStorageRedis::OnTickEvent g write key:%s, msgid:%s, storeid:%s, seqn:%lld, maxseqn:%lld, result:%d\n"\
-                , key\
-                , store.msgid().c_str()\
-                , store.storeid().c_str()\
-                , store.sequence()\
-                , store.maxseqn()\
-                , store.result());
     } else if (store.mflag()==pms::EMsgFlag::FSINGLE)
     {
         char key[512] = {'\0'};
         sprintf(key, "sgl:%s:%lld", store.storeid().c_str(), store.sequence());
         m_RedisDBIdx->CreateDBIndex(key, APHash, CACHE_TYPE_1);
 
-        LI("SRTStorageRedis::OnTickEvent s result:%d, storeid:%s, msgid:%s\n"\
-                , store.result()\
-                , store.storeid().c_str()\
-                , store.msgid().c_str());
         {
 
             if (store.version().compare("1.0.1")==0) {
-                LI("single write store.version is:%s\n", store.version().c_str());
                 VDATA vdata;
                 vdata.push_back("ispush");
                 vdata.push_back(store.ispush());
@@ -317,11 +269,9 @@ void SRTStorageRedis::OnTickEvent(const void*pData, int nSize)
                     if (err) {
                         LE("m_xRedisClient.hmset err:%s\n", err);
                     }
-                    LE("SRTStorageRedis::OnTickEvent s write group msg error\n");
                     store.set_result(Err_Redis_Hmset);
                 }
             } else if (store.version().compare("")==0) {
-                LI("single write store.version nullllllll\n");
                 if (m_xRedisClient.setex(*m_RedisDBIdx, key, MAX_MESSAGE_EXPIRE_TIME, store.content().c_str()))
                 {
                     store.set_result(Err_Redis_Ok);
@@ -330,25 +280,15 @@ void SRTStorageRedis::OnTickEvent(const void*pData, int nSize)
                     if (err) {
                         LE("m_xRedisClient.setex err:%s\n", err);
                     }
-                    LE("SRTStorageRedis::OnTickEvent s write group msg error\n");
                     store.set_result(Err_Redis_Setex);
                     //assert(false);
                 }
             } else {
-                LI("single write store.version not suppoort\n");
                 store.set_result(Err_Vsersion_Not_Support);
             }
         }
-        LI("SRTStorageRedis::OnTickEvent s write key:%s, msgid:%s, storeid:%s, seqn:%lld, maxseqn:%lld, result:%d\n"\
-                , key\
-                , store.msgid().c_str()\
-                , store.storeid().c_str()\
-                , store.sequence()\
-                , store.maxseqn()\
-                , store.result());
     } else {
-        LI("SRTStorageRedis::OnTickEvent mflag:%d error\n", store.mflag());
-        assert(false);
+        LE("SRTStorageRedis::OnTickEvent mflag:%d error\n", store.mflag());
     }
 
     if (m_RedisGroup)

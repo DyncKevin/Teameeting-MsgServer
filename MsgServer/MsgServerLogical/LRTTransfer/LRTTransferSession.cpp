@@ -222,13 +222,11 @@ void LRTTransferSession::OnRecvData(const char*pData, int nLen)
     if (!pData) {
         return;
     }
-    LI("LRTTransferSession::OnRecvData was called\n");
     RTJSBuffer::RecvData(pData, nLen);
 }
 
 void LRTTransferSession::OnRecvMessage(const char*message, int nLen)
 {
-    LI("LRTTransferSession::OnRecvMessage was called\n");
     RTLstorage::DoProcessData(message, nLen);
 }
 
@@ -238,7 +236,6 @@ void LRTTransferSession::OnPushEvent(const char*pData, int nLen)
     if (!m_isRun) return;
     if(m_queueReadMsg.size()==0) return;
     bool hasData = false;
-    LI("LRTTransferSession::OnPushEvent g_idle_event_counter:%d, m_queueReadMsg.size:%d\n",  ++g_read_event_counter, m_queueReadMsg.size());
     for (int i=0;i<PACKED_MSG_ONCE_NUM;++i)
     {
         if(m_queueReadMsg.size()>0)
@@ -280,7 +277,6 @@ void LRTTransferSession::OnTickEvent(const char*pData, int nLen)
     if (!m_isRun) return;
     if(m_queueWriteMsg.size()==0) return;
     bool hasData = false;
-    LI("LRTTransferSession::OnTickEvent g_idle_event_counter:%d, m_queueWriteMsg.size:%d\n",  ++g_write_event_counter, m_queueWriteMsg.size());
     for (int i=0;i<PACKED_MSG_ONCE_NUM;++i)
     {
         if(m_queueWriteMsg.size()>0)
@@ -345,7 +341,6 @@ void LRTTransferSession::OnTypeConn(const std::string& str)
         LE("OnTypeConn c_msg ParseFromString error\n");
         return;
     }
-    LI("OnTypeConn connmsg--->:\n");
 
     if ((c_msg.conn_tag() == pms::EConnTag::THI)) {
         // when other connect to ME:
@@ -478,10 +473,8 @@ void LRTTransferSession::OnTypeWriteRequest(const std::string& str)
                 {
                     if (store.msgs(i).ruserid().length()==0)
                     {
-                        LI("%S store.msgs(%d).ruserid length is 0\n", __FUNCTION__, i);
                         break;
                     }
-                    LI("LRTTransferSession::OnTypeWriteRequest NEWMSG msgid:%s, mtag:%d\n", store.msgs(i).msgid().c_str(), store.msgs(i).mtag());
                     if (store.msgs(i).msgid().length()==0)
                     {
                         char msgid[16] = {0};
@@ -523,12 +516,8 @@ void LRTTransferSession::OnTypeWriteResponse(const std::string& str)
         {
             if (store.msgs(i).ruserid().length()==0)
             {
-                LI("%s newmsgseqn  store.msgs(%d).ruserid length is 0\n", __FUNCTION__, i);
                 break;
             }
-            LI("LRTTransferSession::OnTypeWriteResponse NEWMSGSEQN 1 ruserid:%s, msgid:%s, sequence:%lld, mtag:%d, cont:%s\n\n"\
-                    , store.msgs(i).ruserid().c_str(), store.msgs(i).msgid().c_str()\
-                    , store.msgs(i).sequence(), store.msgs(i).mtag(), store.msgs(i).content().c_str());
 
             pms::StorageMsg* pstore = store.mutable_msgs(i);
             LRTLogicalManager::Instance().UpdateDataWrite(&pstore);
@@ -544,26 +533,14 @@ void LRTTransferSession::OnTypeWriteResponse(const std::string& str)
                 // here should delete local seqn storage
                 LRTLogicalManager::Instance().DeleteDataWrite(pstore);
             }
-
-            LI("LRTTransferSession::OnTypeWriteResponse NEWMSGSEQN 111 ruserid:%s, msgid:%s, sequence:%lld, mtag:%d, cont:%s\n\n"\
-                    , store.msgs(i).ruserid().c_str(), store.msgs(i).msgid().c_str()\
-                    , store.msgs(i).sequence(), store.msgs(i).mtag(), store.msgs(i).content().c_str());
         }
 
         for(int i=0;i<store.msgs_size();++i)
         {
             if (store.msgs(i).ruserid().length()==0)
             {
-                LI("%s store.msgs(%d).ruserid length is 0\n", __FUNCTION__, i);
                 break;
             }
-            LI("LRTTransferSession::OnTypeWriteResponse NEWMSGSEQN 2 ruserid:%s, msgid:%s, sequence:%lld, mtag:%d, newmsg.msgsize:%d, store.svrcmd:%d\n\n"\
-                    , store.msgs(i).ruserid().c_str(), store.msgs(i).msgid().c_str()\
-                    , store.msgs(i).sequence(), store.msgs(i).mtag(), newmsg_store.msgs_size(), store.msgs(i).rsvrcmd());
-
-            LI("LRTTransferSession::OnTypeWriteResponse NEWMSGSEQN 222 ruserid:%s, msgid:%s, sequence:%lld, mtag:%d, newmsg.msgsize:%d, store.svrmcd:%d\n\n"\
-                    , store.mutable_msgs(i)->ruserid().c_str(), store.mutable_msgs(i)->msgid().c_str()\
-                    , store.mutable_msgs(i)->sequence(), store.mutable_msgs(i)->mtag(), newmsg_store.msgs_size(), store.msgs(i).rsvrcmd());
         }
         if (newmsg_store.msgs_size()>0)
         {
@@ -580,15 +557,12 @@ void LRTTransferSession::OnTypeWriteResponse(const std::string& str)
     {
         pms::PackedStoreMsg store;
         if (!store.ParseFromString(rmsg.content())) return;
-        LI("%s was called, store.msgs_size:%d\n", __FUNCTION__, store.msgs_size());
         for(int i=0;i<store.msgs_size();++i)
         {
             if (store.msgs(i).ruserid().length()==0)
             {
-                LI("%s newmsgdata store.msgs(%d).ruserid length is 0\n", __FUNCTION__, i);
                 break;
             }
-            LI("!!!!!!!!!!!!!!!LRTTransferSession::OnTypeWriteResponse NEWMSGDATA  msgid:%s, sequence:%lld, result:%d, mtag:%d\n\n", store.msgs(i).msgid().c_str(), store.msgs(i).sequence(), store.msgs(i).result(), store.msgs(i).mtag());
 
             // after msg was generated, update server local seqn for user;
             // this sequene is from sequence()
@@ -613,7 +587,6 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
         {
             if (store.msgs(i).ruserid().length()==0)
             {
-                LI("%s csyncseqn store.msgs(%d).ruserid length is 0\n", __FUNCTION__, i);
                 break;
             }
 
@@ -624,15 +597,13 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
             if (LRTLogicalManager::Instance().ReadLocalSeqn(store.mutable_msgs(i), &seqn))
             {
                 // update max seqn
-                LI("LRTTransferSession::OnTypeReadRequest get maxseqn:%lld from server local\n", seqn);
-                assert(seqn>=0);
+                if (seqn<0) continue;
                 store.mutable_msgs(i)->set_maxseqn(seqn);
                 this->PushReadMsg(store.msgs(i));// has got max seqn, so send response directly
             } else {
                 char msgid[16] = {0};
                 sprintf(msgid, "rs:%u", m_tmpRSeqnId++);
                 store.mutable_msgs(i)->set_msgid(msgid);
-                LI("LRTTransferSession::OnTypeReadRequest SYNCSEQN msgid:%s, mtag:%d\n", store.msgs(i).msgid().c_str(), store.msgs(i).mtag());
                 LRTLogicalManager::Instance().InsertSeqnRead(this, store.mutable_msgs(i));
                 s_store.add_msgs()->MergeFrom(store.msgs(i));
             }
@@ -655,7 +626,6 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
         {
             if (store.msgs(i).ruserid().length()==0)
             {
-                LI("%s csyncseqn store.msgs(%d).ruserid length is 0\n", __FUNCTION__, i);
                 break;
             }
 
@@ -670,30 +640,18 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
                 char msgid[16] = {0};
                 sprintf(msgid, "prd:%u", m_tmpRDataId++);
                 store.mutable_msgs(i)->set_msgid(msgid);
-                LI("----------++++++++--------------LRTTransferSession::OnTypeReadRequest CPGETDATA msgid:%s, rsvrcmd:%d, seqn:%lld\n"\
-                        , store.msgs(i).msgid().c_str()\
-                        , store.msgs(i).rsvrcmd()\
-                        , store.msgs(i).sequence());
                 LRTLogicalManager::Instance().InsertDataRead(this, store.mutable_msgs(i));
                 d_store.add_msgs()->MergeFrom(store.msgs(i));
             } else if (store.msgs(i).rsvrcmd()==pms::EServerCmd::CSYNCONEDATA) {
                 char msgid[16] = {0};
                 sprintf(msgid, "ord:%u", m_tmpOData2Id++);
                 store.mutable_msgs(i)->set_msgid(msgid);
-                LI("----------++++++++--------------LRTTransferSession::OnTypeReadRequest CSYNCONEDATA msgid:%s, rsvrcmd:%d, seqn:%lld\n"\
-                        , store.msgs(i).msgid().c_str()\
-                        , store.msgs(i).rsvrcmd()\
-                        , store.msgs(i).sequence());
                 LRTLogicalManager::Instance().InsertDataRead(this, store.mutable_msgs(i));
                 d_store.add_msgs()->MergeFrom(store.msgs(i));
             } else if (store.msgs(i).rsvrcmd()==pms::EServerCmd::CSYNCONEGROUPDATA) {
                 char msgid[16] = {0};
                 sprintf(msgid, "ogrd:%u", m_tmpOGData2Id++);
                 store.mutable_msgs(i)->set_msgid(msgid);
-                LI("----------++++++++--------------LRTTransferSession::OnTypeReadRequest CSYNCONEGROUPDATA msgid:%s, rsvrcmd:%d, seqn:%lld\n"\
-                        , store.msgs(i).msgid().c_str()\
-                        , store.msgs(i).rsvrcmd()\
-                        , store.msgs(i).sequence());
                 LRTLogicalManager::Instance().InsertDataRead(this, store.mutable_msgs(i));
                 d_store.add_msgs()->MergeFrom(store.msgs(i));
             } else { // this is from pusher CPGETDATA
@@ -704,10 +662,8 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
                     // update max seqn
 
                     int64 s = store.msgs(i).sequence(), ms = seqn;
-                    LI("LRTTransferSession::OnTypeReadRequest after get max, seqn:%lld, maxseqn:%lld\n", s, ms);
                     // ???????? shoule be eauql here?
-                    LI("LRTTransferSession::OnTypeReadRequest should be equal here\n");
-                    assert(ms>=s);
+                    if (ms<s)continue;
                     store.mutable_msgs(i)->set_maxseqn(seqn);// update maxseqn
                     for(int j=1,k=ms-s;j<=k;++j)
                     {
@@ -715,10 +671,6 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
                         sprintf(msgid, "rd:%u", m_tmpRDataId++);
                         store.mutable_msgs(i)->set_msgid(msgid);
                         store.mutable_msgs(i)->set_sequence(s+j);// modify the sequence, which msg you sync
-                        LI("LRTTransferSession::OnTypeReadRequest CSYNCDATA msgid:%s, rsvrcmd:%d, seqn:%lld\n"\
-                                , store.msgs(i).msgid().c_str()\
-                                , store.msgs(i).rsvrcmd()\
-                                , store.msgs(i).sequence());
                         LRTLogicalManager::Instance().InsertDataRead(this, store.mutable_msgs(i));
                         d_store.add_msgs()->MergeFrom(store.msgs(i));
                     }
@@ -727,16 +679,11 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
                     sprintf(msgid, "drs:%u", m_tmpRSeqn4DataId++);
                     store.mutable_msgs(i)->set_msgid(msgid);
                     store.mutable_msgs(i)->set_tsvrcmd(pms::EServerCmd::CSSEQN4DATA); // modify cmd, to sync seqn from remote
-                    LI("LRTTransferSession::OnTypeReadRequest change to SYNCSEQN4DATA msgid:%s, mtag:%d, rsvrcmd:%d, tsvrcmd:%d\n"\
-                            , store.msgs(i).msgid().c_str(), store.msgs(i).mtag()\
-                            , store.msgs(i).rsvrcmd()\
-                            , store.msgs(i).tsvrcmd());
                     LRTLogicalManager::Instance().InsertSeqnRead(this, store.mutable_msgs(i));
                     s_store.add_msgs()->MergeFrom(store.msgs(i));
                 }
             } // this is for others
         }
-        LI("LRTTransferSession::OnTypeReadRequest ask CSYNCDATA d_store.size:%d\n", d_store.msgs_size());
         if (d_store.msgs_size()>0)
         {
             pms::TransferMsg tmsg;
@@ -747,7 +694,6 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
             LRTConnManager::Instance().PushStoreReadMsg(tmsg.SerializeAsString());
         }
 
-        LI("LRTTransferSession::OnTypeReadRequest ask SYNCSEQN s_store.size:%d\n", s_store.msgs_size());
         if (s_store.msgs_size()>0)
         {
             pms::TransferMsg tmsg;
@@ -767,7 +713,6 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
         {
             if (store.msgs(i).ruserid().length()==0)
             {
-                LI("%s csyncseqn store.msgs(%d).ruserid length is 0\n", __FUNCTION__, i);
                 break;
             }
             // because pusher has give the pointed sequence, so sync data request directly
@@ -776,15 +721,10 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
                 char msgid[16] = {0};
                 sprintf(msgid, "prd:%u", m_tmpRDataId++);
                 store.mutable_msgs(i)->set_msgid(msgid);
-                LI("------------------------LRTTransferSession::OnTypeReadRequest CPGETDATA msgid:%s, rsvrcmd:%d, seqn:%lld\n"\
-                        , store.msgs(i).msgid().c_str()\
-                        , store.msgs(i).rsvrcmd()\
-                        , store.msgs(i).sequence());
                 LRTLogicalManager::Instance().InsertDataRead(this, store.mutable_msgs(i));
                 d_store.add_msgs()->MergeFrom(store.msgs(i));
             }
         }
-        LI("LRTTransferSession::OnTypeReadRequest ask CSYNCDATA d_store.size:%d\n", d_store.msgs_size());
         if (d_store.msgs_size()>0)
         {
             pms::TransferMsg tmsg;
@@ -810,20 +750,12 @@ void LRTTransferSession::OnTypeReadResponse(const std::string& str)
     {
         pms::PackedStoreMsg store, d_store;
         if (!store.ParseFromString(rmsg.content())) return;
-        LI("%s was called, store.msgs_size:%d\n", __FUNCTION__, store.msgs_size());
         for(int i=0;i<store.msgs_size();++i)
         {
             if (store.msgs(i).ruserid().length()==0 || store.msgs(i).msgid().length()==0)
             {
-                LI("%s syncseqn store.msgs(%d).ruserid length is 0\n", __FUNCTION__, i);
                 break;
             }
-            LI("LRTTransferSession::OnTypeReadResponse SYNCSEQN msgid:%s, sequence:%lld, maxseqn:%lld, result:%d, mtag:%d\n\n"\
-                    , store.msgs(i).msgid().c_str()\
-                    , store.msgs(i).sequence()\
-                    , store.msgs(i).maxseqn()\
-                    , store.msgs(i).result()\
-                    , store.msgs(i).mtag());
 
             if (store.msgs(i).tsvrcmd()==pms::EServerCmd::CSYNCSEQN)
             {
@@ -840,24 +772,18 @@ void LRTTransferSession::OnTypeReadResponse(const std::string& str)
                 assert(pSess);
 
                 int64 s = store.msgs(i).sequence(), ms = store.msgs(i).maxseqn();
-                LI("LRTTransferSession::OnTypeReadResponse after get max, seqn:%lld, maxseqn:%lld\n", s, ms);
-                assert(ms>s);
+                //assert(ms>s);
                 for(int j=1,k=ms-s;j<=k;++j)
                 {
                     char msgid[16] = {0};
                     sprintf(msgid, "drd:%u", m_tmpRData2Id++);
                     store.mutable_msgs(i)->set_msgid(msgid);
                     store.mutable_msgs(i)->set_sequence(s+j);// modify the sequence, which msg you sync
-                    LI("LRTTransferSession::OnTypeReadRequest CSYNCDATA msgid:%s, rsvrcmd:%d, seqn:%lld\n"\
-                            , store.msgs(i).msgid().c_str()\
-                            , store.msgs(i).rsvrcmd()\
-                            , store.msgs(i).sequence());
                     LRTLogicalManager::Instance().InsertDataRead(pSess, store.mutable_msgs(i));
                     d_store.add_msgs()->MergeFrom(store.msgs(i));
                 }
             }
         }
-        LI("LRTTransferSession::OnTypeReadResponse ask CSYNCDATA d_store.size:%d\n", d_store.msgs_size());
         if (d_store.msgs_size()>0)
         {
             pms::TransferMsg tmsg;
@@ -871,23 +797,12 @@ void LRTTransferSession::OnTypeReadResponse(const std::string& str)
     {
         pms::PackedStoreMsg store;
         if (!store.ParseFromString(rmsg.content())) return;
-        LI("%s was called, store.msgs_size:%d\n", __FUNCTION__, store.msgs_size());
         for(int i=0;i<store.msgs_size();++i)
         {
             if (store.msgs(i).ruserid().length()==0)
             {
-                LI("%s syncdata store.msgs(%d).ruserid length is 0\n", __FUNCTION__, i);
                 break;
             }
-            LI("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!LRTTransferSession::OnTypeReadResponse SYNCDATA  msgid:%s, sequence:%lld, result:%d, mtag:%d, rsvrcmd:%d, tsvrcmd:%d, ruserid:%s\n\n"\
-                    , store.msgs(i).msgid().c_str()\
-                    , store.msgs(i).sequence()\
-                    , store.msgs(i).result()\
-                    , store.msgs(i).mtag()\
-                    , store.msgs(i).rsvrcmd()\
-                    , store.msgs(i).tsvrcmd()\
-                    , store.msgs(i).ruserid().c_str());
-
             LRTLogicalManager::Instance().DeleteDataRead(store.mutable_msgs(i));
         }
     } else {

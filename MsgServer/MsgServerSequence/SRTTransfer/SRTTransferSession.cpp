@@ -212,7 +212,6 @@ void SRTTransferSession::OnTypeConn(const std::string& str)
         LE("OnTypeConn c_msg ParseFromString error\n");
         return;
     }
-    LI("OnTypeConn connmsg--->:\n");
 
     if ((c_msg.conn_tag() == pms::EConnTag::THI)) {
         // when other connect to ME:
@@ -329,26 +328,22 @@ void SRTTransferSession::OnTypePush(const std::string& str)
 
 void SRTTransferSession::OnTypeWriteRequest(const std::string& str)
 {
-    LI("%s was called, PushData for write\n", __FUNCTION__);
     SRTSequenceManager::Instance().RecvRequestCounter();
     m_SequenceGenerator.PushData(str.c_str(), str.length());
 }
 
 void SRTTransferSession::OnTypeWriteResponse(const std::string& str)
 {
-    LI("%s was called, PushData for write Response\n", __FUNCTION__);
 }
 
 void SRTTransferSession::OnTypeReadRequest(const std::string& str)
 {
-    LI("%s was called, PostData for read\n", __FUNCTION__);
     SRTSequenceManager::Instance().RecvRequestCounter();
     m_SequenceGenerator.PostData(str.c_str(), str.length());
 }
 
 void SRTTransferSession::OnTypeReadResponse(const std::string& str)
 {
-    LI("%s was called, PostData for read Response\n", __FUNCTION__);
 }
 
 void SRTTransferSession::ConnectionDisconnected()

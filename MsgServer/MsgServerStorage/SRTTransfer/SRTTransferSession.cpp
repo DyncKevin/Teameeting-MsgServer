@@ -211,7 +211,6 @@ void SRTTransferSession::OnTypeConn(const std::string& str)
         LE("OnTypeConn c_msg ParseFromString error\n");
         return;
     }
-    LI("OnTypeConn connmsg--->:\n");
 
     if ((c_msg.conn_tag() == pms::EConnTag::THI)) {
         // when other connect to ME:
@@ -328,7 +327,6 @@ void SRTTransferSession::OnTypePush(const std::string& str)
 
 void SRTTransferSession::OnTypeWriteRequest(const std::string& str)
 {
-    LI("%s was called, push for write\n", __FUNCTION__);
     SRTStorageManager::Instance().RecvRequestCounter();
     m_RedisManager.PushRedisRequest(str);
 }
@@ -340,7 +338,6 @@ void SRTTransferSession::OnTypeWriteResponse(const std::string& str)
 
 void SRTTransferSession::OnTypeReadRequest(const std::string& str)
 {
-    LI("%s was called, post for read\n", __FUNCTION__);
     SRTStorageManager::Instance().RecvRequestCounter();
     m_RedisManager.PostRedisRequest(str);
 }
