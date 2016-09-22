@@ -315,8 +315,8 @@ void XTcpClientImpl::OnResolveResult(rtc::AsyncResolverInterface* resolver)
         m_nState = NOT_CONNECTED;
     }
     else {
-        if(m_asynResolver->GetResolvedAddress(AF_INET, &m_svrSockAddr)
-           || m_asynResolver->GetResolvedAddress(AF_INET6, &m_svrSockAddr)) {
+        if(m_asynResolver->GetResolvedAddress(AF_INET6, &m_svrSockAddr)
+           || m_asynResolver->GetResolvedAddress(AF_INET, &m_svrSockAddr)) {
             DoConnect();
         } else {
             m_rCallback.OnServerConnectionFailure();
