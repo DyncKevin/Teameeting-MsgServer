@@ -36,6 +36,7 @@ MsgServerClient_SOURCES=$(top_srcdir)/ClientSession/ClientSession.cpp \
 				   		   $(top_srcdir)/ClientCommon/MSSqlite3.cpp \
 				   		   $(top_srcdir)/ClientCommon/MSSqlite3Manager.cpp \
 				   		   $(top_srcdir)/ClientCommon/MSSubMessage.cpp \
+				   		   $(top_srcdir)/ClientCommon/UtilTimer.cpp \
 						   $(top_srcdir)/ClientManager.cpp \
 						   $(top_srcdir)/MsgServerClient.cpp \
 						   $(top_srcdir)/main.cpp

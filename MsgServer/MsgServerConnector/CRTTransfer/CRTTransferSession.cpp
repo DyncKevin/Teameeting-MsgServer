@@ -9,6 +9,7 @@
 #include "CRTTransferSession.h"
 #include "CRTConnManager.h"
 #include "RTUtils.hpp"
+#include "StatusCode.h"
 
 #include "MsgServer/proto/common_msg.pb.h"
 #include "MsgServer/proto/sys_msg_type.pb.h"
@@ -42,7 +43,9 @@ void CRTTransferSession::Init()
     socket->InitNonBlocking(socket->GetSocketFD());
     socket->NoDelay();
     socket->KeepAlive();
-    socket->SetSocketBufSize(96L * 1024L);
+    socket->SetSocketBufSize(MAX_SOCKET_BUF_32);
+    socket->SetSocketRcvBufSize(MAX_SOCKET_BUF_64);
+
 
     socket->SetTask(this);
     this->SetTimer(120*1000);

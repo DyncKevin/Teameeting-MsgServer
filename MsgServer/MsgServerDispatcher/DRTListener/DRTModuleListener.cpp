@@ -8,6 +8,7 @@
 
 #include "DRTModuleListener.h"
 #include "DRTTransferSession.h"
+#include "StatusCode.h"
 
 Task* DRTModuleListener::GetSessionTask(int osSocket, struct sockaddr_in* addr)
 {
@@ -23,14 +24,15 @@ Task* DRTModuleListener::GetSessionTask(int osSocket, struct sockaddr_in* addr)
     theSocket = theTask->GetSocket();  // out socket is not attached to a unix socket yet.
 
     //set options on the socket
-    int sndBufSize = 96L * 1024L;
     theSocket->Set(osSocket, addr);
     theSocket->InitNonBlocking(osSocket);
     //we are a server, always disable nagle algorithm
     theSocket->NoDelay();
     theSocket->KeepAlive();
     //theSocket->SetTask(theTask);
-    theSocket->SetSocketBufSize(sndBufSize);
+    theSocket->SetSocketBufSize(MAX_SOCKET_BUF_32);
+    theSocket->SetSocketRcvBufSize(MAX_SOCKET_BUF_64);
+
     //setup the socket. When there is data on the socket,
     //theTask will get an kReadEvent event
     theSocket->RequestEvent(EV_RE);

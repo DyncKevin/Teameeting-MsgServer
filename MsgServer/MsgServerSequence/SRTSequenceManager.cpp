@@ -27,7 +27,6 @@ bool SRTSequenceManager::RecvRequestCounter()
     char buf[128] = {0};
     sprintf(buf, "recv_time:%lld:gRecvCounter:%lld\n", curTime, ++gRecvCounter);
     //fwrite(buf, 1, 128, m_RecvFile);
-    LI("%s\n", buf);
     return false;
 }
 
@@ -37,7 +36,6 @@ bool SRTSequenceManager::SendResponseCounter()
     char buf[128] = {0};
     sprintf(buf, "send_time:%lld:gSendCounter:%lld\n", curTime, ++gSendCounter);
     //fwrite(buf, 1, 128, m_SendFile);
-    LI("%s\n", buf);
     return false;
 }
 

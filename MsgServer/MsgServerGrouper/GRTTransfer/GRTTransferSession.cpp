@@ -12,6 +12,7 @@
 #include "RTUtils.hpp"
 #include "GRTConnManager.h"
 #include "GRTGrouperManager.h"
+#include "StatusCode.h"
 
 #define TIMEOUT_TS (60*1000)
 
@@ -52,7 +53,9 @@ void GRTTransferSession::Init()
     socket->InitNonBlocking(socket->GetSocketFD());
     socket->NoDelay();
     socket->KeepAlive();
-    socket->SetSocketBufSize(96L * 1024L);
+    socket->SetSocketBufSize(MAX_SOCKET_BUF_32);
+    socket->SetSocketRcvBufSize(MAX_SOCKET_BUF_64);
+
 
     socket->SetTask(this);
     this->SetTimer(120*1000);
@@ -468,6 +471,7 @@ void GRTTransferSession::OnGroupNotify(int code, const std::string& cont)
     pms::StorageMsg store;
     if (!store.ParseFromString(cont)) return;
 
+    LI("GRTTransferSession::OnGroupNotify ruserid:%s, storeid:%s\n", store.ruserid().c_str(), store.storeid().c_str());
     if (store.groupid().compare("wocaowocaowocao")==0)
     {
         std::string u1("8ca64d158a505876");

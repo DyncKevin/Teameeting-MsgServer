@@ -13,6 +13,7 @@
 #include "RTUtils.hpp"
 #include "ClientManager.h"
 
+static int test_times = 0;
 
 static bool		g_inited = false;
 static char*	g_pVersion = (char*)"0.01.20150810";
@@ -125,7 +126,9 @@ int	MsgServerClient::Start(const char* userid, const char* ip, unsigned short po
 void MsgServerClient::DoTick()
 {
 #if 1
-    ClientManager::Instance().SendGroupMsg();
+    test_times++;
+    if (test_times >10 && test_times <12)
+        ClientManager::Instance().SendGroupMsg();
 #endif
 }
 

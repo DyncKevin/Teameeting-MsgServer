@@ -27,8 +27,7 @@ RTTcpNoTimeout::~RTTcpNoTimeout(void)
 int RTTcpNoTimeout::SendData(const char*pData, int nLen)
 {
     if (nLen > 9999) {
-        LE("RTTcpNoTimeout::SendData pData is over length\n");
-        return -1;
+        LE("RTTcpNoTimeout::SendData pData is over length:%d\n", nLen);
     }
     {
         char* ptr = (char*)malloc(sizeof(char)*(nLen+1));
@@ -47,8 +46,7 @@ int RTTcpNoTimeout::SendData(const char*pData, int nLen)
 int RTTcpNoTimeout::SendTransferData(const char*pData, int nLen)
 {
     if (nLen > 9999) {
-        LE("RTTcpNoTimeout::SendTransferData pData is over length\n");
-        return -1;
+        LE("RTTcpNoTimeout::SendTransferData pData is over length:%d\n", nLen);
     }
     {
         char* ptr = (char*)malloc(sizeof(char)*(nLen+4));
@@ -88,7 +86,6 @@ SInt64 RTTcpNoTimeout::Run()
 	// So return -1.
     if (events&Task::kTimeoutEvent)
     {
-        printf("RTTcpNoTimeout checked timeout here!!!\n");
         UpdateTimer();
         return 0;
     }

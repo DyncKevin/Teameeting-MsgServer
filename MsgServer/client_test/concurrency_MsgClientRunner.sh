@@ -96,7 +96,7 @@ function testClient()
 
 #################################################
 rm test*
-testNum=20;
+testNum=5;
 PARAM_NAME="MsgServerClient"
 PARAM_PATH=$CUR_PATH/../MsgServerClient
 echo "kill PARAM_PATH/PARAM_NAME:" $PARAM_PATH/$PARAM_NAME

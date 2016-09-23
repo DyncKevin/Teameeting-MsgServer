@@ -26,8 +26,7 @@ RTTcp::~RTTcp(void)
 int RTTcp::SendData(const char*pData, int nLen)
 {
     if (nLen > 9999) {
-        LE("RTTcp::SendData pData is over length\n");
-        return -1;
+        LE("RTTcp::SendData pData is over length:%d\n", nLen);
     }
     {
         char* ptr = (char*)malloc(sizeof(char)*(nLen+1));
@@ -46,8 +45,7 @@ int RTTcp::SendData(const char*pData, int nLen)
 int RTTcp::SendTransferData(const char*pData, int nLen)
 {
     if (nLen > 9999) {
-        LE("RTTcp::SendTransferData pData is over length\n");
-        return -1;
+        LE("RTTcp::SendTransferData pData is over length:%d\n", nLen);
     }
     {
         char* ptr = (char*)malloc(sizeof(char)*(nLen+4));

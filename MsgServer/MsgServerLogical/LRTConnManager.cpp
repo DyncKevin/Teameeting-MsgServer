@@ -283,24 +283,28 @@ bool LRTConnManager::TryConnectStorage(const std::string ip, unsigned short port
 
 void LRTConnManager::PushSeqnReadMsg(const std::string& smsg)
 {
+    LI("LRTConnManager::PushSeqnReadMsg smsg.length:%d\n", smsg.length());
     if (m_sequenceReadSession && m_sequenceReadSession->IsLiveSession())
         m_sequenceReadSession->SendTransferData(smsg);
 }
 
 void LRTConnManager::PushSeqnWriteMsg(const std::string& smsg)
 {
+    LI("LRTConnManager::PushSeqnWriteMsg smsg.length:%d\n", smsg.length());
     if (m_sequenceWriteSession && m_sequenceWriteSession->IsLiveSession())
         m_sequenceWriteSession->SendTransferData(smsg);
 }
 
 void LRTConnManager::PushStoreReadMsg(const std::string& srmsg)
 {
+    LI("LRTConnManager::PushStoreReadMsg srmsg.length:%d\n", srmsg.length());
     if (m_storageReadSession && m_storageReadSession->IsLiveSession())
         m_storageReadSession->SendTransferData(srmsg);
 }
 
 void LRTConnManager::PushStoreWriteMsg(const std::string& swmsg)
 {
+    LI("LRTConnManager::PushStoreWriteMsg swmsg.length:%d\n", swmsg.length());
     if (m_storageWriteSession && m_storageWriteSession->IsLiveSession())
         m_storageWriteSession->SendTransferData(swmsg);
 }

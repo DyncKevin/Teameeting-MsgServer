@@ -45,7 +45,6 @@ void SRTRedisManager::Init(SRTTransferSession* sess)
         char ip[16] = {0};
         int port = 0;
         sscanf(s.c_str(), "%s %d", ip, &port);
-        LI("SequenceGenerator Redis Init ip:%s, port:%d\n", ip, port);
         RedisGroup* redisGroup = new RedisGroup;
         redisGroup->ip = ip;
         redisGroup->port = port;
@@ -113,7 +112,6 @@ void SRTRedisManager::Unin()
 // post for read
 void SRTRedisManager::PostRedisRequest(const std::string& request)
 {
-    LI("SRTRedisManager::PostRedisRequest was called\n");
     for(auto x : m_RedisGroupMgr)
     {
         LoopupForRedis((RedisGroup*)x.second)->PostData(request.c_str(), request.length());
@@ -123,7 +121,6 @@ void SRTRedisManager::PostRedisRequest(const std::string& request)
 // push for write
 void SRTRedisManager::PushRedisRequest(const std::string& request)
 {
-    LI("SRTRedisManager::PushRedisRequest was called\n");
     for(auto x : m_RedisGroupMgr)
     {
         LoopupForRedis((RedisGroup*)x.second)->PushData(request.c_str(), request.length());
@@ -144,15 +141,12 @@ SRTSequenceRedis* SRTRedisManager::LoopupForRedis(RedisGroup* group)
  */
 void SRTRedisManager::OnWriteSeqn(const pms::StorageMsg& request, int64 seqn)
 {
-    LI("SRTRedisManager::OnWriteSeqn ruserid:%s, msgid:%s, seqn:%lld\n", request.ruserid().c_str(), request.msgid().c_str(), seqn);
     OSMutexLocker locker(&m_MutexWriteCollection);
     std::unordered_map<std::string, SRTResponseCollection*>::const_iterator cit = m_WriteResponseCollections.find(request.ruserid());
     if (cit != m_WriteResponseCollections.end())
     {
-        LI("OnWriteSeqn ruserid find out:%s\n", request.ruserid().c_str());
         cit->second->AddResponse(request, seqn);
     } else {
-        LI("OnWriteSeqn ruserid not find out:%s\n", request.ruserid().c_str());
         m_WriteResponseCollections.insert(make_pair(request.ruserid(), new SRTResponseCollection(this, REQUEST_TYPE_WRITE, m_RedisNum, request, seqn)));
     }
 }
@@ -183,15 +177,12 @@ void SRTRedisManager::OnAddAndCheckWrite(const std::string& msg)
  */
 void SRTRedisManager::OnReadSeqn(const pms::StorageMsg& request, int64 seqn)
 {
-    LI("SRTRedisManager::OnReadSeqn ruserid:%s, msgid:%s, seqn:%lld\n", request.ruserid().c_str(), request.msgid().c_str(), seqn);
     OSMutexLocker locker(&m_MutexReadCollection);
     std::unordered_map<std::string, SRTResponseCollection*>::const_iterator cit = m_ReadResponseCollections.find(request.ruserid());
     if (cit != m_ReadResponseCollections.end())
     {
-        LI("OnReadSeqn ruserid find out:%s\n", request.ruserid().c_str());
         cit->second->AddResponse(request, seqn);
     } else {
-        LI("OnReadSeqn ruserid not find out:%s\n", request.ruserid().c_str());
         m_ReadResponseCollections.insert(make_pair(request.ruserid(), new SRTResponseCollection(this, REQUEST_TYPE_READ, m_RedisNum, request, seqn)));
     }
 }
@@ -238,7 +229,6 @@ void SRTRedisManager::OnWakeupEvent(const void*pData, int nSize)
     {
         if (m_Session && m_Session->IsLiveSession())
         {
-            LI("SRTRedisManager::OnWakeupEvent TREQUEST\n");
 
             pms::RelayMsg rmsg;
             // here the cmd means this is an seqn msg, not data

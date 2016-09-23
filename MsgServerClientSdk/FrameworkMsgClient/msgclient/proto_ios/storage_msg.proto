@@ -24,6 +24,7 @@ message StorageMsg{
     string          mtype       = 14; // the msg content type
     string          ispush      = 15; // if this message need push
     bytes           content     = 16; // message
+    EModuleType     module      = 17; // module type, this msg belong to which bussiness module
 }
 
 message PackedStoreMsg{

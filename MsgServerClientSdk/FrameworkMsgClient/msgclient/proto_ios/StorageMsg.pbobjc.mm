@@ -63,6 +63,7 @@ static GPBFileDescriptor *StorageMsgRoot_FileDescriptor(void) {
 @dynamic mtype;
 @dynamic ispush;
 @dynamic content;
+@dynamic module;
 
 typedef struct StorageMsg__storage_ {
   uint32_t _has_storage_[1];
@@ -72,6 +73,7 @@ typedef struct StorageMsg__storage_ {
   EMsgFlag mflag;
   EMsgRole mrole;
   int32_t result;
+  EModuleType module;
   NSString *msgid;
   NSString *storeid;
   NSString *ruserid;
@@ -234,6 +236,15 @@ typedef struct StorageMsg__storage_ {
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeBytes,
       },
+      {
+        .name = "module",
+        .dataTypeSpecific.enumDescFunc = EModuleType_EnumDescriptor,
+        .number = StorageMsg_FieldNumber_Module,
+        .hasIndex = 16,
+        .offset = (uint32_t)offsetof(StorageMsg__storage_, module),
+        .flags = GPBFieldOptional | GPBFieldHasEnumDescriptor,
+        .dataType = GPBDataTypeEnum,
+      },
     };
     GPBDescriptor *localDescriptor =
         [GPBDescriptor allocDescriptorForClass:[StorageMsg class]
@@ -308,6 +319,18 @@ int32_t StorageMsg_Mrole_RawValue(StorageMsg *message) {
 void SetStorageMsg_Mrole_RawValue(StorageMsg *message, int32_t value) {
   GPBDescriptor *descriptor = [StorageMsg descriptor];
   GPBFieldDescriptor *field = [descriptor fieldWithNumber:StorageMsg_FieldNumber_Mrole];
+  GPBSetInt32IvarWithFieldInternal(message, field, value, descriptor.file.syntax);
+}
+
+int32_t StorageMsg_Module_RawValue(StorageMsg *message) {
+  GPBDescriptor *descriptor = [StorageMsg descriptor];
+  GPBFieldDescriptor *field = [descriptor fieldWithNumber:StorageMsg_FieldNumber_Module];
+  return GPBGetMessageInt32Field(message, field);
+}
+
+void SetStorageMsg_Module_RawValue(StorageMsg *message, int32_t value) {
+  GPBDescriptor *descriptor = [StorageMsg descriptor];
+  GPBFieldDescriptor *field = [descriptor fieldWithNumber:StorageMsg_FieldNumber_Module];
   GPBSetInt32IvarWithFieldInternal(message, field, value, descriptor.file.syntax);
 }
 

@@ -97,7 +97,7 @@ bool MSSqlite3DB::IsUserExistsInDb(const std::string& userId, const std::string&
     std::ostringstream oss;
     oss << "select count(*) from " << name << " where userId='" << userId << "' and seqnId='" << seqnId << "';";
     std::string sqlSelectCount = oss.str();
-    LI("isUserExistsInDb was called, sqlSelectCount:%s\n", sqlSelectCount.c_str());
+    //LI("isUserExistsInDb was called, sqlSelectCount:%s\n", sqlSelectCount.c_str());
 
     int code = 0;
     int res = RunSqlSelectCount(sqlSelectCount, MC_MSG_SQL_TABLE_STOREID_SEQN, &code);
@@ -112,7 +112,7 @@ bool MSSqlite3DB::InsertSeqn(const std::string& userId, const std::string& seqnI
     std::ostringstream oss;
     oss << "insert into " << name << "(" << key << ") values('" << userId << "','" << seqnId << "'," << seqn << "," << 0 << ");";
     std::string sqlInsert = oss.str();
-    LI("insertSeqnSeqnId was called, sqlInsert:%s\n", sqlInsert.c_str());
+    //LI("insertSeqnSeqnId was called, sqlInsert:%s\n", sqlInsert.c_str());
 
     RunSql(sqlInsert);
     return true;
@@ -124,7 +124,7 @@ bool MSSqlite3DB::UpdateSeqn(const std::string& userId, const std::string& seqnI
     std::ostringstream oss;
     oss << "update " << name << " set seqn=" << seqn << " where userId='" << userId << "' and seqnId='" << seqnId << "';";
     std::string sqlUpdate = oss.str();
-    LI("updateSeqnSeqnId was called, sqlUpdate:%s\n", sqlUpdate.c_str());
+    //LI("updateSeqnSeqnId was called, sqlUpdate:%s\n", sqlUpdate.c_str());
 
     RunSql(sqlUpdate);
     return true;
@@ -136,7 +136,7 @@ bool MSSqlite3DB::UpdateSeqnWithFetched(const std::string& userId, const std::st
     std::ostringstream oss;
     oss << "update " << name << " set seqn=" << seqn << ", isfetched=" << isfetched << " where userId='" << userId << "' and seqnId='" << seqnId << "';";
     std::string sqlUpdate = oss.str();
-    LI("updateSeqnSeqnId with fetched was called, sqlUpdate:%s\n", sqlUpdate.c_str());
+    //LI("updateSeqnSeqnId with fetched was called, sqlUpdate:%s\n", sqlUpdate.c_str());
 
     RunSql(sqlUpdate);
     return true;
@@ -149,7 +149,7 @@ bool MSSqlite3DB::SelectSeqn(const std::string& userId, const std::string& seqnI
     std::ostringstream oss;
     oss << "select seqn from " << name << " where userId='" << userId << "' and seqnId='" << seqnId << "';";
     std::string sqlSelect = oss.str();
-    LI("selectSeqnSeqnId was called, sqlSelect:%s\n", sqlSelect.c_str());
+    //LI("selectSeqnSeqnId was called, sqlSelect:%s\n", sqlSelect.c_str());
 
     int code = 0;
     DbResultVector vec;
@@ -166,7 +166,7 @@ bool MSSqlite3DB::DeleteSeqn(const std::string& userId, const std::string& seqnI
     std::ostringstream oss;
     oss << "delete from " << name << " where userId='" << userId << "' and seqnId='" << seqnId << "';";
     std::string sqlDelete = oss.str();
-    LI("deleteSeqnSeqnId was called, sqlInsert:%s\n", sqlDelete.c_str());
+    //LI("deleteSeqnSeqnId was called, sqlInsert:%s\n", sqlDelete.c_str());
 
     RunSql(sqlDelete);
     return true;
@@ -179,7 +179,7 @@ bool MSSqlite3DB::InsertGroupId(const std::string& userId, const std::string& gr
     std::ostringstream oss;
     oss << "insert into " << name << "(" << key << ") values('" << userId << "','" << grpId << "');";
     std::string sqlInsert = oss.str();
-    LI("insertGroupIdGrpId was called, sqlInsert:%s\n", sqlInsert.c_str());
+    //LI("insertGroupIdGrpId was called, sqlInsert:%s\n", sqlInsert.c_str());
 
     RunSql(sqlInsert);
     return true;
@@ -191,7 +191,7 @@ bool MSSqlite3DB::IsGroupExists(const std::string& userId, const std::string& gr
     std::ostringstream oss;
     oss << "select count(*) from " << name << " where userId='" << userId << "';";
     std::string sqlSelectCount = oss.str();
-    LI("isGroupExistsInDb was called, sqlSelectCount:%s\n", sqlSelectCount.c_str());
+    //LI("isGroupExistsInDb was called, sqlSelectCount:%s\n", sqlSelectCount.c_str());
 
     int code = 0;
     int res = RunSqlSelectCount(sqlSelectCount, MC_MSG_SQL_TABLE_GROUPS_ID, &code);
@@ -204,7 +204,7 @@ bool MSSqlite3DB::SelectGroupInfo(const std::string& userId, DbResultVector& inf
     std::ostringstream oss;
     oss << "select * from " << name << " where userId='" << userId << "';";
     std::string sqlSelect = oss.str();
-    LI("selectGroupIds was called, sqlSelect:%s\n", sqlSelect.c_str());
+    //LI("selectGroupIds was called, sqlSelect:%s\n", sqlSelect.c_str());
 
     RunSqlSelect(sqlSelect, name, 2, info);
     return true;
@@ -216,7 +216,7 @@ bool MSSqlite3DB::DeleteGroupId(const std::string& userId, const std::string& gr
     std::ostringstream oss;
     oss << "delete from " << name << " where userId='" << userId << "' and seqnId='" << grpId << "';";
     std::string sqlDelete = oss.str();
-    LI("deleteGroupIdGrpId was called, sqlDelete:%s\n", sqlDelete.c_str());
+    //LI("deleteGroupIdGrpId was called, sqlDelete:%s\n", sqlDelete.c_str());
 
     RunSql(sqlDelete);
     return true;
@@ -250,7 +250,7 @@ void MSSqlite3DB::CreateTable(const std::string& name, DbResultVector& keyValues
     std::ostringstream oss;
     oss << "create table if not exists " << name << "(" << keys << ");";
     std::string sqlCreateTable = oss.str();
-    LI("createTable was called, sqlCreateTable:%s\n", sqlCreateTable.c_str());
+    //LI("createTable was called, sqlCreateTable:%s\n", sqlCreateTable.c_str());
 
     RunSql(sqlCreateTable);
 }
@@ -260,7 +260,7 @@ void MSSqlite3DB::DropTable(const std::string& name)
     std::ostringstream oss;
     oss << "drop table " << name << ";";
     std::string sqlDropTable = oss.str();
-    LI("dropTable was called, sqlDropTable:%s\n", sqlDropTable.c_str());
+    //LI("dropTable was called, sqlDropTable:%s\n", sqlDropTable.c_str());
 
     RunSql(sqlDropTable);
 }

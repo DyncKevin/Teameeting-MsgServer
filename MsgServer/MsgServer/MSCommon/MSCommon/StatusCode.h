@@ -21,5 +21,8 @@
 #define Err_Redis_Hmset                      (-7)
 #define Err_Redis_Type                       (-8)
 
+#define MAX_SOCKET_BUF_64 (1024*1024*64)
+#define MAX_SOCKET_BUF_32 (1024*1024*32)
+
 
 #endif /* StatusCode_h */

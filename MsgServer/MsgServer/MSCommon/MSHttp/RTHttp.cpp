@@ -28,8 +28,7 @@ RTHttp::~RTHttp()
 int RTHttp::SendData(const char*pData, int nLen)
 {
     if (nLen > 9999) {
-        LE("RTHttp::SendData pData is over length\n");
-        return -1;
+        LE("RTHttp::SendData pData is over length:%d\n", nLen);
     }
     {
         char* ptr = (char*)malloc(sizeof(char)*(nLen+1));

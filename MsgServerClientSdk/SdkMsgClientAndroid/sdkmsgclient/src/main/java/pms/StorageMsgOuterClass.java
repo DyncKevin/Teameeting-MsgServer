@@ -258,6 +258,23 @@ public final class StorageMsgOuterClass {
      * <code>optional bytes content = 16;</code>
      */
     com.google.protobuf.ByteString getContent();
+
+    /**
+     * <pre>
+     * module type, this msg belong to which bussiness module
+     * </pre>
+     *
+     * <code>optional .pms.EModuleType module = 17;</code>
+     */
+    int getModuleValue();
+    /**
+     * <pre>
+     * module type, this msg belong to which bussiness module
+     * </pre>
+     *
+     * <code>optional .pms.EModuleType module = 17;</code>
+     */
+    pms.CommonMsg.EModuleType getModule();
   }
   /**
    * <pre>
@@ -288,6 +305,7 @@ public final class StorageMsgOuterClass {
       mtype_ = "";
       ispush_ = "";
       content_ = com.google.protobuf.ByteString.EMPTY;
+      module_ = 0;
     }
     public static final int RSVRCMD_FIELD_NUMBER = 1;
     private int rsvrcmd_;
@@ -1189,6 +1207,65 @@ public final class StorageMsgOuterClass {
       content_ = getDefaultInstance().getContent();
     }
 
+    public static final int MODULE_FIELD_NUMBER = 17;
+    private int module_;
+    /**
+     * <pre>
+     * module type, this msg belong to which bussiness module
+     * </pre>
+     *
+     * <code>optional .pms.EModuleType module = 17;</code>
+     */
+    public int getModuleValue() {
+      return module_;
+    }
+    /**
+     * <pre>
+     * module type, this msg belong to which bussiness module
+     * </pre>
+     *
+     * <code>optional .pms.EModuleType module = 17;</code>
+     */
+    public pms.CommonMsg.EModuleType getModule() {
+      pms.CommonMsg.EModuleType result = pms.CommonMsg.EModuleType.forNumber(module_);
+      return result == null ? pms.CommonMsg.EModuleType.UNRECOGNIZED : result;
+    }
+    /**
+     * <pre>
+     * module type, this msg belong to which bussiness module
+     * </pre>
+     *
+     * <code>optional .pms.EModuleType module = 17;</code>
+     */
+    private void setModuleValue(int value) {
+        module_ = value;
+    }
+    /**
+     * <pre>
+     * module type, this msg belong to which bussiness module
+     * </pre>
+     *
+     * <code>optional .pms.EModuleType module = 17;</code>
+     */
+    private void setModule(pms.CommonMsg.EModuleType value) {
+      if (value == null) {
+        throw new NullPointerException();
+      }
+      
+      module_ = value.getNumber();
+    }
+    /**
+     * <pre>
+     * module type, this msg belong to which bussiness module
+     * </pre>
+     *
+     * <code>optional .pms.EModuleType module = 17;</code>
+     */
+    private void clearModule() {
+      
+      module_ = 0;
+    }
+
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (rsvrcmd_ != pms.CommonMsg.EServerCmd.CLOGIN.getNumber()) {
@@ -1238,6 +1315,9 @@ public final class StorageMsgOuterClass {
       }
       if (!content_.isEmpty()) {
         output.writeBytes(16, content_);
+      }
+      if (module_ != pms.CommonMsg.EModuleType.TINVALID0.getNumber()) {
+        output.writeEnum(17, module_);
       }
     }
 
@@ -1309,6 +1389,10 @@ public final class StorageMsgOuterClass {
       if (!content_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(16, content_);
+      }
+      if (module_ != pms.CommonMsg.EModuleType.TINVALID0.getNumber()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(17, module_);
       }
       memoizedSerializedSize = size;
       return size;
@@ -2245,6 +2329,63 @@ public final class StorageMsgOuterClass {
         return this;
       }
 
+      /**
+       * <pre>
+       * module type, this msg belong to which bussiness module
+       * </pre>
+       *
+       * <code>optional .pms.EModuleType module = 17;</code>
+       */
+      public int getModuleValue() {
+        return instance.getModuleValue();
+      }
+      /**
+       * <pre>
+       * module type, this msg belong to which bussiness module
+       * </pre>
+       *
+       * <code>optional .pms.EModuleType module = 17;</code>
+       */
+      public Builder setModuleValue(int value) {
+        copyOnWrite();
+        instance.setModuleValue(value);
+        return this;
+      }
+      /**
+       * <pre>
+       * module type, this msg belong to which bussiness module
+       * </pre>
+       *
+       * <code>optional .pms.EModuleType module = 17;</code>
+       */
+      public pms.CommonMsg.EModuleType getModule() {
+        return instance.getModule();
+      }
+      /**
+       * <pre>
+       * module type, this msg belong to which bussiness module
+       * </pre>
+       *
+       * <code>optional .pms.EModuleType module = 17;</code>
+       */
+      public Builder setModule(pms.CommonMsg.EModuleType value) {
+        copyOnWrite();
+        instance.setModule(value);
+        return this;
+      }
+      /**
+       * <pre>
+       * module type, this msg belong to which bussiness module
+       * </pre>
+       *
+       * <code>optional .pms.EModuleType module = 17;</code>
+       */
+      public Builder clearModule() {
+        copyOnWrite();
+        instance.clearModule();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:pms.StorageMsg)
     }
     protected final Object dynamicMethod(
@@ -2293,6 +2434,7 @@ public final class StorageMsgOuterClass {
               !other.ispush_.isEmpty(), other.ispush_);
           content_ = visitor.visitByteString(content_ != com.google.protobuf.ByteString.EMPTY, content_,
               other.content_ != com.google.protobuf.ByteString.EMPTY, other.content_);
+          module_ = visitor.visitInt(module_ != 0, module_,    other.module_ != 0, other.module_);
           if (visitor == com.google.protobuf.GeneratedMessageLite.MergeFromVisitor
               .INSTANCE) {
           }
@@ -2407,6 +2549,12 @@ public final class StorageMsgOuterClass {
                 case 130: {
 
                   content_ = input.readBytes();
+                  break;
+                }
+                case 136: {
+                  int rawValue = input.readEnum();
+
+                  module_ = rawValue;
                   break;
                 }
               }

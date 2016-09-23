@@ -24,6 +24,7 @@
 #include "proto/entity_msg_type.pb.h"
 
 #include "RTSingleton.h"
+#include "UtilTimer.h"
 
 #include "webrtc/base/criticalsection.h"
 #include "rtklog.h"
@@ -373,6 +374,10 @@ private:
             UpdateUserSeqns(item.first, item.second);
         }
     }
+
+    static int OnWorkers();
+    static int OnSuccess();
+    static int OnFailure();
 
 protected:
     MsgClient():m_subMsgDelegate(nullptr)

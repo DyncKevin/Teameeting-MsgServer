@@ -86,6 +86,7 @@ const int StorageMsg::kVersionFieldNumber;
 const int StorageMsg::kMtypeFieldNumber;
 const int StorageMsg::kIspushFieldNumber;
 const int StorageMsg::kContentFieldNumber;
+const int StorageMsg::kModuleFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 StorageMsg::StorageMsg()
@@ -126,6 +127,7 @@ void StorageMsg::SharedCtor() {
   mtype_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ispush_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   content_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  module_ = 0;
 }
 
 StorageMsg::~StorageMsg() {
@@ -201,6 +203,7 @@ void StorageMsg::Clear() {
   mtype_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ispush_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   content_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  module_ = 0;
 
 #undef ZR_HELPER_
 #undef ZR_
@@ -469,6 +472,22 @@ bool StorageMsg::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
+        if (input->ExpectTag(136)) goto parse_module;
+        break;
+      }
+
+      // optional .pms.EModuleType module = 17;
+      case 17: {
+        if (tag == 136) {
+         parse_module:
+          int value;
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
+                 input, &value)));
+          set_module(static_cast< ::pms::EModuleType >(value));
+        } else {
+          goto handle_unusual;
+        }
         if (input->ExpectAtEnd()) goto success;
         break;
       }
@@ -618,6 +637,12 @@ void StorageMsg::SerializeWithCachedSizes(
       16, this->content(), output);
   }
 
+  // optional .pms.EModuleType module = 17;
+  if (this->module() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteEnum(
+      17, this->module(), output);
+  }
+
   // @@protoc_insertion_point(serialize_end:pms.StorageMsg)
 }
 
@@ -732,6 +757,12 @@ int StorageMsg::ByteSize() const {
         this->content());
   }
 
+  // optional .pms.EModuleType module = 17;
+  if (this->module() != 0) {
+    total_size += 2 +
+      ::google::protobuf::internal::WireFormatLite::EnumSize(this->module());
+  }
+
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = total_size;
   GOOGLE_SAFE_CONCURRENT_WRITES_END();
@@ -802,6 +833,9 @@ void StorageMsg::MergeFrom(const StorageMsg& from) {
 
     content_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.content_);
   }
+  if (from.module() != 0) {
+    set_module(from.module());
+  }
 }
 
 void StorageMsg::CopyFrom(const StorageMsg& from) {
@@ -837,6 +871,7 @@ void StorageMsg::InternalSwap(StorageMsg* other) {
   mtype_.Swap(&other->mtype_);
   ispush_.Swap(&other->ispush_);
   content_.Swap(&other->content_);
+  std::swap(module_, other->module_);
   _unknown_fields_.Swap(&other->_unknown_fields_);
   std::swap(_cached_size_, other->_cached_size_);
 }
@@ -1310,6 +1345,20 @@ void StorageMsg::clear_content() {
   }
   content_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), content);
   // @@protoc_insertion_point(field_set_allocated:pms.StorageMsg.content)
+}
+
+// optional .pms.EModuleType module = 17;
+void StorageMsg::clear_module() {
+  module_ = 0;
+}
+ ::pms::EModuleType StorageMsg::module() const {
+  // @@protoc_insertion_point(field_get:pms.StorageMsg.module)
+  return static_cast< ::pms::EModuleType >(module_);
+}
+ void StorageMsg::set_module(::pms::EModuleType value) {
+  
+  module_ = value;
+  // @@protoc_insertion_point(field_set:pms.StorageMsg.module)
 }
 
 #endif  // PROTOBUF_INLINE_NOT_IN_HEADERS

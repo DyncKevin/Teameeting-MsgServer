@@ -11,6 +11,7 @@
 #include "RTUtils.hpp"
 #include "LRTConnManager.h"
 #include "LRTRTLiveManager.h"
+#include "StatusCode.h"
 
 #include "MsgServer/proto/common_msg.pb.h"
 #include "MsgServer/proto/sys_msg_type.pb.h"
@@ -54,7 +55,9 @@ void LRTTransferSession::Init()
     socket->InitNonBlocking(socket->GetSocketFD());
     socket->NoDelay();
     socket->KeepAlive();
-    socket->SetSocketBufSize(96L * 1024L);
+    socket->SetSocketBufSize(MAX_SOCKET_BUF_32);
+    socket->SetSocketRcvBufSize(MAX_SOCKET_BUF_64);
+
 
     socket->SetTask(this);
     this->SetTimer(120*1000);
@@ -237,6 +240,7 @@ void LRTTransferSession::OnWakeupEvent(const char*pData, int nLen)
     if (hasData)
     {
         pms::RelayMsg rmsg;
+        rmsg.set_tr_module(pms::ETransferModule::MLIVE);
         rmsg.set_svr_cmds(pms::EServerCmd::CSYNCSEQN);
         rmsg.set_content(m_packedSeqnMsg.SerializeAsString());
 
@@ -280,6 +284,7 @@ void LRTTransferSession::OnPushEvent(const char*pData, int nLen)
     if (hasData)
     {
         pms::RelayMsg rmsg;
+        rmsg.set_tr_module(pms::ETransferModule::MLIVE);
         rmsg.set_svr_cmds(pms::EServerCmd::CNEWMSG);
         rmsg.set_content(m_packedNewMsg.SerializeAsString());
 
@@ -323,6 +328,7 @@ void LRTTransferSession::OnTickEvent(const char*pData, int nLen)
     if (hasData)
     {
         pms::RelayMsg rmsg;
+        rmsg.set_tr_module(pms::ETransferModule::MLIVE);
         rmsg.set_svr_cmds(pms::EServerCmd::CSYNCDATA);
         rmsg.set_content(m_packedDataMsg.SerializeAsString());
 
@@ -475,7 +481,7 @@ void LRTTransferSession::OnTypeTrans(const std::string& str)
     LRTRTLiveManager::Instance().RecvRequestCounter();
     pms::RelayMsg r_msg;
     if (!r_msg.ParseFromString(str)) return;
-    LI("LRTTransferSession::OnTypeTrans svr_cmds:%d\n", r_msg.svr_cmds());
+    //LI("LRTTransferSession::OnTypeTrans svr_cmds:%d\n", r_msg.svr_cmds());
     if (r_msg.svr_cmds() == pms::EServerCmd::CSNDMSG)
     {
         pms::Entity e_msg;
@@ -665,7 +671,7 @@ void LRTTransferSession::OnTypeQueue(const std::string& str)
                     if (LRTConnManager::Instance().SendToGroupModule(sn, s))
                     {
                     } else {
-                         LI("LRTTransferSession::OnTypeQueue noooooooooot dispatch msg ok\n");
+                         LE("LRTTransferSession::OnTypeQueue noooooooooot dispatch msg ok\n");
                     }
 
                     continue;

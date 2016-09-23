@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "SocketUtils.h"
 #include "RTHttpSender.h"
+#include "StatusCode.h"
 
 
 #define HTTP_SENDER_TIMEOUT (60000)
@@ -47,7 +48,8 @@ bool RTHttpSender::ConnHttpHost(const std::string& addr, const unsigned short po
     }
     socket->InitNonBlocking(socket->GetSocketFD());
     socket->NoDelay();
-    socket->SetSocketBufSize(10L * 1024L);//10k
+    socket->SetSocketBufSize(MAX_SOCKET_BUF_32);//10k
+    socket->SetSocketRcvBufSize(MAX_SOCKET_BUF_64);//10k
     socket->SetTask(this);
     OS_Error err;
     do{

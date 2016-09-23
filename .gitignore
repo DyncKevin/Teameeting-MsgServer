@@ -46,3 +46,14 @@ MsgServer/MsgServerModule/MsgServerModule
 MsgServer/MsgServerModule/module/bin
 MsgServer/MsgServer/MSCommon/MSThirdParty/xredis/examples/demo
 MsgServer/MsgServer/MSCommon/MSThirdParty/xredis/examples/xredis-example
+MsgServer/MsgServerClient/MsgServerClient
+MsgServer/build_shell/msgserver
+MsgServer/MsgServerClient/client_dbs/
+MsgServer/MsgServerClient/client_logs/
+MsgServer/client_test/client_dbs/
+MsgServer/client_test/client_logs/
+MsgServer/client_test/parser/cpp_log_parser
+MsgServer/client_test/parser/msgclient_parser
+MsgServer/client_test/parser/log_parser
+MsgServer/client_test/parser/parser
+MsgServer/xredis_command/xredis-client

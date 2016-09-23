@@ -11,6 +11,7 @@
 #include "RTUtils.hpp"
 #include "SRTConnManager.h"
 #include "SRTSequenceManager.h"
+#include "StatusCode.h"
 
 #define TIMEOUT_TS (60*1000)
 
@@ -42,7 +43,9 @@ void SRTTransferSession::Init()
     socket->InitNonBlocking(socket->GetSocketFD());
     socket->NoDelay();
     socket->KeepAlive();
-    socket->SetSocketBufSize(96L * 1024L);
+    socket->SetSocketBufSize(MAX_SOCKET_BUF_32);
+    socket->SetSocketRcvBufSize(MAX_SOCKET_BUF_64);
+
 
     socket->SetTask(this);
     this->SetTimer(120*1000);

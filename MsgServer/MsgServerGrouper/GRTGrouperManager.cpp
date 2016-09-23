@@ -43,7 +43,6 @@ bool GRTGrouperManager::RecvRequestCounter()
     SInt64 curTime = OS::Milliseconds();
     char buf[128] = {0};
     sprintf(buf, "recv_time:%lld:gRecvCounter:%lld\n", curTime, ++gRecvCounter);
-    LI("%s", buf);
     memset(buf, 0, 128);
     return false;
 }
@@ -53,7 +52,6 @@ bool GRTGrouperManager::SendResponseCounter()
     SInt64 curTime = OS::Milliseconds();
     char buf[128] = {0};
     sprintf(buf, "send_time:%lld:gSendCounter:%lld\n", curTime, ++gSendCounter);
-    LI("%s", buf);
     memset(buf, 0, 128);
     return false;
 }
@@ -101,7 +99,6 @@ bool GRTGrouperManager::GetGroupMembersRedis(const std::string& groupid)
 {
     char grpKey[256] = {0};
     sprintf(grpKey, "anyrtc_live_%s", groupid.c_str());
-    LI("GetGroupMembers key:%s\n", grpKey);
     m_RedisDBIdx->CreateDBIndex(grpKey, APHash, CACHE_TYPE_1);
     VALUES vValue;
     if (m_xRedisClient.smembers(*m_RedisDBIdx, grpKey, vValue))
@@ -128,7 +125,6 @@ bool GRTGrouperManager::GetGroupMembersRedis(const std::string& groupid)
 
 void GRTGrouperManager::UpdateGroupMembers(const std::string& groupid, const GrpMembersStatusMap&  members)
 {
-    LI("GRTGrouperManager::UpdateGroupMembers was called\n");
     // add new members, del old members
     GroupMembersMapIt it = m_MapGroupMembers.find(groupid);
     if (it != m_MapGroupMembers.end())
@@ -141,7 +137,6 @@ void GRTGrouperManager::UpdateGroupMembers(const std::string& groupid, const Grp
             } else if (x.second == DEL) {
                 (*it).second->erase(x.first);
             }
-            LI("UpdateGroupMembers usr list.size:%d\n", (*it).second->size());
         }
     } else {
         if (GetGroupMembersRedis(groupid))
@@ -157,7 +152,6 @@ void GRTGrouperManager::UpdateGroupMembers(const std::string& groupid, const Grp
                     (*it).second->erase(x.first);
                 }
             }
-            LI("UpdateGroupMembers usr 2 list.size:%d\n", (*it).second->size());
         } else {
             LE("GRTGrouperManager::UpdateGroupMembers GetGroupMembersRedis not find groupid:%s\n", groupid.c_str());
         }
@@ -189,8 +183,7 @@ void GRTGrouperManager::TmpStoreGroupMsg(const std::string& groupid, int64 seqn,
     } else {
         m_MapTmpGroupMsg.insert(make_pair(groupid, seqn));
         m_ListTmpGroup.push_back(groupid);
-        LI("TmpStoreGroupMsg m_MapTmpGroupMsg.size:%lu, m_ListTmpGroup.size:%lu\n", m_MapTmpGroupMsg.size(), m_ListTmpGroup.size());
-        Assert(m_MapTmpGroupMsg.size()==m_ListTmpGroup.size());
+        //Assert(m_MapTmpGroupMsg.size()==m_ListTmpGroup.size());
     }
 }
 
@@ -201,8 +194,7 @@ void GRTGrouperManager::RemoveGroupMsg(const std::string& groupid)
         m_MapTmpGroupMsg.erase(groupid);
         m_ListTmpGroup.pop_front();
     }
-    LI("RemoveGroupMsg m_MapTmpGroupMsg.size:%lu, m_ListTmpGroup.size:%lu\n", m_MapTmpGroupMsg.size(), m_ListTmpGroup.size());
-    Assert(m_MapTmpGroupMsg.size()==m_ListTmpGroup.size());
+    //Assert(m_MapTmpGroupMsg.size()==m_ListTmpGroup.size());
 }
 
 bool GRTGrouperManager::ProcessTmpGroupMsg(GRTTransferSession* pSess)
@@ -215,7 +207,6 @@ bool GRTGrouperManager::ProcessTmpGroupMsg(GRTTransferSession* pSess)
         std::unordered_set<std::string>* users = m_MapGroupMembers[grpid];
         for(auto & l : *users)
         {
-           LI("GRTGrouperManager::ProcessTmpGroupMsg  notify userid:%s, groupid:%s, seqn:%lld\n", l.c_str(), grpid.c_str(), seqn);
            pSess->GenGrpSyncDataNotify(l, grpid, seqn);
         }
     }

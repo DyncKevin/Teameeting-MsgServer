@@ -30,7 +30,6 @@ int RTLstorage::DoProcessData(const char *pData, int nLen)
     }
 
     {
-        printf("RTLstorage::DoProcessData m_msg.flag:%d\n", m_msg.flag());
         if (m_msg.flag() == pms::ETransferFlag::FNEEDACK) {
             OnMsgAck(m_msg);
         } else if (m_msg.flag() == pms::ETransferFlag::FACK) {
@@ -41,7 +40,6 @@ int RTLstorage::DoProcessData(const char *pData, int nLen)
         }
     }
 
-    printf("RTLstorage::DoProcessData m_msg.type:%d\n", m_msg.type());
     {
         if (m_msg.type() == pms::ETransferType::TCONN) {
             OnTypeConn(m_msg.content());

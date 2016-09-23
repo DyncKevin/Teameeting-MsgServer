@@ -76,6 +76,7 @@ void SRTStorageRedis::OnWakeupEvent(const void*pData, int nSize)
 {
     if (m_QueuePostMsg.size()==0) return;
     pms::StorageMsg store = m_QueuePostMsg.front();
+    LI("SRTStorageRedis::OnWakeupEvent ruserid:%s, storeid:%s, sequence:%lld\n", store.ruserid().c_str(), store.storeid().c_str(), store.sequence());
     if (store.mflag()==pms::EMsgFlag::FGROUP)
     {
         std::string str("");
@@ -200,6 +201,7 @@ void SRTStorageRedis::OnTickEvent(const void*pData, int nSize)
 {
     if (m_QueuePushMsg.size()==0) return;
     pms::StorageMsg store = m_QueuePushMsg.front();
+    LI("SRTStorageRedis::OnTickEvent ruserid:%s, storeid:%s, sequence:%lld\n", store.ruserid().c_str(), store.storeid().c_str(), store.sequence());
     if (store.mflag()==pms::EMsgFlag::FGROUP)
     {
         char key[512] = {'\0'};

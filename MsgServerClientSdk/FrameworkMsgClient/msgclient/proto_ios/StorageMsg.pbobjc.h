@@ -15,6 +15,7 @@
 CF_EXTERN_C_BEGIN
 
 @class StorageMsg;
+GPB_ENUM_FWD_DECLARE(EModuleType);
 GPB_ENUM_FWD_DECLARE(EMsgFlag);
 GPB_ENUM_FWD_DECLARE(EMsgRole);
 GPB_ENUM_FWD_DECLARE(EServerCmd);
@@ -54,6 +55,7 @@ typedef GPB_ENUM(StorageMsg_FieldNumber) {
   StorageMsg_FieldNumber_Mtype = 14,
   StorageMsg_FieldNumber_Ispush = 15,
   StorageMsg_FieldNumber_Content = 16,
+  StorageMsg_FieldNumber_Module = 17,
 };
 
 /// this is the msg for store msg to redis
@@ -107,6 +109,9 @@ typedef GPB_ENUM(StorageMsg_FieldNumber) {
 /// message
 @property(nonatomic, readwrite, copy, null_resettable) NSData *content;
 
+/// module type, this msg belong to which bussiness module
+@property(nonatomic, readwrite) enum EModuleType module;
+
 @end
 
 /// Fetches the raw value of a @c StorageMsg's @c rsvrcmd property, even
@@ -148,6 +153,14 @@ int32_t StorageMsg_Mrole_RawValue(StorageMsg *message);
 /// it to be set to a value that was not defined by the enum at the time the code
 /// was generated.
 void SetStorageMsg_Mrole_RawValue(StorageMsg *message, int32_t value);
+
+/// Fetches the raw value of a @c StorageMsg's @c module property, even
+/// if the value was not defined by the enum at the time the code was generated.
+int32_t StorageMsg_Module_RawValue(StorageMsg *message);
+/// Sets the raw value of an @c StorageMsg's @c module property, allowing
+/// it to be set to a value that was not defined by the enum at the time the code
+/// was generated.
+void SetStorageMsg_Module_RawValue(StorageMsg *message, int32_t value);
 
 #pragma mark - PackedStoreMsg
 

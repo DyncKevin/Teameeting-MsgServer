@@ -29,7 +29,6 @@ bool SRTStorageManager::RecvRequestCounter()
     sprintf(buf, "recv_time:%lld:gRecvCounter:%lld\n", curTime, ++gRecvCounter);
     //fwrite(buf, 1, 128, m_RecvFile);
     //fflush(m_RecvFile);
-    LI("%s", buf);
     memset(buf, 0, 128);
     return false;
 }
@@ -41,7 +40,6 @@ bool SRTStorageManager::SendResponseCounter()
     sprintf(buf, "send_time:%lld:gSendCounter:%lld\n", curTime, ++gSendCounter);
     //fwrite(buf, 1, 128, m_SendFile);
     //fflush(m_SendFile);
-    LI("%s", buf);
     memset(buf, 0, 128);
     return false;
 }

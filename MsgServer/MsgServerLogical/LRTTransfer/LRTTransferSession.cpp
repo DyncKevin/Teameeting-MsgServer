@@ -11,6 +11,11 @@
 #include "RTUtils.hpp"
 #include "LRTConnManager.h"
 #include "LRTLogicalManager.h"
+#include "StatusCode.h"
+
+#include "MsgServer/proto/storage_msg.pb.h"
+#include "MsgServer/proto/sys_msg_type.pb.h"
+#include "MsgServer/proto/sys_msg.pb.h"
 
 #define PACKED_MSG_ONCE_NUM (10)
 
@@ -56,7 +61,9 @@ void LRTTransferSession::Init()
     socket->InitNonBlocking(socket->GetSocketFD());
     socket->NoDelay();
     socket->KeepAlive();
-    socket->SetSocketBufSize(96L * 1024L);
+    socket->SetSocketBufSize(MAX_SOCKET_BUF_32);
+    socket->SetSocketRcvBufSize(MAX_SOCKET_BUF_64);
+
 
     socket->SetTask(this);
     this->SetTimer(120*1000);
@@ -187,6 +194,7 @@ void LRTTransferSession::EstablishConnection()
 
 void LRTTransferSession::SendTransferData(const char* pData, int nLen)
 {
+    LI("LRTTransferSession::SendTransferData 1 nLen:%d\n", nLen);
     LRTLogicalManager::Instance().SendResponseCounter();
     RTTcpNoTimeout::SendTransferData(pData, nLen);
     GetSocket()->RequestEvent(EV_RE);
@@ -194,6 +202,7 @@ void LRTTransferSession::SendTransferData(const char* pData, int nLen)
 
 void LRTTransferSession::SendTransferData(const std::string& data)
 {
+    LI("LRTTransferSession::SendTransferData 2 nLen:%d\n", data.length());
     SendTransferData(data.c_str(), data.length());
 }
 
@@ -259,6 +268,7 @@ void LRTTransferSession::OnPushEvent(const char*pData, int nLen)
             tmsg.set_priority(pms::ETransferPriority::PNORMAL);
             tmsg.set_content(m_respReadMsg.SerializeAsString());
             this->SendTransferData(tmsg.SerializeAsString());
+            LI("LRTTransferSession::OnPushEvent read transfermsg length:%d, packedmsg length:%d\n", tmsg.SerializeAsString().length(), m_respReadMsg.SerializeAsString().length());
         }
         for (int i=0;i<PACKED_MSG_ONCE_NUM;++i)
         {
@@ -300,6 +310,7 @@ void LRTTransferSession::OnTickEvent(const char*pData, int nLen)
             tmsg.set_priority(pms::ETransferPriority::PNORMAL);
             tmsg.set_content(m_respWriteMsg.SerializeAsString());
             this->SendTransferData(tmsg.SerializeAsString());
+            LI("LRTTransferSession::OnTickEvent write transfermsg length:%d, packedmsg length:%d\n", tmsg.SerializeAsString().length(), m_respWriteMsg.SerializeAsString().length());
         }
         for (int i=0;i<PACKED_MSG_ONCE_NUM;++i)
         {
@@ -316,6 +327,7 @@ void LRTTransferSession::OnTickEvent(const char*pData, int nLen)
 
 void LRTTransferSession::OnTransfer(const std::string& str)
 {
+    LI("LRTTransferSession::OnTransfer 3 nLen:%d\n", str.length());
     RTTcpNoTimeout::SendTransferData(str.c_str(), (int)str.length());
 }
 
@@ -459,6 +471,14 @@ void LRTTransferSession::OnTypeWriteRequest(const std::string& str)
 {
     pms::RelayMsg rmsg;
     if (!rmsg.ParseFromString(str)) return;
+    LI("LRTTransferSession::OnTypeWriteRequest transfermodule:%d, cont_module:%d\n", rmsg.tr_module(), rmsg.cont_module());
+    LRTConnManager::ModuleInfo* pMd = LRTConnManager::Instance().findModuleInfo("", rmsg.tr_module());
+    if (pMd)
+    {
+        LI("find module\n");
+    } else {
+        LI("not find module\n");
+    }
 
     switch (rmsg.svr_cmds())
     {
@@ -505,7 +525,15 @@ void LRTTransferSession::OnTypeWriteResponse(const std::string& str)
 
     pms::RelayMsg rmsg;
     if (!rmsg.ParseFromString(str)) return;
+    LI("LRTTransferSession::OnTypeWriteResponse transfermodule:%d, cont_module:%d\n", rmsg.tr_module(), rmsg.cont_module());
 
+    LRTConnManager::ModuleInfo* pMd = LRTConnManager::Instance().findModuleInfo("", rmsg.tr_module());
+    if (pMd)
+    {
+        LI("find module\n");
+    } else {
+        LI("not find module\n");
+    }
     //if (rmsg.svr_cmds()==pms::EServerCmd::CNEWMSGSEQN)
     // this is response from wirte seqn
     if (rmsg.svr_cmds()==pms::EServerCmd::CSEQN)
@@ -578,7 +606,15 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
 {
     pms::RelayMsg rmsg;
     if (!rmsg.ParseFromString(str)) return;
+    LI("LRTTransferSession::OnTypeReadRequest transfermodule:%d, cont_module:%d\n", rmsg.tr_module(), rmsg.cont_module());
 
+    LRTConnManager::ModuleInfo* pMd = LRTConnManager::Instance().findModuleInfo("", rmsg.tr_module());
+    if (pMd)
+    {
+        LI("find module\n");
+    } else {
+        LI("not find module\n");
+    }
     if (rmsg.svr_cmds()==pms::EServerCmd::CSYNCSEQN)
     {
         pms::PackedStoreMsg store, s_store;
@@ -608,7 +644,6 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
                 s_store.add_msgs()->MergeFrom(store.msgs(i));
             }
         }
-        LI("LRTTransferSession::OnTypeReadRequest SYNCSEQN s_store.size:%d\n", s_store.msgs_size());
         if (s_store.msgs_size()>0)
         {
             pms::TransferMsg tmsg;
@@ -640,18 +675,21 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
                 char msgid[16] = {0};
                 sprintf(msgid, "prd:%u", m_tmpRDataId++);
                 store.mutable_msgs(i)->set_msgid(msgid);
+                store.mutable_msgs(i)->set_maxseqn(store.mutable_msgs(i)->sequence());
                 LRTLogicalManager::Instance().InsertDataRead(this, store.mutable_msgs(i));
                 d_store.add_msgs()->MergeFrom(store.msgs(i));
             } else if (store.msgs(i).rsvrcmd()==pms::EServerCmd::CSYNCONEDATA) {
                 char msgid[16] = {0};
                 sprintf(msgid, "ord:%u", m_tmpOData2Id++);
                 store.mutable_msgs(i)->set_msgid(msgid);
+                store.mutable_msgs(i)->set_maxseqn(store.mutable_msgs(i)->sequence());
                 LRTLogicalManager::Instance().InsertDataRead(this, store.mutable_msgs(i));
                 d_store.add_msgs()->MergeFrom(store.msgs(i));
             } else if (store.msgs(i).rsvrcmd()==pms::EServerCmd::CSYNCONEGROUPDATA) {
                 char msgid[16] = {0};
                 sprintf(msgid, "ogrd:%u", m_tmpOGData2Id++);
                 store.mutable_msgs(i)->set_msgid(msgid);
+                store.mutable_msgs(i)->set_maxseqn(store.mutable_msgs(i)->sequence());
                 LRTLogicalManager::Instance().InsertDataRead(this, store.mutable_msgs(i));
                 d_store.add_msgs()->MergeFrom(store.msgs(i));
             } else { // this is from pusher CPGETDATA
@@ -662,6 +700,7 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
                     // update max seqn
 
                     int64 s = store.msgs(i).sequence(), ms = seqn;
+                    LI("LRTTransferSession::OnTypeReadRequest CSYNCDATA store.msgs(i).sequence:%lld, maxsequence:%lld\n", store.msgs(i).sequence(), store.msgs(i).maxseqn());
                     // ???????? shoule be eauql here?
                     if (ms<s)continue;
                     store.mutable_msgs(i)->set_maxseqn(seqn);// update maxseqn
@@ -672,8 +711,9 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
                         store.mutable_msgs(i)->set_msgid(msgid);
                         store.mutable_msgs(i)->set_sequence(s+j);// modify the sequence, which msg you sync
                         LRTLogicalManager::Instance().InsertDataRead(this, store.mutable_msgs(i));
-                        d_store.add_msgs()->MergeFrom(store.msgs(i));
                     }
+                    // fix later, problem msgid
+                    d_store.add_msgs()->MergeFrom(store.msgs(i));
                 } else {
                     char msgid[16] = {0};
                     sprintf(msgid, "drs:%u", m_tmpRSeqn4DataId++);
@@ -745,7 +785,15 @@ void LRTTransferSession::OnTypeReadResponse(const std::string& str)
 {
     pms::RelayMsg rmsg;
     if (!rmsg.ParseFromString(str)) return;
+    LI("LRTTransferSession::OnTypeReadResponse transfermodule:%d, cont_module:%d\n", rmsg.tr_module(), rmsg.cont_module());
 
+    LRTConnManager::ModuleInfo* pMd = LRTConnManager::Instance().findModuleInfo("", rmsg.tr_module());
+    if (pMd)
+    {
+        LI("find module\n");
+    } else {
+        LI("not find module\n");
+    }
     if (rmsg.svr_cmds()==pms::EServerCmd::CSEQN)
     {
         pms::PackedStoreMsg store, d_store;

@@ -4,7 +4,9 @@
 #include <string.h>
 #include "rtklog.h"
 
-const int	kRequestBufferSizeInBytes = 2048;
+//const int	kRequestBufferSizeInBytes = 2048;
+const int	kRequestBufferSizeInBytes = 1024*1024*64;
+
 void RTJSBuffer::writeShort(char** pptr, unsigned short anInt)
 {
 	**pptr = (char)(anInt / 256);

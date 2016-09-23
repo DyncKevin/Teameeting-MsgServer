@@ -10,6 +10,7 @@
 #include "DRTTransferSession.h"
 #include "DRTConnManager.h"
 #include "RTUtils.hpp"
+#include "StatusCode.h"
 
 #include "MsgServer/proto/common_msg.pb.h"
 #include "MsgServer/proto/sys_msg_type.pb.h"
@@ -50,7 +51,9 @@ void DRTTransferSession::Init()
     socket->InitNonBlocking(socket->GetSocketFD());
     socket->NoDelay();
     socket->KeepAlive();
-    socket->SetSocketBufSize(96L * 1024L);
+    socket->SetSocketBufSize(MAX_SOCKET_BUF_32);
+    socket->SetSocketRcvBufSize(MAX_SOCKET_BUF_64);
+
 
     socket->SetTask(this);
     this->SetTimer(120*1000);
@@ -206,7 +209,6 @@ void DRTTransferSession::OnTypeConn(const std::string& str)
         LE("OnTypeConn c_msg ParseFromString error\n");
         return;
     }
-    LI("OnTypeConn connmsg--->:\n");
     //c_msg.PrintDebugString();
 
     if ((c_msg.conn_tag() == pms::EConnTag::THI)) {
@@ -315,7 +317,6 @@ void DRTTransferSession::OnTypeQueue(const std::string& str)
         LE("r_msg.ParseFromString error\n");
         return;
     }
-    LI("DRTTransferSession::OnTypeQueue was called\n");
 
     //get all user
     pms::ToUser auser = rmsg.touser();
@@ -324,7 +325,6 @@ void DRTTransferSession::OnTypeQueue(const std::string& str)
     pms::RelayMsg pmsg;
     pms::ToUser *pallduser = pmsg.mutable_touser();
     DRTConnManager::UserConnectorMaps connUserId;
-    LI("DRTTransferSession::OnTypeQueue handle_cmd:%s, handle_mtype:%s, handle_data:%s\n", rmsg.handle_cmd().c_str(), rmsg.handle_mtype().c_str(), rmsg.handle_data().c_str());
 #if 0
     {
         //check user online or offline

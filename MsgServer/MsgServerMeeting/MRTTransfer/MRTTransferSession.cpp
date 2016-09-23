@@ -11,6 +11,7 @@
 #include "MRTConnManager.h"
 #include "MRTHttpSvrConn.h"
 #include "RTUtils.hpp"
+#include "StatusCode.h"
 
 #define TIMEOUT_TS (60*1000)
 
@@ -44,7 +45,9 @@ void MRTTransferSession::Init()
     socket->InitNonBlocking(socket->GetSocketFD());
     socket->NoDelay();
     socket->KeepAlive();
-    socket->SetSocketBufSize(96L * 1024L);
+    socket->SetSocketBufSize(MAX_SOCKET_BUF_32);
+    socket->SetSocketRcvBufSize(MAX_SOCKET_BUF_64);
+
 
     this->SetTimer(120*1000);
 }

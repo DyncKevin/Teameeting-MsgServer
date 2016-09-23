@@ -132,7 +132,7 @@ int MsgClient::MCSendTxtMsg(std::string& outmsgid, MSTxtMessage *txtMsg)
 
     if (!jsonString)
     {
-        LI("MCSendTxtMsg JSONToNSString error");
+        LE("MCSendTxtMsg JSONToNSString error");
         delete mMsg;
         mMsg = nullptr;
         return -3;
@@ -155,7 +155,7 @@ int MsgClient::MCSendTxtMsgTos(std::string& outmsgid, MSTxtMessage *txtMsg, cons
 
     if (!jsonString)
     {
-        LI("MCSendTxtMsgTos JSONToNSString error");
+        LE("MCSendTxtMsgTos JSONToNSString error");
         delete mMsg;
         mMsg = nullptr;
         return -3;
@@ -178,7 +178,7 @@ int MsgClient::MCSendTxtMsgToUsr(std::string& outmsgid, MSTxtMessage *txtMsg)
 
     if (!jsonString)
     {
-        LI("MCSendTxtMsgToUsr JSONToNSString error");
+        LE("MCSendTxtMsgToUsr JSONToNSString error");
         delete mMsg;
         mMsg = nullptr;
         return -3;
@@ -201,7 +201,7 @@ int MsgClient::MCSendTxtMsgToUsrs(std::string& outmsgid, MSTxtMessage *txtMsg, c
 
     if (!jsonString)
     {
-        LI("MCSendTxtMsgToUsrs JSONToNSString error");
+        LE("MCSendTxtMsgToUsrs JSONToNSString error");
         delete mMsg;
         mMsg = nullptr;
         return -3;
@@ -224,7 +224,7 @@ int MsgClient::MCNotifyLive(std::string& outmsgid, MSLivMessage *livMsg)
 
     if (!jsonString)
     {
-        LI("MCSendTxtMsgToUsr JSONToNSString error");
+        LE("MCSendTxtMsgToUsr JSONToNSString error");
         delete mMsg;
         mMsg = nullptr;
         return -3;
@@ -246,7 +246,7 @@ int MsgClient::MCNotifyRedEnvelope(std::string& outmsgid, MSRenMessage *renMsg)
 
     if (!jsonString)
     {
-        LI("MCSendTxtMsgToUsr JSONToNSString error");
+        LE("MCSendTxtMsgToUsr JSONToNSString error");
         delete mMsg;
         mMsg = nullptr;
         return -3;
@@ -268,7 +268,7 @@ int MsgClient::MCNotifyBlacklist(std::string& outmsgid, MSBlkMessage *blkMsg, co
 
     if (!jsonString)
     {
-        LI("MCSendTxtMsgToUsr JSONToNSString error");
+        LE("MCSendTxtMsgToUsr JSONToNSString error");
         delete mMsg;
         mMsg = nullptr;
         return -3;
@@ -301,7 +301,7 @@ int MsgClient::MCNotifyForbidden(std::string& outmsgid, MSFbdMessage *fbdMsg, co
 
     if (!jsonString)
     {
-        LI("MCSendTxtMsgToUsr JSONToNSString error");
+        LE("MCSendTxtMsgToUsr JSONToNSString error");
         delete mMsg;
         mMsg = nullptr;
         return -3;
@@ -333,7 +333,7 @@ int MsgClient::MCNotifySettedMgr(std::string& outmsgid, MSMgrMessage *mgrMsg, co
 
     if (!jsonString)
     {
-        LI("MCSendTxtMsgToUsr JSONToNSString error");
+        LE("MCSendTxtMsgToUsr JSONToNSString error");
         delete mMsg;
         mMsg = nullptr;
         return -3;
@@ -440,15 +440,13 @@ void MsgClient::OnRecvMsg(int64 seqn, const std::string& msg)
 
     pms::Entity entity;
     if (!entity.ParseFromString(msg)) {
-        LI("entity ParseFromString failed error\n");
+        LE("entity ParseFromString failed error\n");
         return;
     }
 
     if (entity.usr_from().compare(m_nsUserId)==0) {
-        LI("MsgClient::OnRecvMsg recv the msg you just send!!!, so return\n");
         return;
     }
-    LI("MsgClient::OnRecvMsg entityByte tag:%d, cont:%s, romid:%s, usr_from:%s\n", entity.msg_tag(), entity.msg_cont().c_str(), entity.rom_id().c_str(), entity.usr_from().c_str());
 
     MSMessage *mMsg = MSMsgUtil::JsonToMessage(entity.msg_cont());
     mMsg->SetMillSec(entity.msg_time());
@@ -522,12 +520,11 @@ void MsgClient::OnRecvGroupMsg(int64 seqn, const std::string& seqnid, const std:
 
     pms::Entity entity;;
     if (!entity.ParseFromString(msg)) {
-        LI("eeeee Entity parseFromData has error\n");
+        LE("eeeee Entity parseFromData has error\n");
         return;
     }
 
     if (entity.usr_from().compare(m_nsUserId)==0) {
-        LI("MsgClient::OnRecvGroupMsg recv the msg you just send!!!, so return");
         return;
     }
 
@@ -649,33 +646,15 @@ void MsgClient::OnMsgServerConnected()
     m_clientDelegate->OnMsgServerConnected();
     m_clientDelegate->OnMsgClientInitializing();
 
-#if 0
-    // check per second until get all fetch
-    NSTimeInterval period = 1.0; //设置时间间隔
-    //dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-    dispatch_source_t _timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0));
-    dispatch_source_set_timer(_timer, dispatch_walltime(NULL, 0), period * NSEC_PER_SEC, 0); //每秒执行
-    dispatch_source_set_event_handler(_timer, ^{
-        LI("MsgClient::OnMsgServerConnected timer was called...............");
-        //在这里执行事件
-        if (IsFetchedAll())
-        {
-            // stop timer here
-            m_isFetched = true;
-            UpdateSeqnFromDb2Core();
-            SyncAllSeqns();
-            [m_clientDelegate OnMsgClientInitialized];
-            dispatch_source_set_cancel_handler(_timer, ^{
-
-                LI("MsgClient::OnMsgServerConnected dispatch_source_cancel...ok");
-            });
-            dispatch_source_cancel(_timer);
-        } else {
-            FetchAllSeqns();
-        }
-    });
-    dispatch_resume(_timer);
-#endif
+    UtilTimer timer;
+    LI("waiting for initialized....\n");
+    // this function invoke will block here, until OnWorkers return 0
+    timer.Init(&MsgClient::OnWorkers);
+    LI("lalalal for initialized....\n");
+    m_isFetched = true;
+    UpdateSeqnFromDb2Core();
+    SyncAllSeqns();
+    m_clientDelegate->OnMsgClientInitialized();
 }
 
 
@@ -695,4 +674,20 @@ void MsgClient::OnMsgServerConnectionFailure()
 {
     if (m_clientDelegate)
         m_clientDelegate->OnMsgServerConnectionFailure();
+}
+
+
+//////////////private call of UtilTimer//////////////////////////
+
+int MsgClient::OnWorkers()
+{
+    if (MsgClient::Instance().IsFetchedAll())
+    {
+        // stop timer here
+        LI("MsgClient::OnMsgServerConnected dispatch_source_cancel...ok");
+        return 0;
+    } else {
+        MsgClient::Instance().FetchAllSeqns();
+        return 1;
+    }
 }

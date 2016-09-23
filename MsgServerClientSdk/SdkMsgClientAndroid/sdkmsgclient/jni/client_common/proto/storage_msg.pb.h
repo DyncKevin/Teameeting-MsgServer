@@ -241,6 +241,12 @@ class StorageMsg : public ::google::protobuf::MessageLite {
   ::std::string* release_content();
   void set_allocated_content(::std::string* content);
 
+  // optional .pms.EModuleType module = 17;
+  void clear_module();
+  static const int kModuleFieldNumber = 17;
+  ::pms::EModuleType module() const;
+  void set_module(::pms::EModuleType value);
+
   // @@protoc_insertion_point(class_scope:pms.StorageMsg)
  private:
 
@@ -264,6 +270,7 @@ class StorageMsg : public ::google::protobuf::MessageLite {
   ::google::protobuf::internal::ArenaStringPtr mtype_;
   ::google::protobuf::internal::ArenaStringPtr ispush_;
   ::google::protobuf::internal::ArenaStringPtr content_;
+  int module_;
   mutable int _cached_size_;
   #ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
   friend void  protobuf_AddDesc_storage_5fmsg_2eproto_impl();
@@ -844,6 +851,20 @@ inline void StorageMsg::set_allocated_content(::std::string* content) {
   }
   content_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), content);
   // @@protoc_insertion_point(field_set_allocated:pms.StorageMsg.content)
+}
+
+// optional .pms.EModuleType module = 17;
+inline void StorageMsg::clear_module() {
+  module_ = 0;
+}
+inline ::pms::EModuleType StorageMsg::module() const {
+  // @@protoc_insertion_point(field_get:pms.StorageMsg.module)
+  return static_cast< ::pms::EModuleType >(module_);
+}
+inline void StorageMsg::set_module(::pms::EModuleType value) {
+  
+  module_ = value;
+  // @@protoc_insertion_point(field_set:pms.StorageMsg.module)
 }
 
 // -------------------------------------------------------------------
