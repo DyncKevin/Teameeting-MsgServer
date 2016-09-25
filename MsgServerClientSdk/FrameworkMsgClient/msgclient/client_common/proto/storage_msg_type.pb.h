@@ -47,6 +47,17 @@ const EStorageTag EStorageTag_MIN = TSEQN;
 const EStorageTag EStorageTag_MAX = TFETCHSEQN;
 const int EStorageTag_ARRAYSIZE = EStorageTag_MAX + 1;
 
+enum EStoreContType {
+  TRAWCONT = 0,
+  TPACKEDSTORE = 1,
+  EStoreContType_INT_MIN_SENTINEL_DO_NOT_USE_ = ::google::protobuf::kint32min,
+  EStoreContType_INT_MAX_SENTINEL_DO_NOT_USE_ = ::google::protobuf::kint32max
+};
+bool EStoreContType_IsValid(int value);
+const EStoreContType EStoreContType_MIN = TRAWCONT;
+const EStoreContType EStoreContType_MAX = TPACKEDSTORE;
+const int EStoreContType_ARRAYSIZE = EStoreContType_MAX + 1;
+
 // ===================================================================
 
 
@@ -67,6 +78,7 @@ namespace google {
 namespace protobuf {
 
 template <> struct is_proto_enum< ::pms::EStorageTag> : ::google::protobuf::internal::true_type {};
+template <> struct is_proto_enum< ::pms::EStoreContType> : ::google::protobuf::internal::true_type {};
 
 }  // namespace protobuf
 }  // namespace google

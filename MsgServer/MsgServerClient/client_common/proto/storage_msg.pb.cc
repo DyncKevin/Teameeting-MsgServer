@@ -86,7 +86,9 @@ const int StorageMsg::kVersionFieldNumber;
 const int StorageMsg::kMtypeFieldNumber;
 const int StorageMsg::kIspushFieldNumber;
 const int StorageMsg::kContentFieldNumber;
+const int StorageMsg::kConttypeFieldNumber;
 const int StorageMsg::kModuleFieldNumber;
+const int StorageMsg::kSdmaxseqnFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 StorageMsg::StorageMsg()
@@ -127,7 +129,9 @@ void StorageMsg::SharedCtor() {
   mtype_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ispush_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   content_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  conttype_ = 0;
   module_ = 0;
+  sdmaxseqn_ = GOOGLE_LONGLONG(0);
 }
 
 StorageMsg::~StorageMsg() {
@@ -203,7 +207,7 @@ void StorageMsg::Clear() {
   mtype_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ispush_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   content_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  module_ = 0;
+  ZR_(conttype_, sdmaxseqn_);
 
 #undef ZR_HELPER_
 #undef ZR_
@@ -472,19 +476,50 @@ bool StorageMsg::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectTag(136)) goto parse_module;
+        if (input->ExpectTag(136)) goto parse_conttype;
         break;
       }
 
-      // optional .pms.EModuleType module = 17;
+      // optional .pms.EStoreContType conttype = 17;
       case 17: {
         if (tag == 136) {
+         parse_conttype:
+          int value;
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
+                 input, &value)));
+          set_conttype(static_cast< ::pms::EStoreContType >(value));
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(144)) goto parse_module;
+        break;
+      }
+
+      // optional .pms.EModuleType module = 18;
+      case 18: {
+        if (tag == 144) {
          parse_module:
           int value;
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
                  input, &value)));
           set_module(static_cast< ::pms::EModuleType >(value));
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(152)) goto parse_sdmaxseqn;
+        break;
+      }
+
+      // optional sint64 sdmaxseqn = 19;
+      case 19: {
+        if (tag == 152) {
+         parse_sdmaxseqn:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_SINT64>(
+                 input, &sdmaxseqn_)));
+
         } else {
           goto handle_unusual;
         }
@@ -637,10 +672,21 @@ void StorageMsg::SerializeWithCachedSizes(
       16, this->content(), output);
   }
 
-  // optional .pms.EModuleType module = 17;
+  // optional .pms.EStoreContType conttype = 17;
+  if (this->conttype() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteEnum(
+      17, this->conttype(), output);
+  }
+
+  // optional .pms.EModuleType module = 18;
   if (this->module() != 0) {
     ::google::protobuf::internal::WireFormatLite::WriteEnum(
-      17, this->module(), output);
+      18, this->module(), output);
+  }
+
+  // optional sint64 sdmaxseqn = 19;
+  if (this->sdmaxseqn() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteSInt64(19, this->sdmaxseqn(), output);
   }
 
   // @@protoc_insertion_point(serialize_end:pms.StorageMsg)
@@ -757,10 +803,23 @@ int StorageMsg::ByteSize() const {
         this->content());
   }
 
-  // optional .pms.EModuleType module = 17;
+  // optional .pms.EStoreContType conttype = 17;
+  if (this->conttype() != 0) {
+    total_size += 2 +
+      ::google::protobuf::internal::WireFormatLite::EnumSize(this->conttype());
+  }
+
+  // optional .pms.EModuleType module = 18;
   if (this->module() != 0) {
     total_size += 2 +
       ::google::protobuf::internal::WireFormatLite::EnumSize(this->module());
+  }
+
+  // optional sint64 sdmaxseqn = 19;
+  if (this->sdmaxseqn() != 0) {
+    total_size += 2 +
+      ::google::protobuf::internal::WireFormatLite::SInt64Size(
+        this->sdmaxseqn());
   }
 
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
@@ -833,8 +892,14 @@ void StorageMsg::MergeFrom(const StorageMsg& from) {
 
     content_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.content_);
   }
+  if (from.conttype() != 0) {
+    set_conttype(from.conttype());
+  }
   if (from.module() != 0) {
     set_module(from.module());
+  }
+  if (from.sdmaxseqn() != 0) {
+    set_sdmaxseqn(from.sdmaxseqn());
   }
 }
 
@@ -871,7 +936,9 @@ void StorageMsg::InternalSwap(StorageMsg* other) {
   mtype_.Swap(&other->mtype_);
   ispush_.Swap(&other->ispush_);
   content_.Swap(&other->content_);
+  std::swap(conttype_, other->conttype_);
   std::swap(module_, other->module_);
+  std::swap(sdmaxseqn_, other->sdmaxseqn_);
   _unknown_fields_.Swap(&other->_unknown_fields_);
   std::swap(_cached_size_, other->_cached_size_);
 }
@@ -1347,7 +1414,21 @@ void StorageMsg::clear_content() {
   // @@protoc_insertion_point(field_set_allocated:pms.StorageMsg.content)
 }
 
-// optional .pms.EModuleType module = 17;
+// optional .pms.EStoreContType conttype = 17;
+void StorageMsg::clear_conttype() {
+  conttype_ = 0;
+}
+ ::pms::EStoreContType StorageMsg::conttype() const {
+  // @@protoc_insertion_point(field_get:pms.StorageMsg.conttype)
+  return static_cast< ::pms::EStoreContType >(conttype_);
+}
+ void StorageMsg::set_conttype(::pms::EStoreContType value) {
+  
+  conttype_ = value;
+  // @@protoc_insertion_point(field_set:pms.StorageMsg.conttype)
+}
+
+// optional .pms.EModuleType module = 18;
 void StorageMsg::clear_module() {
   module_ = 0;
 }
@@ -1359,6 +1440,20 @@ void StorageMsg::clear_module() {
   
   module_ = value;
   // @@protoc_insertion_point(field_set:pms.StorageMsg.module)
+}
+
+// optional sint64 sdmaxseqn = 19;
+void StorageMsg::clear_sdmaxseqn() {
+  sdmaxseqn_ = GOOGLE_LONGLONG(0);
+}
+ ::google::protobuf::int64 StorageMsg::sdmaxseqn() const {
+  // @@protoc_insertion_point(field_get:pms.StorageMsg.sdmaxseqn)
+  return sdmaxseqn_;
+}
+ void StorageMsg::set_sdmaxseqn(::google::protobuf::int64 value) {
+  
+  sdmaxseqn_ = value;
+  // @@protoc_insertion_point(field_set:pms.StorageMsg.sdmaxseqn)
 }
 
 #endif  // PROTOBUF_INLINE_NOT_IN_HEADERS

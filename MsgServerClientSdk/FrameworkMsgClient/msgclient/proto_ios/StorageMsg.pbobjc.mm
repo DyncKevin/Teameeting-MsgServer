@@ -63,7 +63,9 @@ static GPBFileDescriptor *StorageMsgRoot_FileDescriptor(void) {
 @dynamic mtype;
 @dynamic ispush;
 @dynamic content;
+@dynamic conttype;
 @dynamic module;
+@dynamic sdmaxseqn;
 
 typedef struct StorageMsg__storage_ {
   uint32_t _has_storage_[1];
@@ -73,6 +75,7 @@ typedef struct StorageMsg__storage_ {
   EMsgFlag mflag;
   EMsgRole mrole;
   int32_t result;
+  EStoreContType conttype;
   EModuleType module;
   NSString *msgid;
   NSString *storeid;
@@ -84,6 +87,7 @@ typedef struct StorageMsg__storage_ {
   NSData *content;
   int64_t sequence;
   int64_t maxseqn;
+  int64_t sdmaxseqn;
 } StorageMsg__storage_;
 
 // This method is threadsafe because it is initially called
@@ -237,13 +241,31 @@ typedef struct StorageMsg__storage_ {
         .dataType = GPBDataTypeBytes,
       },
       {
+        .name = "conttype",
+        .dataTypeSpecific.enumDescFunc = EStoreContType_EnumDescriptor,
+        .number = StorageMsg_FieldNumber_Conttype,
+        .hasIndex = 16,
+        .offset = (uint32_t)offsetof(StorageMsg__storage_, conttype),
+        .flags = GPBFieldOptional | GPBFieldHasEnumDescriptor,
+        .dataType = GPBDataTypeEnum,
+      },
+      {
         .name = "module",
         .dataTypeSpecific.enumDescFunc = EModuleType_EnumDescriptor,
         .number = StorageMsg_FieldNumber_Module,
-        .hasIndex = 16,
+        .hasIndex = 17,
         .offset = (uint32_t)offsetof(StorageMsg__storage_, module),
         .flags = GPBFieldOptional | GPBFieldHasEnumDescriptor,
         .dataType = GPBDataTypeEnum,
+      },
+      {
+        .name = "sdmaxseqn",
+        .dataTypeSpecific.className = NULL,
+        .number = StorageMsg_FieldNumber_Sdmaxseqn,
+        .hasIndex = 18,
+        .offset = (uint32_t)offsetof(StorageMsg__storage_, sdmaxseqn),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeSInt64,
       },
     };
     GPBDescriptor *localDescriptor =
@@ -319,6 +341,18 @@ int32_t StorageMsg_Mrole_RawValue(StorageMsg *message) {
 void SetStorageMsg_Mrole_RawValue(StorageMsg *message, int32_t value) {
   GPBDescriptor *descriptor = [StorageMsg descriptor];
   GPBFieldDescriptor *field = [descriptor fieldWithNumber:StorageMsg_FieldNumber_Mrole];
+  GPBSetInt32IvarWithFieldInternal(message, field, value, descriptor.file.syntax);
+}
+
+int32_t StorageMsg_Conttype_RawValue(StorageMsg *message) {
+  GPBDescriptor *descriptor = [StorageMsg descriptor];
+  GPBFieldDescriptor *field = [descriptor fieldWithNumber:StorageMsg_FieldNumber_Conttype];
+  return GPBGetMessageInt32Field(message, field);
+}
+
+void SetStorageMsg_Conttype_RawValue(StorageMsg *message, int32_t value) {
+  GPBDescriptor *descriptor = [StorageMsg descriptor];
+  GPBFieldDescriptor *field = [descriptor fieldWithNumber:StorageMsg_FieldNumber_Conttype];
   GPBSetInt32IvarWithFieldInternal(message, field, value, descriptor.file.syntax);
 }
 

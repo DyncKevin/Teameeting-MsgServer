@@ -10,3 +10,7 @@ enum EStorageTag{
     TFETCHSEQN      = 2;
 }
 
+enum EStoreContType{
+    TRAWCONT        = 0;
+    TPACKEDSTORE    = 1;
+}

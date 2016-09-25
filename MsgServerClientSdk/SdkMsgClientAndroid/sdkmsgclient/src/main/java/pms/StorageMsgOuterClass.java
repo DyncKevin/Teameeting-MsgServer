@@ -252,7 +252,7 @@ public final class StorageMsgOuterClass {
 
     /**
      * <pre>
-     * message
+     * message, this can be raw msg or embeded msg
      * </pre>
      *
      * <code>optional bytes content = 16;</code>
@@ -261,10 +261,27 @@ public final class StorageMsgOuterClass {
 
     /**
      * <pre>
+     * content type, raw msg or embeded or other
+     * </pre>
+     *
+     * <code>optional .pms.EStoreContType conttype = 17;</code>
+     */
+    int getConttypeValue();
+    /**
+     * <pre>
+     * content type, raw msg or embeded or other
+     * </pre>
+     *
+     * <code>optional .pms.EStoreContType conttype = 17;</code>
+     */
+    pms.StorageMsgType.EStoreContType getConttype();
+
+    /**
+     * <pre>
      * module type, this msg belong to which bussiness module
      * </pre>
      *
-     * <code>optional .pms.EModuleType module = 17;</code>
+     * <code>optional .pms.EModuleType module = 18;</code>
      */
     int getModuleValue();
     /**
@@ -272,9 +289,18 @@ public final class StorageMsgOuterClass {
      * module type, this msg belong to which bussiness module
      * </pre>
      *
-     * <code>optional .pms.EModuleType module = 17;</code>
+     * <code>optional .pms.EModuleType module = 18;</code>
      */
     pms.CommonMsg.EModuleType getModule();
+
+    /**
+     * <pre>
+     * sync data max sequence
+     * </pre>
+     *
+     * <code>optional sint64 sdmaxseqn = 19;</code>
+     */
+    long getSdmaxseqn();
   }
   /**
    * <pre>
@@ -305,7 +331,9 @@ public final class StorageMsgOuterClass {
       mtype_ = "";
       ispush_ = "";
       content_ = com.google.protobuf.ByteString.EMPTY;
+      conttype_ = 0;
       module_ = 0;
+      sdmaxseqn_ = 0L;
     }
     public static final int RSVRCMD_FIELD_NUMBER = 1;
     private int rsvrcmd_;
@@ -1173,7 +1201,7 @@ public final class StorageMsgOuterClass {
     private com.google.protobuf.ByteString content_;
     /**
      * <pre>
-     * message
+     * message, this can be raw msg or embeded msg
      * </pre>
      *
      * <code>optional bytes content = 16;</code>
@@ -1183,7 +1211,7 @@ public final class StorageMsgOuterClass {
     }
     /**
      * <pre>
-     * message
+     * message, this can be raw msg or embeded msg
      * </pre>
      *
      * <code>optional bytes content = 16;</code>
@@ -1197,7 +1225,7 @@ public final class StorageMsgOuterClass {
     }
     /**
      * <pre>
-     * message
+     * message, this can be raw msg or embeded msg
      * </pre>
      *
      * <code>optional bytes content = 16;</code>
@@ -1207,14 +1235,73 @@ public final class StorageMsgOuterClass {
       content_ = getDefaultInstance().getContent();
     }
 
-    public static final int MODULE_FIELD_NUMBER = 17;
+    public static final int CONTTYPE_FIELD_NUMBER = 17;
+    private int conttype_;
+    /**
+     * <pre>
+     * content type, raw msg or embeded or other
+     * </pre>
+     *
+     * <code>optional .pms.EStoreContType conttype = 17;</code>
+     */
+    public int getConttypeValue() {
+      return conttype_;
+    }
+    /**
+     * <pre>
+     * content type, raw msg or embeded or other
+     * </pre>
+     *
+     * <code>optional .pms.EStoreContType conttype = 17;</code>
+     */
+    public pms.StorageMsgType.EStoreContType getConttype() {
+      pms.StorageMsgType.EStoreContType result = pms.StorageMsgType.EStoreContType.forNumber(conttype_);
+      return result == null ? pms.StorageMsgType.EStoreContType.UNRECOGNIZED : result;
+    }
+    /**
+     * <pre>
+     * content type, raw msg or embeded or other
+     * </pre>
+     *
+     * <code>optional .pms.EStoreContType conttype = 17;</code>
+     */
+    private void setConttypeValue(int value) {
+        conttype_ = value;
+    }
+    /**
+     * <pre>
+     * content type, raw msg or embeded or other
+     * </pre>
+     *
+     * <code>optional .pms.EStoreContType conttype = 17;</code>
+     */
+    private void setConttype(pms.StorageMsgType.EStoreContType value) {
+      if (value == null) {
+        throw new NullPointerException();
+      }
+      
+      conttype_ = value.getNumber();
+    }
+    /**
+     * <pre>
+     * content type, raw msg or embeded or other
+     * </pre>
+     *
+     * <code>optional .pms.EStoreContType conttype = 17;</code>
+     */
+    private void clearConttype() {
+      
+      conttype_ = 0;
+    }
+
+    public static final int MODULE_FIELD_NUMBER = 18;
     private int module_;
     /**
      * <pre>
      * module type, this msg belong to which bussiness module
      * </pre>
      *
-     * <code>optional .pms.EModuleType module = 17;</code>
+     * <code>optional .pms.EModuleType module = 18;</code>
      */
     public int getModuleValue() {
       return module_;
@@ -1224,7 +1311,7 @@ public final class StorageMsgOuterClass {
      * module type, this msg belong to which bussiness module
      * </pre>
      *
-     * <code>optional .pms.EModuleType module = 17;</code>
+     * <code>optional .pms.EModuleType module = 18;</code>
      */
     public pms.CommonMsg.EModuleType getModule() {
       pms.CommonMsg.EModuleType result = pms.CommonMsg.EModuleType.forNumber(module_);
@@ -1235,7 +1322,7 @@ public final class StorageMsgOuterClass {
      * module type, this msg belong to which bussiness module
      * </pre>
      *
-     * <code>optional .pms.EModuleType module = 17;</code>
+     * <code>optional .pms.EModuleType module = 18;</code>
      */
     private void setModuleValue(int value) {
         module_ = value;
@@ -1245,7 +1332,7 @@ public final class StorageMsgOuterClass {
      * module type, this msg belong to which bussiness module
      * </pre>
      *
-     * <code>optional .pms.EModuleType module = 17;</code>
+     * <code>optional .pms.EModuleType module = 18;</code>
      */
     private void setModule(pms.CommonMsg.EModuleType value) {
       if (value == null) {
@@ -1259,11 +1346,46 @@ public final class StorageMsgOuterClass {
      * module type, this msg belong to which bussiness module
      * </pre>
      *
-     * <code>optional .pms.EModuleType module = 17;</code>
+     * <code>optional .pms.EModuleType module = 18;</code>
      */
     private void clearModule() {
       
       module_ = 0;
+    }
+
+    public static final int SDMAXSEQN_FIELD_NUMBER = 19;
+    private long sdmaxseqn_;
+    /**
+     * <pre>
+     * sync data max sequence
+     * </pre>
+     *
+     * <code>optional sint64 sdmaxseqn = 19;</code>
+     */
+    public long getSdmaxseqn() {
+      return sdmaxseqn_;
+    }
+    /**
+     * <pre>
+     * sync data max sequence
+     * </pre>
+     *
+     * <code>optional sint64 sdmaxseqn = 19;</code>
+     */
+    private void setSdmaxseqn(long value) {
+      
+      sdmaxseqn_ = value;
+    }
+    /**
+     * <pre>
+     * sync data max sequence
+     * </pre>
+     *
+     * <code>optional sint64 sdmaxseqn = 19;</code>
+     */
+    private void clearSdmaxseqn() {
+      
+      sdmaxseqn_ = 0L;
     }
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
@@ -1316,8 +1438,14 @@ public final class StorageMsgOuterClass {
       if (!content_.isEmpty()) {
         output.writeBytes(16, content_);
       }
+      if (conttype_ != pms.StorageMsgType.EStoreContType.TRAWCONT.getNumber()) {
+        output.writeEnum(17, conttype_);
+      }
       if (module_ != pms.CommonMsg.EModuleType.TINVALID0.getNumber()) {
-        output.writeEnum(17, module_);
+        output.writeEnum(18, module_);
+      }
+      if (sdmaxseqn_ != 0L) {
+        output.writeSInt64(19, sdmaxseqn_);
       }
     }
 
@@ -1390,9 +1518,17 @@ public final class StorageMsgOuterClass {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(16, content_);
       }
+      if (conttype_ != pms.StorageMsgType.EStoreContType.TRAWCONT.getNumber()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(17, conttype_);
+      }
       if (module_ != pms.CommonMsg.EModuleType.TINVALID0.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(17, module_);
+          .computeEnumSize(18, module_);
+      }
+      if (sdmaxseqn_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt64Size(19, sdmaxseqn_);
       }
       memoizedSerializedSize = size;
       return size;
@@ -2296,7 +2432,7 @@ public final class StorageMsgOuterClass {
 
       /**
        * <pre>
-       * message
+       * message, this can be raw msg or embeded msg
        * </pre>
        *
        * <code>optional bytes content = 16;</code>
@@ -2306,7 +2442,7 @@ public final class StorageMsgOuterClass {
       }
       /**
        * <pre>
-       * message
+       * message, this can be raw msg or embeded msg
        * </pre>
        *
        * <code>optional bytes content = 16;</code>
@@ -2318,7 +2454,7 @@ public final class StorageMsgOuterClass {
       }
       /**
        * <pre>
-       * message
+       * message, this can be raw msg or embeded msg
        * </pre>
        *
        * <code>optional bytes content = 16;</code>
@@ -2331,10 +2467,67 @@ public final class StorageMsgOuterClass {
 
       /**
        * <pre>
+       * content type, raw msg or embeded or other
+       * </pre>
+       *
+       * <code>optional .pms.EStoreContType conttype = 17;</code>
+       */
+      public int getConttypeValue() {
+        return instance.getConttypeValue();
+      }
+      /**
+       * <pre>
+       * content type, raw msg or embeded or other
+       * </pre>
+       *
+       * <code>optional .pms.EStoreContType conttype = 17;</code>
+       */
+      public Builder setConttypeValue(int value) {
+        copyOnWrite();
+        instance.setConttypeValue(value);
+        return this;
+      }
+      /**
+       * <pre>
+       * content type, raw msg or embeded or other
+       * </pre>
+       *
+       * <code>optional .pms.EStoreContType conttype = 17;</code>
+       */
+      public pms.StorageMsgType.EStoreContType getConttype() {
+        return instance.getConttype();
+      }
+      /**
+       * <pre>
+       * content type, raw msg or embeded or other
+       * </pre>
+       *
+       * <code>optional .pms.EStoreContType conttype = 17;</code>
+       */
+      public Builder setConttype(pms.StorageMsgType.EStoreContType value) {
+        copyOnWrite();
+        instance.setConttype(value);
+        return this;
+      }
+      /**
+       * <pre>
+       * content type, raw msg or embeded or other
+       * </pre>
+       *
+       * <code>optional .pms.EStoreContType conttype = 17;</code>
+       */
+      public Builder clearConttype() {
+        copyOnWrite();
+        instance.clearConttype();
+        return this;
+      }
+
+      /**
+       * <pre>
        * module type, this msg belong to which bussiness module
        * </pre>
        *
-       * <code>optional .pms.EModuleType module = 17;</code>
+       * <code>optional .pms.EModuleType module = 18;</code>
        */
       public int getModuleValue() {
         return instance.getModuleValue();
@@ -2344,7 +2537,7 @@ public final class StorageMsgOuterClass {
        * module type, this msg belong to which bussiness module
        * </pre>
        *
-       * <code>optional .pms.EModuleType module = 17;</code>
+       * <code>optional .pms.EModuleType module = 18;</code>
        */
       public Builder setModuleValue(int value) {
         copyOnWrite();
@@ -2356,7 +2549,7 @@ public final class StorageMsgOuterClass {
        * module type, this msg belong to which bussiness module
        * </pre>
        *
-       * <code>optional .pms.EModuleType module = 17;</code>
+       * <code>optional .pms.EModuleType module = 18;</code>
        */
       public pms.CommonMsg.EModuleType getModule() {
         return instance.getModule();
@@ -2366,7 +2559,7 @@ public final class StorageMsgOuterClass {
        * module type, this msg belong to which bussiness module
        * </pre>
        *
-       * <code>optional .pms.EModuleType module = 17;</code>
+       * <code>optional .pms.EModuleType module = 18;</code>
        */
       public Builder setModule(pms.CommonMsg.EModuleType value) {
         copyOnWrite();
@@ -2378,11 +2571,46 @@ public final class StorageMsgOuterClass {
        * module type, this msg belong to which bussiness module
        * </pre>
        *
-       * <code>optional .pms.EModuleType module = 17;</code>
+       * <code>optional .pms.EModuleType module = 18;</code>
        */
       public Builder clearModule() {
         copyOnWrite();
         instance.clearModule();
+        return this;
+      }
+
+      /**
+       * <pre>
+       * sync data max sequence
+       * </pre>
+       *
+       * <code>optional sint64 sdmaxseqn = 19;</code>
+       */
+      public long getSdmaxseqn() {
+        return instance.getSdmaxseqn();
+      }
+      /**
+       * <pre>
+       * sync data max sequence
+       * </pre>
+       *
+       * <code>optional sint64 sdmaxseqn = 19;</code>
+       */
+      public Builder setSdmaxseqn(long value) {
+        copyOnWrite();
+        instance.setSdmaxseqn(value);
+        return this;
+      }
+      /**
+       * <pre>
+       * sync data max sequence
+       * </pre>
+       *
+       * <code>optional sint64 sdmaxseqn = 19;</code>
+       */
+      public Builder clearSdmaxseqn() {
+        copyOnWrite();
+        instance.clearSdmaxseqn();
         return this;
       }
 
@@ -2434,7 +2662,10 @@ public final class StorageMsgOuterClass {
               !other.ispush_.isEmpty(), other.ispush_);
           content_ = visitor.visitByteString(content_ != com.google.protobuf.ByteString.EMPTY, content_,
               other.content_ != com.google.protobuf.ByteString.EMPTY, other.content_);
+          conttype_ = visitor.visitInt(conttype_ != 0, conttype_,    other.conttype_ != 0, other.conttype_);
           module_ = visitor.visitInt(module_ != 0, module_,    other.module_ != 0, other.module_);
+          sdmaxseqn_ = visitor.visitLong(sdmaxseqn_ != 0L, sdmaxseqn_,
+              other.sdmaxseqn_ != 0L, other.sdmaxseqn_);
           if (visitor == com.google.protobuf.GeneratedMessageLite.MergeFromVisitor
               .INSTANCE) {
           }
@@ -2554,7 +2785,18 @@ public final class StorageMsgOuterClass {
                 case 136: {
                   int rawValue = input.readEnum();
 
+                  conttype_ = rawValue;
+                  break;
+                }
+                case 144: {
+                  int rawValue = input.readEnum();
+
                   module_ = rawValue;
+                  break;
+                }
+                case 152: {
+
+                  sdmaxseqn_ = input.readSInt64();
                   break;
                 }
               }

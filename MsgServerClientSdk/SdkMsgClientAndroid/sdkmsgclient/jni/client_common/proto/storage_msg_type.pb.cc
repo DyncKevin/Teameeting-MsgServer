@@ -58,6 +58,16 @@ bool EStorageTag_IsValid(int value) {
   }
 }
 
+bool EStoreContType_IsValid(int value) {
+  switch(value) {
+    case 0:
+    case 1:
+      return true;
+    default:
+      return false;
+  }
+}
+
 
 // @@protoc_insertion_point(namespace_scope)
 

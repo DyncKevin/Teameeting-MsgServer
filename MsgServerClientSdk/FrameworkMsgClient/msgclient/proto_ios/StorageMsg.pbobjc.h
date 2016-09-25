@@ -20,6 +20,7 @@ GPB_ENUM_FWD_DECLARE(EMsgFlag);
 GPB_ENUM_FWD_DECLARE(EMsgRole);
 GPB_ENUM_FWD_DECLARE(EServerCmd);
 GPB_ENUM_FWD_DECLARE(EStorageTag);
+GPB_ENUM_FWD_DECLARE(EStoreContType);
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -55,7 +56,9 @@ typedef GPB_ENUM(StorageMsg_FieldNumber) {
   StorageMsg_FieldNumber_Mtype = 14,
   StorageMsg_FieldNumber_Ispush = 15,
   StorageMsg_FieldNumber_Content = 16,
-  StorageMsg_FieldNumber_Module = 17,
+  StorageMsg_FieldNumber_Conttype = 17,
+  StorageMsg_FieldNumber_Module = 18,
+  StorageMsg_FieldNumber_Sdmaxseqn = 19,
 };
 
 /// this is the msg for store msg to redis
@@ -106,11 +109,17 @@ typedef GPB_ENUM(StorageMsg_FieldNumber) {
 /// if this message need push
 @property(nonatomic, readwrite, copy, null_resettable) NSString *ispush;
 
-/// message
+/// message, this can be raw msg or embeded msg
 @property(nonatomic, readwrite, copy, null_resettable) NSData *content;
+
+/// content type, raw msg or embeded or other
+@property(nonatomic, readwrite) enum EStoreContType conttype;
 
 /// module type, this msg belong to which bussiness module
 @property(nonatomic, readwrite) enum EModuleType module;
+
+/// sync data max sequence
+@property(nonatomic, readwrite) int64_t sdmaxseqn;
 
 @end
 
@@ -153,6 +162,14 @@ int32_t StorageMsg_Mrole_RawValue(StorageMsg *message);
 /// it to be set to a value that was not defined by the enum at the time the code
 /// was generated.
 void SetStorageMsg_Mrole_RawValue(StorageMsg *message, int32_t value);
+
+/// Fetches the raw value of a @c StorageMsg's @c conttype property, even
+/// if the value was not defined by the enum at the time the code was generated.
+int32_t StorageMsg_Conttype_RawValue(StorageMsg *message);
+/// Sets the raw value of an @c StorageMsg's @c conttype property, allowing
+/// it to be set to a value that was not defined by the enum at the time the code
+/// was generated.
+void SetStorageMsg_Conttype_RawValue(StorageMsg *message, int32_t value);
 
 /// Fetches the raw value of a @c StorageMsg's @c module property, even
 /// if the value was not defined by the enum at the time the code was generated.

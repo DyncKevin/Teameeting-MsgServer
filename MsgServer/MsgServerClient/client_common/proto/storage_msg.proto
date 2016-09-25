@@ -23,8 +23,10 @@ message StorageMsg{
     string          version     = 13; // message version
     string          mtype       = 14; // the msg content type
     string          ispush      = 15; // if this message need push
-    bytes           content     = 16; // message
-    EModuleType     module      = 17; // module type, this msg belong to which bussiness module
+    bytes           content     = 16; // message, this can be raw msg or embeded msg
+    EStoreContType  conttype    = 17; // content type, raw msg or embeded or other
+    EModuleType     module      = 18; // module type, this msg belong to which bussiness module
+    sint64          sdmaxseqn   = 19; // sync data max sequence
 }
 
 message PackedStoreMsg{

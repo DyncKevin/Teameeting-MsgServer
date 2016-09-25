@@ -241,11 +241,23 @@ class StorageMsg : public ::google::protobuf::MessageLite {
   ::std::string* release_content();
   void set_allocated_content(::std::string* content);
 
-  // optional .pms.EModuleType module = 17;
+  // optional .pms.EStoreContType conttype = 17;
+  void clear_conttype();
+  static const int kConttypeFieldNumber = 17;
+  ::pms::EStoreContType conttype() const;
+  void set_conttype(::pms::EStoreContType value);
+
+  // optional .pms.EModuleType module = 18;
   void clear_module();
-  static const int kModuleFieldNumber = 17;
+  static const int kModuleFieldNumber = 18;
   ::pms::EModuleType module() const;
   void set_module(::pms::EModuleType value);
+
+  // optional sint64 sdmaxseqn = 19;
+  void clear_sdmaxseqn();
+  static const int kSdmaxseqnFieldNumber = 19;
+  ::google::protobuf::int64 sdmaxseqn() const;
+  void set_sdmaxseqn(::google::protobuf::int64 value);
 
   // @@protoc_insertion_point(class_scope:pms.StorageMsg)
  private:
@@ -270,7 +282,9 @@ class StorageMsg : public ::google::protobuf::MessageLite {
   ::google::protobuf::internal::ArenaStringPtr mtype_;
   ::google::protobuf::internal::ArenaStringPtr ispush_;
   ::google::protobuf::internal::ArenaStringPtr content_;
+  int conttype_;
   int module_;
+  ::google::protobuf::int64 sdmaxseqn_;
   mutable int _cached_size_;
   #ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
   friend void  protobuf_AddDesc_storage_5fmsg_2eproto_impl();
@@ -853,7 +867,21 @@ inline void StorageMsg::set_allocated_content(::std::string* content) {
   // @@protoc_insertion_point(field_set_allocated:pms.StorageMsg.content)
 }
 
-// optional .pms.EModuleType module = 17;
+// optional .pms.EStoreContType conttype = 17;
+inline void StorageMsg::clear_conttype() {
+  conttype_ = 0;
+}
+inline ::pms::EStoreContType StorageMsg::conttype() const {
+  // @@protoc_insertion_point(field_get:pms.StorageMsg.conttype)
+  return static_cast< ::pms::EStoreContType >(conttype_);
+}
+inline void StorageMsg::set_conttype(::pms::EStoreContType value) {
+  
+  conttype_ = value;
+  // @@protoc_insertion_point(field_set:pms.StorageMsg.conttype)
+}
+
+// optional .pms.EModuleType module = 18;
 inline void StorageMsg::clear_module() {
   module_ = 0;
 }
@@ -865,6 +893,20 @@ inline void StorageMsg::set_module(::pms::EModuleType value) {
   
   module_ = value;
   // @@protoc_insertion_point(field_set:pms.StorageMsg.module)
+}
+
+// optional sint64 sdmaxseqn = 19;
+inline void StorageMsg::clear_sdmaxseqn() {
+  sdmaxseqn_ = GOOGLE_LONGLONG(0);
+}
+inline ::google::protobuf::int64 StorageMsg::sdmaxseqn() const {
+  // @@protoc_insertion_point(field_get:pms.StorageMsg.sdmaxseqn)
+  return sdmaxseqn_;
+}
+inline void StorageMsg::set_sdmaxseqn(::google::protobuf::int64 value) {
+  
+  sdmaxseqn_ = value;
+  // @@protoc_insertion_point(field_set:pms.StorageMsg.sdmaxseqn)
 }
 
 // -------------------------------------------------------------------

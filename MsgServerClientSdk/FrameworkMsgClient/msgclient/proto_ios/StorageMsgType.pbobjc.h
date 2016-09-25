@@ -35,6 +35,23 @@ GPBEnumDescriptor *EStorageTag_EnumDescriptor(void);
 /// the time this source was generated.
 BOOL EStorageTag_IsValidValue(int32_t value);
 
+#pragma mark - Enum EStoreContType
+
+typedef GPB_ENUM(EStoreContType) {
+  /// Value used if any message's field encounters a value that is not defined
+  /// by this enum. The message will also have C functions to get/set the rawValue
+  /// of the field.
+  EStoreContType_GPBUnrecognizedEnumeratorValue = kGPBUnrecognizedEnumeratorValue,
+  EStoreContType_Trawcont = 0,
+  EStoreContType_Tpackedstore = 1,
+};
+
+GPBEnumDescriptor *EStoreContType_EnumDescriptor(void);
+
+/// Checks to see if the given value is defined by the enum or was not known at
+/// the time this source was generated.
+BOOL EStoreContType_IsValidValue(int32_t value);
+
 #pragma mark - StorageMsgTypeRoot
 
 /// Exposes the extension registry for this file.

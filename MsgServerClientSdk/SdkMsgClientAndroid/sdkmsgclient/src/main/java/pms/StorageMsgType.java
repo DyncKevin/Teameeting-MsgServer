@@ -88,6 +88,73 @@ public final class StorageMsgType {
     // @@protoc_insertion_point(enum_scope:pms.EStorageTag)
   }
 
+  /**
+   * Protobuf enum {@code pms.EStoreContType}
+   */
+  public enum EStoreContType
+      implements com.google.protobuf.Internal.EnumLite {
+    /**
+     * <code>TRAWCONT = 0;</code>
+     */
+    TRAWCONT(0),
+    /**
+     * <code>TPACKEDSTORE = 1;</code>
+     */
+    TPACKEDSTORE(1),
+    UNRECOGNIZED(-1),
+    ;
+
+    /**
+     * <code>TRAWCONT = 0;</code>
+     */
+    public static final int TRAWCONT_VALUE = 0;
+    /**
+     * <code>TPACKEDSTORE = 1;</code>
+     */
+    public static final int TPACKEDSTORE_VALUE = 1;
+
+
+    public final int getNumber() {
+      return value;
+    }
+
+    /**
+     * @deprecated Use {@link #forNumber(int)} instead.
+     */
+    @java.lang.Deprecated
+    public static EStoreContType valueOf(int value) {
+      return forNumber(value);
+    }
+
+    public static EStoreContType forNumber(int value) {
+      switch (value) {
+        case 0: return TRAWCONT;
+        case 1: return TPACKEDSTORE;
+        default: return null;
+      }
+    }
+
+    public static com.google.protobuf.Internal.EnumLiteMap<EStoreContType>
+        internalGetValueMap() {
+      return internalValueMap;
+    }
+    private static final com.google.protobuf.Internal.EnumLiteMap<
+        EStoreContType> internalValueMap =
+          new com.google.protobuf.Internal.EnumLiteMap<EStoreContType>() {
+            public EStoreContType findValueByNumber(int number) {
+              return EStoreContType.forNumber(number);
+            }
+          };
+
+    private final int value;
+
+    private EStoreContType(int value) {
+      this.value = value;
+    }
+
+    // @@protoc_insertion_point(enum_scope:pms.EStoreContType)
+  }
+
 
   static {
   }

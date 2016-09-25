@@ -50,6 +50,40 @@ BOOL EStorageTag_IsValidValue(int32_t value__) {
   }
 }
 
+#pragma mark - Enum EStoreContType
+
+GPBEnumDescriptor *EStoreContType_EnumDescriptor(void) {
+  static GPBEnumDescriptor *descriptor = NULL;
+  if (!descriptor) {
+    static const char *valueNames =
+        "Trawcont\000Tpackedstore\000";
+    static const int32_t values[] = {
+        EStoreContType_Trawcont,
+        EStoreContType_Tpackedstore,
+    };
+    GPBEnumDescriptor *worker =
+        [GPBEnumDescriptor allocDescriptorForName:GPBNSStringifySymbol(EStoreContType)
+                                       valueNames:valueNames
+                                           values:values
+                                            count:(uint32_t)(sizeof(values) / sizeof(int32_t))
+                                     enumVerifier:EStoreContType_IsValidValue];
+    if (!OSAtomicCompareAndSwapPtrBarrier(nil, worker, (void * volatile *)&descriptor)) {
+      [worker release];
+    }
+  }
+  return descriptor;
+}
+
+BOOL EStoreContType_IsValidValue(int32_t value__) {
+  switch (value__) {
+    case EStoreContType_Trawcont:
+    case EStoreContType_Tpackedstore:
+      return YES;
+    default:
+      return NO;
+  }
+}
+
 
 #pragma clang diagnostic pop
 
