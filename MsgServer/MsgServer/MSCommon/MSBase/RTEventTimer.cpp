@@ -30,11 +30,11 @@ int RTEventTimer::DataDelay(const char*pData, int nLen)
         return -1;
     }
     {
+        OSMutexLocker locker(&mMutexDelay);
         char* ptr = (char*)malloc(sizeof(char)*(nLen+1));
         memcpy(ptr, pData, nLen);
         ptr[nLen] = '\0';
         {
-            OSMutexLocker locker(&mMutexDelay);
             ListAppend(&mListDelay, ptr, nLen);
         }
     }

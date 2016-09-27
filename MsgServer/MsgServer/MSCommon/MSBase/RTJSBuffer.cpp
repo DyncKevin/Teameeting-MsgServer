@@ -5,7 +5,7 @@
 #include "rtklog.h"
 
 //const int	kRequestBufferSizeInBytes = 2048;
-const int	kRequestBufferSizeInBytes = 1024*1024*64;
+const int	kRequestBufferSizeInBytes = 1024*1024*128;
 
 void RTJSBuffer::writeShort(char** pptr, unsigned short anInt)
 {
@@ -56,24 +56,28 @@ void RTJSBuffer::RecvData(const char*data, int size)
 			delete[] m_pBuffer;
 			m_pBuffer = temp;
 			m_nBufLen = newLen;
+            //LI("RTJSBuffer::RecvData total newLen is :%d\n", newLen);
 		}
+        //LI("RTJSBuffer::RecvData total m_nBufLen is :%d\n", m_nBufLen);
 
 		memcpy(m_pBuffer + m_nBufOffset, data, size);
 		m_nBufOffset += size;
 	}
 
+    //LI("RTJSBuffer::RecvData m_nBufOffset:%d, m_nBufLen:%d, m_nParseBufLen:%d\n", m_nBufOffset, m_nBufLen, m_nParseBufLen);
 	while (m_nBufOffset > 3)
 	{
 		int parsed = 0;
 		if (m_pBuffer[0] != '$')
 		{// Has error!
-            LE("RTJSBuffer::RecvData m_pBuffer[0] is not $, %c, %d\n", m_pBuffer[0], m_pBuffer[0]);
+            LE("RTJSBuffer::RecvData mTestName:%s, m_pBuffer[0] is not $, %c, %d\n", mTestName.c_str(), m_pBuffer[0], m_pBuffer[0]);
 			parsed = m_nBufOffset;
 		}
 		else
 		{
 			char*pptr = m_pBuffer + 1;
 			int packLen = readShort(&pptr);
+            //LI("RTJSBuffer::RecvData readShort packLen is :%d\n", packLen);
 			if ((packLen + 3) <= m_nBufOffset)
 			{
 				ParseMessage(pptr, packLen);
@@ -81,6 +85,7 @@ void RTJSBuffer::RecvData(const char*data, int size)
 			}
 			else
 			{
+                LE("RTJSBuffer::RecvData packLen:%d, packLen+3 <= m_nBufOffset :%d\n", packLen, m_nBufOffset);
 				break;
 			}
 		}

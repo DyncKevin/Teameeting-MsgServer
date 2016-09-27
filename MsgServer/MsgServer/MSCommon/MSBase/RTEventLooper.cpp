@@ -26,11 +26,11 @@ RTEventLooper::~RTEventLooper(void)
 int RTEventLooper::PostData(const char*pData, int nSize)
 {
     {
+        OSMutexLocker locker(&mMutexRecv);
         char* ptr = (char*)malloc(sizeof(char)*(nSize+1));
         memcpy(ptr, pData, nSize);
         ptr[nSize] = '\0';
         {
-            OSMutexLocker locker(&mMutexRecv);
             ListAppend(&m_listRecv, ptr, nSize);
         }
     }
@@ -42,10 +42,10 @@ int RTEventLooper::PostData(const char*pData, int nSize)
 int RTEventLooper::SendData(const void*pData, int nSize)
 {
     {
+        OSMutexLocker locker(&mMutexSend);
         void* ptr = (void*)malloc(sizeof(char)*(nSize));
         memcpy(ptr, pData, nSize);
         {
-            OSMutexLocker locker(&mMutexSend);
             ListAppend(&m_listSend, ptr, nSize);
         }
     }
@@ -57,11 +57,11 @@ int RTEventLooper::SendData(const void*pData, int nSize)
 int RTEventLooper::PushData(const char*pData, int nSize)
 {
     {
+        OSMutexLocker locker(&mMutexPush);
         char* ptr = (char*)malloc(sizeof(char)*(nSize+1));
         memcpy(ptr, pData, nSize);
         ptr[nSize] = '\0';
         {
-            OSMutexLocker locker(&mMutexPush);
             ListAppend(&m_listPush, ptr, nSize);
         }
     }

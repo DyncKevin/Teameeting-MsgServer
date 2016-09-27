@@ -22,7 +22,6 @@
 #include "MsgServer/proto/entity_msg_type.pb.h"
 
 #define TIMEOUT_TS (60*1000)
-#define MSG_PACKED_ONCE_NUM (10)
 
 static int g_on_ticket_time = 0;
 
@@ -61,15 +60,15 @@ void LRTTransferSession::Init()
 
     socket->SetTask(this);
     this->SetTimer(120*1000);
-    for(int i=0;i<MSG_PACKED_ONCE_NUM;++i)
+    for(int i=0;i<PACKED_MSG_ONCE_NUM;++i)
     {
          m_packedNewMsg.add_msgs();
     }
-    for(int i=0;i<MSG_PACKED_ONCE_NUM;++i)
+    for(int i=0;i<PACKED_MSG_ONCE_NUM;++i)
     {
          m_packedSeqnMsg.add_msgs();
     }
-    for(int i=0;i<MSG_PACKED_ONCE_NUM;++i)
+    for(int i=0;i<PACKED_MSG_ONCE_NUM;++i)
     {
          m_packedDataMsg.add_msgs();
     }
@@ -78,15 +77,15 @@ void LRTTransferSession::Init()
 
 void LRTTransferSession::InitConf()
 {
-    for(int i=0;i<MSG_PACKED_ONCE_NUM;++i)
+    for(int i=0;i<PACKED_MSG_ONCE_NUM;++i)
     {
          m_packedNewMsg.add_msgs();
     }
-    for(int i=0;i<MSG_PACKED_ONCE_NUM;++i)
+    for(int i=0;i<PACKED_MSG_ONCE_NUM;++i)
     {
          m_packedSeqnMsg.add_msgs();
     }
-    for(int i=0;i<MSG_PACKED_ONCE_NUM;++i)
+    for(int i=0;i<PACKED_MSG_ONCE_NUM;++i)
     {
          m_packedDataMsg.add_msgs();
     }
@@ -223,7 +222,7 @@ void LRTTransferSession::OnWakeupEvent(const char*pData, int nLen)
 {
     if (m_queueSeqnMsg.size()==0) return;
     bool hasData = false;
-    for(int i=0;i<MSG_PACKED_ONCE_NUM;++i)
+    for(int i=0;i<PACKED_MSG_ONCE_NUM;++i)
     {
         if (m_queueSeqnMsg.size()>0)
         {
@@ -251,7 +250,7 @@ void LRTTransferSession::OnWakeupEvent(const char*pData, int nLen)
         tmsg.set_content(rmsg.SerializeAsString());
 
         this->SendTransferData(tmsg.SerializeAsString());
-        for(int i=0;i<MSG_PACKED_ONCE_NUM;++i)
+        for(int i=0;i<PACKED_MSG_ONCE_NUM;++i)
         {
              m_packedSeqnMsg.mutable_msgs(i)->Clear();
         }
@@ -267,7 +266,7 @@ void LRTTransferSession::OnPushEvent(const char*pData, int nLen)
 {
     if (m_queueNewMsg.size()==0) return;
     bool hasData = false;
-    for(int i=0;i<MSG_PACKED_ONCE_NUM;++i)
+    for(int i=0;i<PACKED_MSG_ONCE_NUM;++i)
     {
         if (m_queueNewMsg.size()>0)
         {
@@ -295,7 +294,7 @@ void LRTTransferSession::OnPushEvent(const char*pData, int nLen)
         tmsg.set_content(rmsg.SerializeAsString());
 
         this->SendTransferData(tmsg.SerializeAsString());
-        for(int i=0;i<MSG_PACKED_ONCE_NUM;++i)
+        for(int i=0;i<PACKED_MSG_ONCE_NUM;++i)
         {
              m_packedNewMsg.mutable_msgs(i)->Clear();
         }
@@ -311,7 +310,7 @@ void LRTTransferSession::OnTickEvent(const char*pData, int nLen)
 {
     if (m_queueDataMsg.size()==0) return;
     bool hasData = false;
-    for(int i=0;i<MSG_PACKED_ONCE_NUM;++i)
+    for(int i=0;i<PACKED_MSG_ONCE_NUM;++i)
     {
         if (m_queueDataMsg.size()>0)
         {
@@ -339,7 +338,7 @@ void LRTTransferSession::OnTickEvent(const char*pData, int nLen)
         tmsg.set_content(rmsg.SerializeAsString());
 
         this->SendTransferData(tmsg.SerializeAsString());
-        for(int i=0;i<MSG_PACKED_ONCE_NUM;++i)
+        for(int i=0;i<PACKED_MSG_ONCE_NUM;++i)
         {
              m_packedDataMsg.mutable_msgs(i)->Clear();
         }
@@ -440,6 +439,7 @@ void LRTTransferSession::OnTypeConn(const std::string& str)
             t_msg.set_priority(pms::ETransferPriority::PHIGH);
             t_msg.set_content(c_msg.SerializeAsString());
 
+            this->SetTestName(m_transferSessId);
             std::string s = t_msg.SerializeAsString();
             SendTransferData(s.c_str(), (int)s.length());
         } else {
@@ -463,6 +463,7 @@ void LRTTransferSession::OnTypeConn(const std::string& str)
             } else {
                 LE("new ModuleInfo error!!!!\n");
             }
+            this->SetTestName(m_transferSessId);
         }
     }  else if (c_msg.conn_tag() == pms::EConnTag::TKEEPALIVE) {
         RTTcpNoTimeout::UpdateTimer();
@@ -511,6 +512,7 @@ void LRTTransferSession::OnTypeTrans(const std::string& str)
             recver.set_mflag(pms::EMsgFlag::FGROUP);
             recver.set_groupid(e_msg.rom_id());
             recver.set_version(e_msg.version());
+            recver.set_module(pms::EModuleType::TLIVE);
             // store the Entity to redis
             recver.set_content(r_msg.content());
             LRTConnManager::Instance().PushNewMsg2Queue(recver.SerializeAsString());
@@ -529,6 +531,7 @@ void LRTTransferSession::OnTypeTrans(const std::string& str)
             sender.set_mrole(pms::EMsgRole::RSENDER);
             sender.set_mflag(pms::EMsgFlag::FSINGLE);
             sender.set_version(e_msg.version());
+            sender.set_module(pms::EModuleType::TLIVE);
             // store the Entity to redis
             sender.set_content(r_msg.content());
             LRTConnManager::Instance().PushNewMsg2Queue(sender.SerializeAsString());
@@ -543,6 +546,7 @@ void LRTTransferSession::OnTypeTrans(const std::string& str)
             recver.set_mrole(pms::EMsgRole::RRECVER);
             recver.set_mflag(pms::EMsgFlag::FSINGLE);
             recver.set_version(e_msg.version());
+            recver.set_module(pms::EModuleType::TLIVE);
             // store the Entity to redis
             recver.set_content(r_msg.content());
             LRTConnManager::Instance().PushNewMsg2Queue(recver.SerializeAsString());
@@ -560,6 +564,7 @@ void LRTTransferSession::OnTypeTrans(const std::string& str)
             sender.set_mrole(pms::EMsgRole::RSENDER);
             sender.set_mflag(pms::EMsgFlag::FSINGLE);
             sender.set_version(e_msg.version());
+            sender.set_module(pms::EModuleType::TLIVE);
             // store the Entity to redis
             sender.set_content(r_msg.content());
             LRTConnManager::Instance().PushNewMsg2Queue(sender.SerializeAsString());
@@ -575,6 +580,7 @@ void LRTTransferSession::OnTypeTrans(const std::string& str)
                 recver.set_mrole(pms::EMsgRole::RRECVER);
                 recver.set_mflag(pms::EMsgFlag::FSINGLE);
                 recver.set_version(e_msg.version());
+                recver.set_module(pms::EModuleType::TLIVE);
                 // store the Entity to redis
                 recver.set_content(r_msg.content());
                 LRTConnManager::Instance().PushNewMsg2Queue(recver.SerializeAsString());

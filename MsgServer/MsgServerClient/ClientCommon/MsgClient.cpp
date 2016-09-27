@@ -8,6 +8,7 @@
 
 #include "MsgClient.h"
 #include "MSSubMessage.h"
+#include "webrtc/base/timeutils.h"
 
 #if 0
 #include "proto/common_msg.pb.h"
@@ -34,11 +35,15 @@ int MsgClient::MCInit(const std::string& uid, const std::string& token, const st
     m_nsToken = token;
     m_nsNname = nname;
 
+    uint64_t nano = rtc::TimeNanos();
+    char cnano[64] = {0};
+    sprintf(cnano, "%llu", nano);
+
     // get UUID
     //CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
     //NSString *uuidStr = (__bridge_transfer NSString *)CFUUIDCreateString(kCFAllocatorDefault, uuid);
     //CFRelease(uuid);
-    SetUUID("thisisuuidlaterusingtimereplace");
+    SetUUID(cnano);
 
     m_isFetched = false;
     //m_recurLock = [[NSRecursiveLock alloc] init];
@@ -374,7 +379,7 @@ void MsgClient::OnCmdCallback(int code, int cmd, const std::string& groupid, con
                     m_sqlite3Manager->AddGroupSeqn(m_nsUserId, groupid, data.seqn);
                 }
                 UpdateLocalSeqn(groupid, data.seqn);
-                UpdateSeqnFromDb2Core();
+                UpdateMaxSeqn2Core(groupid, data.seqn);
                 m_groupDelegate->OnAddGroupSuccess(groupid);;
             } else if (code == -1)
             {
@@ -414,7 +419,7 @@ void MsgClient::OnCmdCallback(int code, int cmd, const std::string& groupid, con
                 if (data.result==0)
                 {
                     UpdateGroupInfoToDb(groupid, data.seqn, 1);
-                    UpdateSeqnFromDb2Core();
+                    UpdateMaxSeqn2Core(groupid, data.seqn);
                 } else if (data.result==-1)
                 {
                     UpdateGroupInfoToDb(groupid, data.seqn, -1);
@@ -646,14 +651,13 @@ void MsgClient::OnMsgServerConnected()
     m_clientDelegate->OnMsgServerConnected();
     m_clientDelegate->OnMsgClientInitializing();
 
-    UtilTimer timer;
+    //UtilTimer timer;
     LI("waiting for initialized....\n");
     // this function invoke will block here, until OnWorkers return 0
-    timer.Init(&MsgClient::OnWorkers);
+    //timer.Init(&MsgClient::OnWorkers);
     LI("lalalal for initialized....\n");
     m_isFetched = true;
-    UpdateSeqnFromDb2Core();
-    SyncAllSeqns();
+    ////SyncAllSeqns();
     m_clientDelegate->OnMsgClientInitialized();
 }
 

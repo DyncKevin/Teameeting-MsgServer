@@ -14,8 +14,7 @@
 #include <vector>
 
 #include "ProtoCommon.h"
-
-#define PACKED_MSG_NUM_ONCE (10)
+#include "StatusCode.h"
 
 class XPushMsgClientHelper {
 public:
@@ -32,13 +31,13 @@ public:
 
     void Init()
     {
-        for (int i=0;i<PACKED_MSG_NUM_ONCE;++i)
+        for (int i=0;i<PACKED_MSG_ONCE_NUM;++i)
             m_packed.add_msgs();
     }
 
     void Unin()
     {
-        for (int i=0;i<PACKED_MSG_NUM_ONCE;++i)
+        for (int i=0;i<PACKED_MSG_ONCE_NUM;++i)
             m_packed.mutable_msgs(i)->Clear();
     }
 

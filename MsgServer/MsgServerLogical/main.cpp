@@ -57,13 +57,13 @@ int main(int argc, const char * argv[]) {
 
     LRTLogical::Initialize(1024);
     LRTLogical* pLogical = LRTLogical::Inst();
+    //int test = 0;
     int res = pLogical->Start(conf);
     if (res != 0) {
         LI("LRTLogical start failed and goto exit, res:%d\n", res);
         goto EXIT;
     }
-    //int test = 0;
-    //while (test++ < 60) {
+    //while (test++ < 50) {
     while (1) {
         pLogical->DoTick();
         sleep(1);

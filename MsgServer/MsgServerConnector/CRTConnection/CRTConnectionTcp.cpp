@@ -59,8 +59,6 @@ void CRTConnectionTcp::GenericResponse(pms::EServerCmd cmd, pms::EModuleType mod
 // here I will send msg notify user this account was login in other place
 void CRTConnectionTcp::NotifyOtherLogin(const std::string& userid, const std::string& uuid)
 {
-    LI("CRTConnectionTcp::NotifyOtherLogin was called, userid:%s, uuid:%s\n", userid.c_str(), uuid.c_str());
-
     CRTConnManager::ConnectionInfo* pci = CRTConnManager::Instance().findConnectionInfoById(userid);
     CRTConnectionTcp* ct = nullptr;
     if (pci) {
@@ -142,6 +140,7 @@ void CRTConnectionTcp::OnLogin(pms::EServerCmd cmd, pms::EModuleType module, con
     m_token = login.usr_token();
     m_nname = login.usr_nname();
     m_uuid = login.usr_uuid();
+    this->SetTestName(m_uuid);
 
     CRTConnManager::Instance().TransferToPusher(cmd, module, m_userId, msg);
     LI("Onlogin user:%s login\n", m_userId.c_str());
@@ -255,7 +254,8 @@ void CRTConnectionTcp::OnKeepAlive(pms::EServerCmd cmd, pms::EModuleType module,
             LE("login.ParseFromString error\n");
         }
         LI("Userid:%s OnKeepAlive\n", keep.usr_from().c_str());
-        RTTcp::UpdateTimer();
+        //RTTcp::UpdateTimer();
+        this->UpdateTimer();
     }
 #else
     LE("not define DEF_PROTO\n");

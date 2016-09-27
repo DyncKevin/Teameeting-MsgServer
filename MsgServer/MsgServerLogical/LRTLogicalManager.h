@@ -64,10 +64,6 @@ public:
     bool UpdateDataWrite(pms::StorageMsg** storeMsg);
     bool DeleteDataWrite(pms::StorageMsg*  storeMsg);
 
-    bool InsertDataRead(LRTTransferSession* sess, pms::StorageMsg*  storeMsg);
-    bool UpdateDataRead(pms::StorageMsg** storeMsg);
-    bool DeleteDataRead(pms::StorageMsg*  storeMsg);
-
     bool InsertSeqnRead(LRTTransferSession* sess, pms::StorageMsg*  storeMsg);
     bool UpdateSeqnRead(pms::StorageMsg** storeMsg);
     bool DeleteSeqnRead(pms::StorageMsg*  storeMsg);

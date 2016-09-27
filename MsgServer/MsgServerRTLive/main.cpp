@@ -58,12 +58,12 @@ int main(int argc, const char * argv[]) {
     LRTRTLive::Initialize(1024);
     LRTRTLive* pRTLive = LRTRTLive::Inst();
     int res = pRTLive->Start(conf);
-    int test = 0;
+    //int test = 0;
     if (res != 0) {
         LI("LRTRTLive start failed and goto exit, res:%d\n", res);
         goto EXIT;
     }
-    //while (test++ < 60) {
+    //while (test++ < 30) {
     while (1) {
         pRTLive->DoTick();
         sleep(1);

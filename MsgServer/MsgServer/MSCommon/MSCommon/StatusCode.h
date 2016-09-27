@@ -24,5 +24,11 @@
 #define MAX_SOCKET_BUF_64 (1024*1024*64)
 #define MAX_SOCKET_BUF_32 (1024*1024*32)
 
+#define PACKED_MSG_ONCE_NUM (1)
+
+#define REDIS_GROUP_CLIENT (1)
+#define REDIS_GROUP_CLIENT_MAX (REDIS_GROUP_CLIENT*10007)
+
+
 
 #endif /* StatusCode_h */

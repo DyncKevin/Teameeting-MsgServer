@@ -398,6 +398,7 @@ void GRTTransferSession::OnTypeConn(const std::string& str)
 
             std::string s = t_msg.SerializeAsString();
             SendTransferData(s.c_str(), (int)s.length());
+            this->SetTestName(m_transferSessId);
         } else {
             LE("Connection id:%s error!!!\n", c_msg.transferid().c_str());
         }
@@ -419,6 +420,7 @@ void GRTTransferSession::OnTypeConn(const std::string& str)
             } else {
                 LE("new ModuleInfo error!!!!\n");
             }
+            this->SetTestName(m_transferSessId);
         }
     }  else if (c_msg.conn_tag() == pms::EConnTag::TKEEPALIVE) {
         RTTcpNoTimeout::UpdateTimer();
@@ -484,6 +486,8 @@ void GRTTransferSession::OnGroupNotify(int code, const std::string& cont)
     GRTGrouperManager::Instance().GetGroupMembersLocal(store.groupid(), &puset);
     if (!puset)
     {
+         // TODO:
+         // why here?
          LE("groupid :%s is not find in group manager, so return\n", store.groupid().c_str());
          if (GRTGrouperManager::Instance().FindTmpGroupId(store.groupid())) {
              GRTGrouperManager::Instance().TmpStoreGroupMsg(store.groupid(), store.sequence(), true);

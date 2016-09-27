@@ -127,7 +127,9 @@ void MsgServerClient::DoTick()
 {
 #if 1
     test_times++;
-    if (test_times >10 && test_times <12)
+    //if (test_times >10 && test_times <=250)
+    //if (test_times >10)
+    if (test_times <0)
         ClientManager::Instance().SendGroupMsg();
 #endif
 }

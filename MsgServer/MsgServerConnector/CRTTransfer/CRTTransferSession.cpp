@@ -262,6 +262,7 @@ void CRTTransferSession::OnTypeConn(const std::string& str)
             } else {
                 LE("new ModuleInfo error!!!\n");
             }
+            this->SetTestName(m_transferSessId);
         }
     } else if (c_msg.conn_tag() == pms::EConnTag::TKEEPALIVE) {
         this->RTTcp::UpdateTimer();

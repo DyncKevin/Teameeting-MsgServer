@@ -291,6 +291,7 @@ int MSSqlite3DB::RunSqlSelect(const std::string& sql, const std::string& dbName,
     }
     int code = 0;
     sqlite3_stmt *stmt = nullptr;
+    LI("RunSelect type:%d, sql:%s\n", type, sql.c_str());
     code = sqlite3_prepare_v2(_sql3Db, sql.c_str(), -1, &stmt, NULL);
     if (code != SQLITE_OK)
     {
@@ -320,6 +321,7 @@ int MSSqlite3DB::RunSqlSelect(const std::string& sql, const std::string& dbName,
             {
                 while(sqlite3_step(stmt) == SQLITE_ROW)
                 {
+                    LI("RunSelect group info......... \n");
                     char *userid = (char*)sqlite3_column_text(stmt, 0);
                     char *grpid = (char*)sqlite3_column_text(stmt, 1);
                     sqlite3_int64 seqn = sqlite3_column_int64(stmt, 2);
@@ -336,6 +338,7 @@ int MSSqlite3DB::RunSqlSelect(const std::string& sql, const std::string& dbName,
                     map.insert(std::make_pair("seqn"   , nsSeqn));
                     map.insert(std::make_pair("isfetched" , nsFetched));
 
+                    LI("RunSelect group info userid:%s, seqnid:%s, seqn:%s, isfetched:%s\n", nsUserId.c_str(), nsGrpId.c_str(), nsSeqn.c_str(), nsFetched.c_str());
                     result.push_back(map);
                 }
                 sqlite3_finalize(stmt);

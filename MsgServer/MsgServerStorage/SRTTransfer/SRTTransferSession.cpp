@@ -273,6 +273,7 @@ void SRTTransferSession::OnTypeConn(const std::string& str)
             t_msg.set_flag(pms::ETransferFlag::FNEEDACK);
             t_msg.set_priority(pms::ETransferPriority::PHIGH);
             t_msg.set_content(c_msg.SerializeAsString());
+            this->SetTestName(m_transferSessId);
 
             std::string s = t_msg.SerializeAsString();
             SendTransferData(s.c_str(), (int)s.length());
@@ -297,7 +298,8 @@ void SRTTransferSession::OnTypeConn(const std::string& str)
             } else {
                 LE("new ModuleInfo error!!!!\n");
             }
-        }
+             this->SetTestName(m_transferSessId);
+       }
     }  else if (c_msg.conn_tag() == pms::EConnTag::TKEEPALIVE) {
         RTTcpNoTimeout::UpdateTimer();
     } else {

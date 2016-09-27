@@ -111,7 +111,7 @@ void ClientSession::OnRecvTxtMessage(MSMessage* txtMsg)
     sprintf(buf, "Grp:%s:Usr:%s:%ld\n", mGroupId.c_str(), mUserId.c_str(), s_recv_msg_times++);
     fwrite(buf, 1, strlen(buf), mRecvLog);
     fflush(mRecvLog);
-    LI("%s was called, recv msg times:%ld\n", __FUNCTION__, s_recv_msg_times);
+    LI("%s was called, userid:%s, recv msg times:%ld\n", __FUNCTION__, mUserId.c_str(), s_recv_msg_times);
 
 }
 

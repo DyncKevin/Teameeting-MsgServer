@@ -8,8 +8,7 @@
 
 #include "SRTResponseSender.h"
 #include "SRTTransferSession.h"
-
-#define PACKED_MSG_ONCE_NUM (10)
+#include "StatusCode.h"
 
 static int g_push_response_counter = 0;
 static int g_idle_event_counter = 0;

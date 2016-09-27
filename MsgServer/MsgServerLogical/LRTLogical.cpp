@@ -211,4 +211,6 @@ void LRTLogical::Stop()
     LRTLogicalManager::Instance().SignalKill();
     LRTLogicalManager::Instance().ClearAll();
     LRTLogicalManager::Instance().UninManager();
+    LRTConnManager::Instance().SignalKill();
+    LRTConnManager::Instance().ClearAll();
 }

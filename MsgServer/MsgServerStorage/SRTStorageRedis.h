@@ -49,10 +49,14 @@ public:
 public:
     virtual void ConnectionDisconnected();
 private:
+    int ProcessRead(pms::StorageMsg* pStore, int times);
+    int ProcessWrite(pms::StorageMsg* pStore);
+private:
     std::string                      m_Ip;
     int                              m_Port;
     SRTRedisGroup*                   m_RedisGroup;
     pms::StorageMsg                  m_RecvStoreMsg;
+    pms::PackedStoreMsg              m_ReadedMsg;
 
     xRedisClient                     m_xRedisClient;
     RedisDBIdx*                      m_RedisDBIdx;

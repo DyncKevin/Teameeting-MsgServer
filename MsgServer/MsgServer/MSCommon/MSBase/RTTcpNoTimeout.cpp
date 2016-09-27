@@ -30,11 +30,11 @@ int RTTcpNoTimeout::SendData(const char*pData, int nLen)
         LE("RTTcpNoTimeout::SendData pData is over length:%d\n", nLen);
     }
     {
+        OSMutexLocker locker(&mMutexSend);
         char* ptr = (char*)malloc(sizeof(char)*(nLen+1));
         memcpy(ptr, pData, nLen);
         ptr[nLen] = '\0';
         {
-            OSMutexLocker locker(&mMutexSend);
             ListAppend(&m_listSend, ptr, nLen);
         }
     }
@@ -49,6 +49,7 @@ int RTTcpNoTimeout::SendTransferData(const char*pData, int nLen)
         LE("RTTcpNoTimeout::SendTransferData pData is over length:%d\n", nLen);
     }
     {
+        OSMutexLocker locker(&mMutexSend);
         char* ptr = (char*)malloc(sizeof(char)*(nLen+4));
         char* pptr = ptr;
         *pptr = '$';
@@ -57,13 +58,11 @@ int RTTcpNoTimeout::SendTransferData(const char*pData, int nLen)
         memcpy((pptr), pData, nLen);
         ptr[nLen+3] = '\0';
         {
-#if 0
-            OSMutexLocker locker(&mMutexSend);
+#if 1
             ListAppend(&m_listSend, ptr, nLen+3);
 #else
         std::string str(ptr, nLen+3);
         {
-            OSMutexLocker locker(&mMutexSend);
             m_dequeSend.push_back(str);
         }
         free(ptr);
@@ -132,7 +131,7 @@ SInt64 RTTcpNoTimeout::Run()
 		}
 		else if(events&Task::kWriteEvent)
 		{
-#if 0
+#if 1
 			ListElement *elem = NULL;
 			if((elem = m_listSend.first) != NULL)
 			{
@@ -146,7 +145,7 @@ SInt64 RTTcpNoTimeout::Run()
 				{
                     {
                         OSMutexLocker locker(&mMutexSend);
-                        printf("RTTcpNoTimeout::Run kWriteEvent m_listSend.size:%d, m_listSend.count:%d\n", m_listSend.size, m_listSend.count);
+                        //printf("RTTcpNoTimeout::Run kWriteEvent m_listSend.size:%d, m_listSend.count:%d\n", m_listSend.size, m_listSend.count);
                         ListRemoveHead(&m_listSend);
                     }
 					if(NULL != m_listSend.first)

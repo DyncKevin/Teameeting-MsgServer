@@ -11,10 +11,7 @@
 #include "SRTTransferSession.h"
 #include "SRTStorageRedis.h"
 
-
-#define REDIS_GROUP_CLIENT (10)
-#define REDIS_GROUP_CLIENT_MAX (REDIS_GROUP_CLIENT*10007)
-#define PACKED_MSG_ONCE_NUM (10)
+#include "StatusCode.h"
 
 static int g_push_request_counter = 0;
 static int g_post_event_counter = 0;

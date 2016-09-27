@@ -7,6 +7,7 @@
 //
 
 #include "XGrpMsgProcesser.h"
+#include "StatusCode.h"
 
 #include <iostream>
 #include <string>
@@ -77,7 +78,7 @@ int XGrpMsgProcesser::EncodeGrpSyncSeqnNotifys(std::string& outstr, const std::v
 {
     pms::MsgReq req;
     pms::TransferMsg tmsg;
-    for(int i=0,j=(userids.size()<=PACKED_MSG_NUM_ONCE)?userids.size():PACKED_MSG_NUM_ONCE; i<j;++i)
+    for(int i=0,j=(userids.size()<=PACKED_MSG_ONCE_NUM)?userids.size():PACKED_MSG_ONCE_NUM; i<j;++i)
     {
         if (userids.at(i).length()==0)break;
         m_packed.mutable_msgs(i)->set_rsvrcmd(pms::EServerCmd::CGROUPNOTIFY);
@@ -101,7 +102,7 @@ int XGrpMsgProcesser::EncodeGrpSyncSeqnNotifys(std::string& outstr, const std::v
     tmsg.set_type(pms::ETransferType::TPUSH);
     tmsg.set_content(req.SerializeAsString());
     outstr = tmsg.SerializeAsString();
-    for(int i=0;i<PACKED_MSG_NUM_ONCE;++i)
+    for(int i=0;i<PACKED_MSG_ONCE_NUM;++i)
     {
         m_packed.mutable_msgs(i)->Clear();
     }
@@ -119,7 +120,7 @@ int XGrpMsgProcesser::EncodeGrpSyncDataNotifys(std::string& outstr, const std::v
 {
     pms::MsgReq req;
     pms::TransferMsg tmsg;
-    for(int i=0,j=(userids.size()<=PACKED_MSG_NUM_ONCE)?userids.size():PACKED_MSG_NUM_ONCE; i<j;++i)
+    for(int i=0,j=(userids.size()<=PACKED_MSG_ONCE_NUM)?userids.size():PACKED_MSG_ONCE_NUM; i<j;++i)
     {
         if (userids.at(i).length()==0)break;
         m_packed.mutable_msgs(i)->set_rsvrcmd(pms::EServerCmd::CGROUPNOTIFY);
@@ -139,7 +140,7 @@ int XGrpMsgProcesser::EncodeGrpSyncDataNotifys(std::string& outstr, const std::v
     tmsg.set_type(pms::ETransferType::TPUSH);
     tmsg.set_content(req.SerializeAsString());
     outstr = tmsg.SerializeAsString();
-    for(int i=0;i<PACKED_MSG_NUM_ONCE;++i)
+    for(int i=0;i<PACKED_MSG_ONCE_NUM;++i)
     {
         m_packed.mutable_msgs(i)->Clear();
     }

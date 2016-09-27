@@ -361,17 +361,16 @@ private:
     {
         for (auto &item : m_groupSeqn)
         {
-            LI("SyncSeqnFromDb2Core will call InitUserSeqns...\n");
+            LI("SyncSeqnFromDb2Core will call InitUserSeqns...storeid:%s, seqn:%lld\n", item.first.c_str(), item.second);
             InitUserSeqns(item.first, item.second);
         }
     }
 
-    void UpdateSeqnFromDb2Core()
+    void UpdateMaxSeqn2Core(const std::string& seqnId, int64_t seqn)
     {
-        for (auto &item : m_groupSeqn)
         {
-            LI("UpdateSeqnFromDb2Core will call UpdateUserSeqns...\n");
-            UpdateUserSeqns(item.first, item.second);
+            LI("UpdateMaxSeqn2Core will call UpdateMaxSeqns...\n");
+            UpdateMaxSeqns(seqnId, seqn);
         }
     }
 

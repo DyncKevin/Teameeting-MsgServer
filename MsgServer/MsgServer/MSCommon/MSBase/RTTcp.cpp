@@ -29,11 +29,11 @@ int RTTcp::SendData(const char*pData, int nLen)
         LE("RTTcp::SendData pData is over length:%d\n", nLen);
     }
     {
+        OSMutexLocker locker(&mMutexSend);
         char* ptr = (char*)malloc(sizeof(char)*(nLen+1));
         memcpy(ptr, pData, nLen);
         ptr[nLen] = '\0';
         {
-            OSMutexLocker locker(&mMutexSend);
             ListAppend(&m_listSend, ptr, nLen);
         }
     }
@@ -48,6 +48,7 @@ int RTTcp::SendTransferData(const char*pData, int nLen)
         LE("RTTcp::SendTransferData pData is over length:%d\n", nLen);
     }
     {
+        OSMutexLocker locker(&mMutexSend);
         char* ptr = (char*)malloc(sizeof(char)*(nLen+4));
         char* pptr = ptr;
         *pptr = '$';
@@ -56,7 +57,6 @@ int RTTcp::SendTransferData(const char*pData, int nLen)
         memcpy((pptr), pData, nLen);
         ptr[nLen+3] = '\0';
         {
-            OSMutexLocker locker(&mMutexSend);
             ListAppend(&m_listSend, ptr, nLen+3);
         }
         pptr = NULL;
@@ -82,7 +82,10 @@ SInt64 RTTcp::Run()
                 conn->ConnectionDisconnected();
             }
         }
-        printf("RTTcp timeout or killed\n");
+        if (events&Task::kTimeoutEvent)
+        LE("RTTcp::Run~~~~~~RTTcp timeout\n");
+        if (events&Task::kKillEvent)
+        LE("RTTcp::Run~~~~~~RTTcp killed\n");
 		return -1;
 	}
 

@@ -29,11 +29,11 @@ int RTDispatch::PostData(const char*pData, int nLen)
         return -1;
     }
     {
+        OSMutexLocker locker(&mMutexRecv);
         char* ptr = (char*)malloc(sizeof(char)*(nLen+1));
         memcpy(ptr, pData, nLen);
         ptr[nLen] = '\0';
         {
-            OSMutexLocker locker(&mMutexRecv);
             ListAppend(&m_listRecv, ptr, nLen);
         }
     }
@@ -48,11 +48,11 @@ int RTDispatch::SendData(const char*pData, int nLen)
         return -1;
     }
     {
+        OSMutexLocker locker(&mMutexSend);
         char* ptr = (char*)malloc(sizeof(char)*(nLen+1));
         memcpy(ptr, pData, nLen);
         ptr[nLen] = '\0';
         {
-            OSMutexLocker locker(&mMutexSend);
             ListAppend(&m_listSend, ptr, nLen);
         }
     }
@@ -67,11 +67,11 @@ int RTDispatch::WakeupData(const char*pData, int nLen)
         return -1;
     }
     {
+        OSMutexLocker locker(&mMutexWakeup);
         char* ptr = (char*)malloc(sizeof(char)*(nLen+1));
         memcpy(ptr, pData, nLen);
         ptr[nLen] = '\0';
         {
-            OSMutexLocker locker(&mMutexWakeup);
             ListAppend(&m_listWakeup, ptr, nLen);
         }
     }
@@ -86,11 +86,11 @@ int RTDispatch::PushData(const char*pData, int nLen)
         return -1;
     }
     {
+        OSMutexLocker locker(&mMutexPush);
         char* ptr = (char*)malloc(sizeof(char)*(nLen+1));
         memcpy(ptr, pData, nLen);
         ptr[nLen] = '\0';
         {
-            OSMutexLocker locker(&mMutexPush);
             ListAppend(&m_listPush, ptr, nLen);
         }
     }

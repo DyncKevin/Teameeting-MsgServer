@@ -380,7 +380,7 @@ start_log
 sleep 2
 
 ####################    building 3rdpartylibs    ###########################
-if [ "no"x = "yes"x ]
+if [ "yes"x = "yes"x ]
 then
     COMMON_LIB_PATH=$BASE_PATH/MsgServer/MSCommonLib
     THIRDPARTY_LIB_PATH=$BASE_PATH/MsgServer/MSCommon/lib_linux_a

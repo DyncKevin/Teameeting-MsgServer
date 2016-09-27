@@ -120,7 +120,6 @@ bool LRTConnManager::SendToGroupModule(const std::string& userid, const std::str
         return false;
     } else { //!pmi
         if (pmi->pModule) {
-            LI("LRTConnManager::SendToGroupModule find user:%s module MGRPNOTIFY send ok\n", userid.c_str());
              pmi->pModule->SendTransferData(msg);
              return true;
         } else {
@@ -138,7 +137,6 @@ bool LRTConnManager::SendToPushModule(const std::string& userid, const std::stri
         return false;
     } else { //!pmi
         if (pmi->pModule) {
-            LI("LRTConnManager::SendToPUSHModule find user:%s module MPUSHER send ok\n", userid.c_str());
              pmi->pModule->SendTransferData(msg);
              return true;
         } else {
@@ -355,7 +353,6 @@ void LRTConnManager::PushDataReq2Queue(const std::string& str)
 {
      if (m_logicalSession && m_logicalSession->IsLiveSession())
      {
-         LI("LRTConnManager::PushDataReq2Queue ticket_time:%d\n", ++ticket_time);
          m_logicalSession->PushDataReq2Queue(str);
      }
 }
@@ -533,7 +530,6 @@ void LRTConnManager::TransferSessionLostNotify(const std::string& sid)
         request["port"] = data.connect.port;
         std::string s = request.toStyledString();
         LI("TransferSessionLostNotify EventData mtype:%d, module:%d, ip:%s, port:%d\n", data.mtype, data.connect.module, data.connect.ip, data.connect.port);
-        LI("TransferSessionLostNotify s:%s\n", s.c_str());
         RTEventTimer* timer = new RTEventTimer(RETRY_MAX_TIME, &LRTConnManager::DispTimerCallback);
         timer->DataDelay(s.c_str(), (int)s.length());
         LI("Waiting for Session Reconnecting...");

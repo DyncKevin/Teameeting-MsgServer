@@ -569,6 +569,3 @@ int LRTConnManager::DispTimerCallback(const char*pData, int nLen)
     }
     return 0;
 }
-
-
-

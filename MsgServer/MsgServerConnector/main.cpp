@@ -49,13 +49,13 @@ int main(int argc, const char * argv[]) {
 
     CRTConnector::Initialize(1024);
     CRTConnector* pConnector = CRTConnector::Inst();
+    //int test = 0;
     int res = pConnector->Start(conf);
     if (res != 0) {
         LI("CRTConnector start failed and goto exit, res:%d\n", res);
         goto EXIT;
     }
-    //int test = 0;
-    //while (test++ < 120) {
+    //while (test++ < 30) {
     while (1) {
         pConnector->DoTick();
         sleep(1);

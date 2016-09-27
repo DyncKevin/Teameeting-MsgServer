@@ -400,7 +400,7 @@ void PRTTransferSession::OnTypeQueue(const std::string& str)
         LE("PRTTransferSession::OnTypeQueue store ParseFromString error\n");
         return;
     }
-    LI("PRTTransferSession::OnTypeQueue sequence:%lld, ruseid:%s, storeid:%s, ispush:%s, version:%s, groupid:%s, mtype:%s, group or single flag:%d\n\n"\
+    LI("PRTTransferSession::OnTypeQueue sequence:%lld, ruseid:%s, storeid:%s, ispush:%s, version:%s, groupid:%s, mtype:%s, group or single flag:%d, module:%d\n\n"\
             , store.sequence()\
             , store.ruserid().c_str()\
             , store.storeid().c_str()\
@@ -408,7 +408,8 @@ void PRTTransferSession::OnTypeQueue(const std::string& str)
             , store.version().c_str()\
             , store.groupid().c_str()\
             , store.mtype().c_str()\
-            , store.mflag());
+            , store.mflag()\
+            , store.module());
 
     store.set_rsvrcmd(pms::EServerCmd::CPGETDATA);
     store.set_tsvrcmd(pms::EServerCmd::CPGETDATA);

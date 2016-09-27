@@ -49,13 +49,13 @@ int main(int argc, const char * argv[]) {
 
     DRTMsgQueue::Initialize(1024);
     DRTMsgQueue* pMsgQueue = DRTMsgQueue::Inst();
+    //int test = 0;
     int res = pMsgQueue->Start(conf);
     if (res != 0) {
         LI("DRTMsgQueue start failed and goto exit, res:%d\n", res);
         goto EXIT;
     }
-    //int test = 0;
-    //while (test++ < 100) {
+    //while (test++ < 30) {
     while (1) {
         pMsgQueue->DoTick();
         sleep(1);

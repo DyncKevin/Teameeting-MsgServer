@@ -207,7 +207,6 @@ void CRTConnManager::TransferSessionLostNotify(const std::string& sid)
 
 void CRTConnManager::TransferMsg(pms::EServerCmd cmd, pms::EModuleType module, const std::string& uid, const std::string& msg)
 {
-    LI("CRTConnManager::TransferMsg module is:%d\n", module);
     ModuleInfo* pmi = findModuleInfo(uid, (pms::ETransferModule)module);
     if (pmi && pmi->pModule) {
         pmi->pModule->TransferMsg(cmd, msg);
@@ -246,9 +245,9 @@ void CRTConnManager::TransferToPusher(pms::EServerCmd cmd, pms::EModuleType type
         // t_msg is pms::TransferMsg->pms::RelayMsg->pms::MsgReq->pms::Setting
         std::string s = t_msg.SerializeAsString();
         pmodule->pModule->SendTransferData(s.c_str(), (int)s.length());
-        LI("CRTConnManager::TransferToPusher send push msg to pusher, module type:%d, module id:%s!!!\n\n", pmodule->othModuleType, pmodule->othModuleId.c_str());
+        //LI("CRTConnManager::TransferToPusher send push msg to pusher, module type:%d, module id:%s!!!\n\n", pmodule->othModuleType, pmodule->othModuleId.c_str());
     } else {
-        LE("CRTConnManager::TransferToPusher module pusher is not liveeeeeeeeeeee!!!\n");
+        //LE("CRTConnManager::TransferToPusher module pusher is not liveeeeeeeeeeee!!!\n");
     }
     return;
 }

@@ -10,10 +10,10 @@
 #include "SRTSequenceManager.h"
 #include "SRTTransferSession.h"
 #include "SRTResponseCollection.h"
+#include "StatusCode.h"
 
 #define SESSION_TIMEOUT (90*1000)
 #define REDIS_GROUP_CLIENT (10)
-#define PACKED_MSG_ONCE_NUM (10)
 
 SRTRedisManager::SRTRedisManager()
     : m_LastUpdateTime(0)
