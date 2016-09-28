@@ -133,7 +133,7 @@ public:
             m_MaxSeqnMap[seqnid] = seqn;
          }
     }
-    
+
     void AddGroupInCore(const std::string& seqnid, int64 seqn)
     {
         m_MaxSeqnMap[seqnid] = seqn;
@@ -145,7 +145,7 @@ public:
             }
         }
     }
-    
+
     void RemoveGroupInCore(const std::string& seqnid)
     {
         //m_Wait4CheckSeqnKeyMap
@@ -153,7 +153,7 @@ public:
         //m_gSyncedMsgMap;
         //m_gUserSeqnMap;
         //m_gRecvMsgList;
-        
+
         m_MaxSeqnMap.erase(seqnid);
         {
             rtc::CritScope cs(&m_csWait4CheckSeqnKey);
@@ -179,12 +179,12 @@ public:
                 }
             }
         }
-        
+
         {
             rtc::CritScope cs(&m_csgUserSeqn);
             m_gUserSeqnMap.erase(seqnid);
         }
-        
+
         {
             rtc::CritScope cs(&m_csgRecvMsg);
             for(RecvMsgListIt it=m_gRecvMsgList.begin();it!=m_gRecvMsgList.end();)
@@ -197,7 +197,7 @@ public:
                 }
             }
         }
-        
+
     }
 
 public:

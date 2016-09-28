@@ -339,6 +339,16 @@ private:
         //[m_recurLock unlock];
     }
 
+    void AddCoreGroup(const std::string& seqnId, int64_t seqn)
+    {
+        AddGroupInCore(seqnId, seqn);
+    }
+
+    void RemoveCoreGroup(const std::string& seqnId)
+    {
+        RemoveGroupInCore(seqnId);
+    }
+
     int64 GetLocalSeqnFromId(const std::string& seqnId)
     {
         int64 lseqn = -1;

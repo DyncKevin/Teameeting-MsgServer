@@ -689,6 +689,7 @@ void XMsgClient::OnHelpSyncSeqn(int code, const std::string& cont)
         if (uit == m_MaxSeqnMap.end()) {
             m_MaxSeqnMap.insert(make_pair(store.storeid(), store.maxseqn()));
         } else {
+            //uit->second = store.maxseqn(); // this line is only for test and skip sync data
             if (uit->second < store.maxseqn()) {
                 uit->second = store.maxseqn();
                 // here means no matter TSEQN or TFETCHSEQN

@@ -380,6 +380,7 @@ void MsgClient::OnCmdCallback(int code, int cmd, const std::string& groupid, con
                 }
                 UpdateLocalSeqn(groupid, data.seqn);
                 UpdateMaxSeqn2Core(groupid, data.seqn);
+                AddCoreGroup(groupid, data.seqn);
                 m_groupDelegate->OnAddGroupSuccess(groupid);;
             } else if (code == -1)
             {
@@ -394,6 +395,7 @@ void MsgClient::OnCmdCallback(int code, int cmd, const std::string& groupid, con
                 m_sqlite3Manager->DelGroupId(m_nsUserId, groupid);
                 RemoveLocalSeqn(groupid);
                 //Update seqn from db 2 core
+                RemoveCoreGroup(groupid);
                 m_groupDelegate->OnRmvGroupSuccess(groupid);;
             } else if (code == -1)
             {
@@ -648,8 +650,6 @@ void MsgClient::OnNotifyOtherLogin(int code)
 void MsgClient::OnMsgServerConnected()
 {
     FetchAllSeqns();
-    m_clientDelegate->OnMsgServerConnected();
-    m_clientDelegate->OnMsgClientInitializing();
 
     //UtilTimer timer;
     LI("waiting for initialized....\n");
@@ -657,7 +657,8 @@ void MsgClient::OnMsgServerConnected()
     //timer.Init(&MsgClient::OnWorkers);
     LI("lalalal for initialized....\n");
     m_isFetched = true;
-    ////SyncAllSeqns();
+    m_clientDelegate->OnMsgServerConnected();
+    m_clientDelegate->OnMsgClientInitializing();
     m_clientDelegate->OnMsgClientInitialized();
 }
 
