@@ -84,7 +84,7 @@ void PRTApnsPusher::Run(void* data)
         }
 
         // get 10 needed push msg in redis each time
-        int64_t start=0, stop=9;
+        int64_t start=0, stop=0;
         ArrayReply reply;
         if (!m_xRedis.GetNeedPushMsg("ios", reply, start, stop))
         {

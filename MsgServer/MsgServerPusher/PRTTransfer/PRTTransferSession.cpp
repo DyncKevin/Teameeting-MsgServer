@@ -222,7 +222,6 @@ void PRTTransferSession::OnRecvData(const char*pData, int nLen)
 
 void PRTTransferSession::OnRecvMessage(const char*message, int nLen)
 {
-    LI("PRTTransferSession::OnRecvMessage ~~~~~~~~~~~~~~~~~~\n");
     RTTransfer::DoProcessData(message, nLen);
 }
 
