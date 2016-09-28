@@ -303,7 +303,8 @@ void MsgClient::OnCmdCallback(int code, int cmd, const std::string& groupid, con
                     [m_sqlite3Manager addGroupSeqnUserId:m_nsUserId GrpId:nsGrpId seqn:[NSNumber numberWithLongLong:data.seqn]];
                 }
                 UpdateLocalSeqn(groupid, data.seqn);
-                UpdateSeqnFromDb2Core();
+                UpdateMaxSeqn2Core(groupid, data.seqn);
+                AddCoreGroup(groupid, data.seqn);
                 [m_groupDelegate OnAddGroupSuccessGrpId:nsGrpId];
             } else if (code == -1)
             {
@@ -319,6 +320,7 @@ void MsgClient::OnCmdCallback(int code, int cmd, const std::string& groupid, con
                 [m_sqlite3Manager delGroupIdUserId:m_nsUserId GrpId:nsGrpId];
                 RemoveLocalSeqn(groupid);
                 //Update seqn from db 2 core
+                RemoveCoreGroup(groupid);
                 [m_groupDelegate OnRmvGroupSuccessGrpId:nsGrpId];
             } else if (code == -1)
             {
@@ -344,7 +346,7 @@ void MsgClient::OnCmdCallback(int code, int cmd, const std::string& groupid, con
                 if (data.result==0)
                 {
                     UpdateGroupInfoToDb([NSString stringWithCString:groupid.c_str() encoding:NSUTF8StringEncoding], [NSNumber numberWithLongLong:data.seqn], [NSNumber numberWithInt:1]);
-                    UpdateSeqnFromDb2Core();
+                    UpdateMaxSeqn2Core(groupid, data.seqn);
                 } else if (data.result==-1)
                 {
                     UpdateGroupInfoToDb([NSString stringWithCString:groupid.c_str() encoding:NSUTF8StringEncoding], [NSNumber numberWithLongLong:data.seqn], [NSNumber numberWithInt:-1]);
@@ -603,12 +605,9 @@ void MsgClient::OnNotifyOtherLogin(int code)
 void MsgClient::OnMsgServerConnected()
 {
     FetchAllSeqns();
-    [m_clientDelegate OnMsgServerConnected];
-    [m_clientDelegate OnMsgClientInitializing];
     
     // check per second until get all fetch
-    NSTimeInterval period = 1.0; //设置时间间隔
-    //dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    NSTimeInterval period = 3.0; //设置时间间隔
     dispatch_source_t _timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0));
     dispatch_source_set_timer(_timer, dispatch_walltime(NULL, 0), period * NSEC_PER_SEC, 0); //每秒执行
     dispatch_source_set_event_handler(_timer, ^{
@@ -618,8 +617,8 @@ void MsgClient::OnMsgServerConnected()
         {
             // stop timer here
             m_isFetched = true;
-            UpdateSeqnFromDb2Core();
-            SyncAllSeqns();
+            [m_clientDelegate OnMsgServerConnected];
+            [m_clientDelegate OnMsgClientInitializing];
             [m_clientDelegate OnMsgClientInitialized];
             dispatch_source_set_cancel_handler(_timer, ^{
                

@@ -313,6 +313,16 @@ private:
         [m_recurLock unlock];
     }
     
+    void AddCoreGroup(const std::string& seqnId, int64_t seqn)
+    {
+        AddGroupInCore(seqnId, seqn);
+    }
+    
+    void RemoveCoreGroup(const std::string& seqnId)
+    {
+        RemoveGroupInCore(seqnId);
+    }
+    
     int64 GetLocalSeqnFromId(const std::string& seqnId)
     {
         int64 lseqn = -1;
@@ -337,12 +347,9 @@ private:
         }
     }
     
-    void UpdateSeqnFromDb2Core()
+    void UpdateMaxSeqn2Core(const std::string& seqnId, int64_t seqn)
     {
-        for (auto &item : m_groupSeqn)
-        {
-            UpdateUserSeqns(item.first, item.second);
-        }
+        UpdateMaxSeqns(seqnId, seqn);
     }
     
 protected:

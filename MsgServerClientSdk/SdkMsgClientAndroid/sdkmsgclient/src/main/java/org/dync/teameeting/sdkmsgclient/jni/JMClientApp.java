@@ -51,7 +51,9 @@ public class JMClientApp {
     public native void SetUUID(String strUUID);
 
     public native void InitUserSeqns(String strSeqnid, long seqn);
-    public native void UpdateUserSeqns(String strSeqnid, long seqn);
+    public native void UpdateMaxSeqns(String strSeqnid, long seqn);
+    public native void AddGroupInCore(String strSeqnid, long seqn);
+    public native void RemoveGroupInCore(String strSeqnid);
 
     /**
      * 销毁APP

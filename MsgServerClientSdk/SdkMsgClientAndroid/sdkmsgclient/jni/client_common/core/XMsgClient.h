@@ -41,6 +41,8 @@
 #define PUSH_ENABLE (1)
 #define PUSH_DISABLE (2)
 
+#define SYNC_DATA_RETRY_TIMES (50)
+
 class XMsgClientHelper {
 public:
     XMsgClientHelper() {}
@@ -53,7 +55,7 @@ public:
     virtual void OnHelpSyncSeqn(int code, const std::string& cont) = 0;
     virtual void OnHelpSyncData(int code, const std::string& cont) = 0;
     virtual void OnHelpSyncGroupData(int code, const std::string& cont) = 0;
-    
+
     virtual void OnHelpGroupNotify(int code, const std::string& cont) = 0;
     virtual void OnHelpNotifySeqn(int code, const std::string& cont) = 0;
     virtual void OnHelpNotifyData(int code, const std::string& cont) = 0;
@@ -75,13 +77,13 @@ public:
     int UnRegisterMsgCb(XMsgCallback* cb);
 
     int ConnToServer(const std::string& server="", int port=0, bool bAutoConnect=true);
-    
+
     int AddGroup(const std::string& groupid);
     int RmvGroup(const std::string& groupid);
 
     int SndMsg(std::string& outmsgid, const std::string& groupid, const std::string& grpname, const std::string& msg, int tag, int type, int module, int flag, int push);
     int SndMsgTo(std::string& outmsgid, const std::string& groupid, const std::string& grpname, const std::string& msg, int tag, int type, int module, int flag, int push, const std::vector<std::string>& uvec);
-    
+
     int FetchSeqn();
     int SyncSeqn(int64 seqn, int role);
     int SyncData(int64 seqn);
@@ -102,12 +104,12 @@ public:
     {
         m_enablePush = enablePush;
     }
-    
+
     void SetMuteNotify(int mutenotify)
     {
         m_muteNotify = mutenotify;
     }
-    
+
     void SetUUID(const std::string& uuid)
     {
         m_uuid = uuid;
@@ -121,16 +123,81 @@ public:
         } else {
             m_gUserSeqnMap.insert(make_pair(seqnid, seqn));
         }
+        m_MaxSeqnMap.insert(make_pair(seqnid, seqn));
     }
 
-    void UpdateUserSeqns(const std::string& seqnid, int64 seqn)
+    void UpdateMaxSeqns(const std::string& seqnid, int64 seqn)
     {
-         if (seqnid.compare(m_uid)==0)
+         if (m_MaxSeqnMap[seqnid] < seqn)
          {
-            m_uUserSeqnMap[seqnid] = seqn;
-         } else {
-            m_gUserSeqnMap[seqnid] = seqn;
+            m_MaxSeqnMap[seqnid] = seqn;
          }
+    }
+    
+    void AddGroupInCore(const std::string& seqnid, int64 seqn)
+    {
+        m_MaxSeqnMap[seqnid] = seqn;
+        {
+            rtc::CritScope cs(&m_csgUserSeqn);
+            if (m_gUserSeqnMap.find(seqnid)==m_gUserSeqnMap.end())
+            {
+                m_gUserSeqnMap[seqnid] = seqn;
+            }
+        }
+    }
+    
+    void RemoveGroupInCore(const std::string& seqnid)
+    {
+        //m_Wait4CheckSeqnKeyMap
+        //m_gWait4AckMsgMap;
+        //m_gSyncedMsgMap;
+        //m_gUserSeqnMap;
+        //m_gRecvMsgList;
+        
+        m_MaxSeqnMap.erase(seqnid);
+        {
+            rtc::CritScope cs(&m_csWait4CheckSeqnKey);
+            for(Wait4CheckSeqnKeyMapIt it=m_Wait4CheckSeqnKeyMap.begin();it!=m_Wait4CheckSeqnKeyMap.end();)
+            {
+                if (it->first.find_first_of(seqnid)>0)
+                {
+                    m_Wait4CheckSeqnKeyMap.erase(it++);
+                } else {
+                    ++it;
+                }
+            }
+        }
+        {
+            rtc::CritScope cs(&m_csgSyncedMsg);
+            for(SyncedMsgMapIt it=m_gSyncedMsgMap.begin();it!=m_gSyncedMsgMap.end();)
+            {
+                if (it->first.find_first_of(seqnid)>0)
+                {
+                    m_gSyncedMsgMap.erase(it++);
+                } else {
+                    ++it;
+                }
+            }
+        }
+        
+        {
+            rtc::CritScope cs(&m_csgUserSeqn);
+            m_gUserSeqnMap.erase(seqnid);
+        }
+        
+        {
+            rtc::CritScope cs(&m_csgRecvMsg);
+            for(RecvMsgListIt it=m_gRecvMsgList.begin();it!=m_gRecvMsgList.end();)
+            {
+                if (it->seqnid.find_first_of(seqnid)>0)
+                {
+                    m_gRecvMsgList.erase(it++);
+                } else {
+                    ++it;
+                }
+            }
+        }
+        
     }
 
 public:
@@ -173,7 +240,7 @@ private:
         std::string seqnid;
         std::string msgcont;
     }CachedMsgInfo;
-    
+
     //<msgid, str_msg>
     typedef std::unordered_map<std::string, std::string>        Wait4AckMsgMap;
     typedef Wait4AckMsgMap::iterator                            Wait4AckMsgMapIt;
@@ -189,10 +256,14 @@ private:
     //<StorageMsg>
     typedef std::list<CachedMsgInfo>                            RecvMsgList;
     typedef RecvMsgList::iterator                               RecvMsgListIt;
-    
+
     //<seqnkey, synctimes>
     typedef std::unordered_map<std::string, int>                Wait4CheckSeqnKeyMap;
     typedef Wait4CheckSeqnKeyMap::iterator                      Wait4CheckSeqnKeyMapIt;
+
+
+    void DoHelpSyncData(const pms::StorageMsg& store);
+    void DoHelpSyncGroupData(const pms::StorageMsg& store);
 
     // for user
     bool UAddWait4AckMsg(const std::string& msgid, const std::string& strMsg)
@@ -278,7 +349,7 @@ private:
                     }
                     break;
                 } else { // int waitCheckMap find sk
-                    if (skit->second > 5) { // has try sync data 5 times
+                    if (skit->second > SYNC_DATA_RETRY_TIMES) { // has try sync data 5 times
                         // if curseqn < maxseqn, drop current seqn sync, itCurSeqn->second += 1;
                         // sync the next one
                         // if curseqn equal maxseqn, just drop current seqn sync
@@ -399,7 +470,7 @@ private:
                 cmi.msgcont = en.SerializeAsString();
                 m_gRecvMsgList.push_back(cmi);
                 m_gSyncedMsgMap.erase(sk);
-                
+
                 continue;
             } else {
                 UserSeqnMapIt uit = m_MaxSeqnMap.find(storeid);
@@ -414,7 +485,7 @@ private:
                     }
                     break;
                 } else { // find sk
-                    if (skit->second > 5) { // has try sync data 5 times
+                    if (skit->second > SYNC_DATA_RETRY_TIMES) { // has try sync data 5 times
                         // if curseqn < maxseqn, drop current seqn sync, itCurSeqn->second += 1;
                         // sync the next one
                         // if curseqn equal maxseqn, just drop current seqn sync
@@ -473,7 +544,7 @@ private:
     SyncedMsgMap            m_gSyncedMsgMap;
     UserSeqnMap             m_gUserSeqnMap;
     RecvMsgList             m_gRecvMsgList;
-    
+
     Wait4CheckSeqnKeyMap    m_Wait4CheckSeqnKeyMap;
     UserSeqnMap             m_MaxSeqnMap;
 
@@ -486,7 +557,7 @@ private:
 	rtc::CriticalSection	m_csgSyncedMsg;
 	rtc::CriticalSection	m_csgUserSeqn;
 	rtc::CriticalSection	m_csgRecvMsg;
-    
+
     rtc::CriticalSection    m_csWait4CheckSeqnKey;
 
 

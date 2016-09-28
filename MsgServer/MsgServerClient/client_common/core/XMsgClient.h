@@ -133,6 +133,72 @@ public:
             m_MaxSeqnMap[seqnid] = seqn;
          }
     }
+    
+    void AddGroupInCore(const std::string& seqnid, int64 seqn)
+    {
+        m_MaxSeqnMap[seqnid] = seqn;
+        {
+            rtc::CritScope cs(&m_csgUserSeqn);
+            if (m_gUserSeqnMap.find(seqnid)==m_gUserSeqnMap.end())
+            {
+                m_gUserSeqnMap[seqnid] = seqn;
+            }
+        }
+    }
+    
+    void RemoveGroupInCore(const std::string& seqnid)
+    {
+        //m_Wait4CheckSeqnKeyMap
+        //m_gWait4AckMsgMap;
+        //m_gSyncedMsgMap;
+        //m_gUserSeqnMap;
+        //m_gRecvMsgList;
+        
+        m_MaxSeqnMap.erase(seqnid);
+        {
+            rtc::CritScope cs(&m_csWait4CheckSeqnKey);
+            for(Wait4CheckSeqnKeyMapIt it=m_Wait4CheckSeqnKeyMap.begin();it!=m_Wait4CheckSeqnKeyMap.end();)
+            {
+                if (it->first.find_first_of(seqnid)>0)
+                {
+                    m_Wait4CheckSeqnKeyMap.erase(it++);
+                } else {
+                    ++it;
+                }
+            }
+        }
+        {
+            rtc::CritScope cs(&m_csgSyncedMsg);
+            for(SyncedMsgMapIt it=m_gSyncedMsgMap.begin();it!=m_gSyncedMsgMap.end();)
+            {
+                if (it->first.find_first_of(seqnid)>0)
+                {
+                    m_gSyncedMsgMap.erase(it++);
+                } else {
+                    ++it;
+                }
+            }
+        }
+        
+        {
+            rtc::CritScope cs(&m_csgUserSeqn);
+            m_gUserSeqnMap.erase(seqnid);
+        }
+        
+        {
+            rtc::CritScope cs(&m_csgRecvMsg);
+            for(RecvMsgListIt it=m_gRecvMsgList.begin();it!=m_gRecvMsgList.end();)
+            {
+                if (it->seqnid.find_first_of(seqnid)>0)
+                {
+                    m_gRecvMsgList.erase(it++);
+                } else {
+                    ++it;
+                }
+            }
+        }
+        
+    }
 
 public:
     // For XTcpClientCallback

@@ -554,6 +554,20 @@ public class MsgClient implements JMClientHelper{
         mReentrantLock.unlock();
     }
 
+    private void AddCoreGroup(String strSeqnId, long seqn) {
+        if (null != mMApp)
+        {
+            mMApp.AddGroupInCore(strSeqnId, seqn);
+        }
+    }
+
+    private void RemoveCoreGroup(String strSeqnId) {
+        if (null != mMApp)
+        {
+            mMApp.RemoveGroupInCore(strSeqnId);
+        }
+    }
+
     private long GetLocalSeqnFromId(String strSeqnId) {
         long lseqn = -1;
         mReentrantLock.lock();
@@ -572,12 +586,9 @@ public class MsgClient implements JMClientHelper{
         }
     }
 
-    private void UpdateSeqnFromDb2Core()
+    private void UpdateMaxSeqn2Core(String strSeqnId, long seqn)
     {
-        for (String k  : mGroupSeqn.keySet())
-        {
-            mMApp.UpdateUserSeqns(k, mGroupSeqn.get(k));
-        }
+        mMApp.UpdateMaxSeqns(strSeqnId, seqn);
     }
 
 
@@ -609,7 +620,8 @@ public class MsgClient implements JMClientHelper{
                             mSqlite3Manager.AddGroupSeqn(mStrUserId, groupid, data.seqn);
                         }
                         UpdateLocalSeqn(groupid, data.seqn);
-                        UpdateSeqnFromDb2Core();
+                        UpdateMaxSeqn2Core(groupid, data.seqn);
+                        AddCoreGroup(groupid, data.seqn);
                         mGroupDelegate.OnAddGroupSuccess(groupid);
                     }
                 } else if (code == -1)
@@ -628,6 +640,7 @@ public class MsgClient implements JMClientHelper{
                         mSqlite3Manager.DelGroup(mStrUserId, groupid);
                         RemoveLocalSeqn(groupid);
                         // update seqn from db 2 core
+                        RemoveCoreGroup(groupid);
                         mGroupDelegate.OnRmvGroupSuccess(groupid);
                     }
                 } else if (code == -1)
@@ -656,7 +669,7 @@ public class MsgClient implements JMClientHelper{
                     if (data.result==0)
                     {
                         UpdateGroupInfoToDb(groupid, data.seqn, 1);
-                        UpdateSeqnFromDb2Core();
+                        UpdateMaxSeqn2Core(groupid, data.seqn);
                     } else if (data.result==-1)
                     {
                         UpdateGroupInfoToDb(groupid, data.seqn, -1);
@@ -907,10 +920,6 @@ public class MsgClient implements JMClientHelper{
     @Override
     public void OnMsgServerConnected() {
         FetchAllSeqns();
-        if (null != mClientDelegate) {
-            mClientDelegate.OnMsgServerConnected();
-            mClientDelegate.OnMsgClientInitializing();
-        }
 
         // check per second until get all fetch
         Timer timer = new Timer();
@@ -920,9 +929,9 @@ public class MsgClient implements JMClientHelper{
                 if (IsFetchedAll()) {
                     // stop timer here
                     mIsFetched = true;
-                    UpdateSeqnFromDb2Core();
-                    SyncAllSeqns();
                     if (null != mClientDelegate) {
+                        mClientDelegate.OnMsgServerConnected();
+                        mClientDelegate.OnMsgClientInitializing();
                         mClientDelegate.OnMsgClientInitialized();
                     }
                     System.out.println("MsgClient::OnMsgServerConnected dispatch_source_cancel...ok");

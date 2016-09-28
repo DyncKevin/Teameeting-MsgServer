@@ -168,6 +168,7 @@ int XMsgProcesser::EncodeSyncSeqn(std::string& outstr, const std::string& userid
     store.set_ruserid(userid);
     store.set_sequence(seqn);
     store.set_version(MSG_VERSION);
+    store.set_module((pms::EModuleType)module);
 
     req.set_svr_cmds(pms::EServerCmd::CSYNCSEQN);
     req.set_mod_type((pms::EModuleType)module);
@@ -191,6 +192,7 @@ int XMsgProcesser::EncodeSyncData(std::string& outstr, const std::string& userid
     store.set_ruserid(userid);
     store.set_sequence(seqn);
     store.set_version(MSG_VERSION);
+    store.set_module((pms::EModuleType)module);
 
     req.set_svr_cmds(pms::EServerCmd::CSYNCDATA);
     req.set_mod_type((pms::EModuleType)module);
@@ -216,6 +218,7 @@ int XMsgProcesser::EncodeSyncGroupSeqn(std::string& outstr, const std::string& u
     store.set_groupid(groupid);
     store.set_sequence(seqn);
     store.set_version(MSG_VERSION);
+    store.set_module((pms::EModuleType)module);
 
     req.set_svr_cmds(pms::EServerCmd::CSYNCSEQN);
     req.set_mod_type((pms::EModuleType)module);
@@ -240,6 +243,7 @@ int XMsgProcesser::EncodeSyncGroupData(std::string& outstr, const std::string& u
     store.set_groupid(groupid);
     store.set_sequence(seqn);
     store.set_version(MSG_VERSION);
+    store.set_module((pms::EModuleType)module);
 
     req.set_svr_cmds(pms::EServerCmd::CSYNCDATA);
     req.set_mod_type((pms::EModuleType)module);
@@ -263,6 +267,7 @@ int XMsgProcesser::EncodeCreateSeqn(std::string& outstr, const std::string& user
     store.set_ruserid(userid);
     store.set_sequence(seqn);
     store.set_version(MSG_VERSION);
+    store.set_module((pms::EModuleType)module);
 
     req.set_svr_cmds(pms::EServerCmd::CCREATESEQN);
     req.set_mod_type((pms::EModuleType)module);
@@ -283,6 +288,7 @@ int XMsgProcesser::EncodeDeleteSeqn(std::string& outstr, const std::string& user
     store.set_ruserid(userid);
     store.set_sequence(seqn);
     store.set_version(MSG_VERSION);
+    store.set_module((pms::EModuleType)module);
 
     req.set_svr_cmds(pms::EServerCmd::CDELETESEQN);
     req.set_mod_type((pms::EModuleType)module);
@@ -299,7 +305,7 @@ int XMsgProcesser::EncodeUpdateSetting(std::string& outstr, const std::string& u
     setting.set_version(MSG_VERSION);
     setting.set_set_type(setType);
     setting.set_json_cont(json);
-    
+
     req.set_svr_cmds(pms::EServerCmd::CUPDATESETTING);
     req.set_mod_type((pms::EModuleType)module);
     req.set_content(setting.SerializeAsString());
@@ -320,7 +326,8 @@ int XMsgProcesser::EncodeSyncOneData(std::string& outstr, const std::string& use
     store.set_ruserid(userid);
     store.set_sequence(seqn);
     store.set_version(MSG_VERSION);
-    
+    store.set_module((pms::EModuleType)module);
+
     req.set_svr_cmds(pms::EServerCmd::CSYNCDATA);
     req.set_mod_type((pms::EModuleType)module);
     req.set_content(store.SerializeAsString());
@@ -344,7 +351,8 @@ int XMsgProcesser::EncodeSyncOneGroupData(std::string& outstr, const std::string
     store.set_groupid(groupid);
     store.set_sequence(seqn);
     store.set_version(MSG_VERSION);
-    
+    store.set_module((pms::EModuleType)module);
+
     req.set_svr_cmds(pms::EServerCmd::CSYNCDATA);
     req.set_mod_type((pms::EModuleType)module);
     req.set_content(store.SerializeAsString());
@@ -370,6 +378,7 @@ int XMsgProcesser::DecodeRecvData(const char* pData, int nLen)
         LOG(LS_ERROR) << "RecvData resp.ParseFromString error!";
         return -1;
     }
+    //LOG(LS_INFO) << "XMsgProcesser::DecodeRecvData msg svrcmds:" << resp.svr_cmds();
     switch (resp.svr_cmds()) {
         case pms::EServerCmd::CLOGIN:
             DecodeLogin(resp.rsp_code(), resp.rsp_cont());

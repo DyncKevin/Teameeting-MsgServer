@@ -182,7 +182,8 @@
     impl.delegate = self;
     
     
-    server = @"hui.msg.anyrtc.io";//@"192.168.7.207";
+    server = @"192.168.7.207";
+    //server = @"hui.msg.anyrtc.io";
     port   = 6630;
     uid = [[[ASIdentifierManager sharedManager] advertisingIdentifier] UUIDString];
     NSLog(@"this device uid is:%@", uid);

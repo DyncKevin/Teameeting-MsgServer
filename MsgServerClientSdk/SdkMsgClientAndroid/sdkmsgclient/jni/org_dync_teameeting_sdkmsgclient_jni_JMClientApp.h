@@ -217,11 +217,27 @@ JNIEXPORT void JNICALL Java_org_dync_teameeting_sdkmsgclient_jni_JMClientApp_Ini
 
 /*
  * Class:     org_dync_teameeting_sdkmsgclient_jni_JMClientApp
- * Method:    UpdateUserSeqns
+ * Method:    UpdateMaxSeqns
  * Signature: (Ljava/lang/String;J)V
  */
-JNIEXPORT void JNICALL Java_org_dync_teameeting_sdkmsgclient_jni_JMClientApp_UpdateUserSeqns
+JNIEXPORT void JNICALL Java_org_dync_teameeting_sdkmsgclient_jni_JMClientApp_UpdateMaxSeqns
   (JNIEnv *, jobject, jstring, jlong);
+
+/*
+ * Class:     org_dync_teameeting_sdkmsgclient_jni_JMClientApp
+ * Method:    AddGroupInCore
+ * Signature: (Ljava/lang/String;J)V
+ */
+JNIEXPORT void JNICALL Java_org_dync_teameeting_sdkmsgclient_jni_JMClientApp_AddGroupInCore
+  (JNIEnv *, jobject, jstring, jlong);
+
+/*
+ * Class:     org_dync_teameeting_sdkmsgclient_jni_JMClientApp
+ * Method:    RemoveGroupInCore
+ * Signature: (Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_org_dync_teameeting_sdkmsgclient_jni_JMClientApp_RemoveGroupInCore
+  (JNIEnv *, jobject, jstring);
 
 /*
  * Class:     org_dync_teameeting_sdkmsgclient_jni_JMClientApp
