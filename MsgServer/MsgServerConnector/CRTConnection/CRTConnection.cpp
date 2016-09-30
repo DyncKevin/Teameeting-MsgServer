@@ -4,6 +4,7 @@
 #include "rapidjson/stringbuffer.h"
 #include "CRTConnManager.h"
 #include "RTUtils.hpp"
+#include "StatusCode.h"
 
 #define DEF_PTORO 1
 #include "ProtoCommon.h"
@@ -13,7 +14,7 @@ CRTConnection::CRTConnection(void)
 , m_nBufLen(0)
 , m_nBufOffset(0)
 {
-	m_nBufLen = kRequestBufferSizeInBytes;
+	m_nBufLen = REQUEST_BUFFER_SIZE_IN_BYTES_32;
 	m_pBuffer = new char[m_nBufLen];
     AddObserver(this);
 }
@@ -38,7 +39,7 @@ void CRTConnection::OnRecvData(const char*data, int size)
 	{//
         while ((m_nBufOffset + size) > m_nBufLen)
         {
-            int newLen = m_nBufLen + kRequestBufferSizeInBytes;
+            int newLen = m_nBufLen + REQUEST_BUFFER_SIZE_IN_BYTES_32;
             if (size > newLen)
                 newLen = m_nBufLen + size;
             char* temp = new char[newLen];

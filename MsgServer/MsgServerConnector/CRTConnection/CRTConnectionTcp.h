@@ -13,6 +13,7 @@
 #include "CRTConnTcp.h"
 #include "RTJSBuffer.h"
 #include "RTObserverConnection.h"
+#include <queue>
 
 #define DEF_PROTO 1
 #include "ProtoCommon.h"
@@ -67,6 +68,7 @@ public:
     virtual void OnWakeupEvent(const char*pData, int nLen) {}
     virtual void OnPushEvent(const char*pData, int nLen) {}
     virtual void OnTickEvent(const char*pData, int nLen) {}
+    virtual void OnRedisEvent(const char*pData, int nLen);
 
 public:
     //* For RTConnTcp
@@ -96,6 +98,10 @@ private:
     std::string     m_nname;
     std::string     m_uuid;
     bool            m_login;
+
+    std::string     m_SessionId;
+    std::queue<std::string>             m_RecvMsgBuf;
+    bool                                m_IsValid;
 };
 
 #endif /* defined(__MsgServerConnector__CRTConnectionTcp__) */

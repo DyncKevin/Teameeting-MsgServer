@@ -26,12 +26,19 @@ MRTTransferSession::MRTTransferSession(pms::ETransferModule module)
 , m_addr("")
 , m_port(0)
 , m_connectingStatus(0)
+, m_IsValid(true)
 {
     AddObserver(this);
+    GenericSessionId(m_transferSessId);
 }
 
 MRTTransferSession::~MRTTransferSession()
 {
+    m_IsValid = false;
+    while(m_RecvMsgBuf.size()>0)
+    {
+         m_RecvMsgBuf.pop();
+    }
     DelObserver(this);
     Unit();
 }
@@ -169,9 +176,32 @@ void MRTTransferSession::OnRecvData(const char*pData, int nLen)
     RTJSBuffer::RecvData(pData, nLen);
 }
 
+void MRTTransferSession::OnRedisEvent(const char*pData, int nLen)
+{
+    int64_t c=0;
+    LI("MRTTransferSession::OnRedisEvent\n");
+    if (m_RecvMsgBuf.size()>0)
+    {
+        std::string v = m_RecvMsgBuf.front();
+        LI("MRTTransferSession::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, val:%s\n", v.length(), v.c_str());
+        RTTransfer::DoProcessData(v.c_str(), v.length());
+        m_RecvMsgBuf.pop();
+    }
+
+    if (m_IsValid && m_RecvMsgBuf.size()<5)
+    {
+        this->NotifyRedis();
+    }
+}
+
 void MRTTransferSession::OnRecvMessage(const char*message, int nLen)
 {
-    RTTransfer::DoProcessData(message, nLen);
+    //write redis to store msg
+    std::string s(message, nLen);
+    LI("MRTTransferSession::OnRecvMessage nLen:%d, message:%s, s:%s, s.len:%d\n", nLen, message, s.c_str(), s.length());
+    m_RecvMsgBuf.push(s);
+    if (m_IsValid)
+        this->NotifyRedis();
 }
 
 // from RTTransfer
@@ -345,6 +375,7 @@ void MRTTransferSession::ConnectionDisconnected()
 {
     if (m_transferSessId.length()>0) {
         m_connectingStatus = 0;
+        m_IsValid = false;
         MRTConnManager::Instance().TransferSessionLostNotify(m_transferSessId);
     }
 }

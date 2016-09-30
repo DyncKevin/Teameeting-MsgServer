@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <string>
+#include <queue>
 #include <unordered_map>
 #include <utility>
 #include <queue>
@@ -65,6 +66,7 @@ public:
     virtual void OnWakeupEvent(const char*pData, int nLen) {}
     virtual void OnPushEvent(const char*pData, int nLen);
     virtual void OnTickEvent(const char*pData, int nLen);
+    virtual void OnRedisEvent(const char*pData, int nSize);
 
 // from RTTransfer
 public:
@@ -114,6 +116,8 @@ private:
     unsigned int                    m_tmpRData2Id;
     unsigned int                    m_tmpOData2Id; // one data
     unsigned int                    m_tmpOGData2Id; // one group data
+    std::queue<std::string>             m_RecvMsgBuf;
+    bool                                m_IsValid;
 };
 
 #endif /* defined(__MsgServerLogical__LRTTransferSession__) */

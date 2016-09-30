@@ -81,7 +81,7 @@ bool RedisPool::CheckReply(const redisReply *reply){
             return false;
         }
     }
-    
+
     return false;
 }
 
@@ -167,9 +167,9 @@ redisContext * RedisConn::ConnectWithTimeout()
             redisFree(ctx);
             ctx = NULL;
         } else {
-            
+
         }
-    } 
+    }
 
     return ctx;
 }
@@ -184,7 +184,7 @@ bool RedisConn::auth()
         if ((NULL == reply) || (strcasecmp(reply->str, "OK") != 0)) {
             bRet = false;
         } else {
-            bRet = true;    
+            bRet = true;
         }
         freeReplyObject(reply);
     }
@@ -436,7 +436,7 @@ void RedisDBSlice::ConnPoolPing()
             if (!bRet) {
                 (*master_iter)->RedisReConnect();
             } else {
-                
+
             }
         }
     }
@@ -452,7 +452,7 @@ void RedisDBSlice::ConnPoolPing()
                 if (!bRet) {
                     (*iter)->RedisReConnect();
                 } else {
-                    
+
                 }
             }
         }
@@ -489,7 +489,7 @@ bool RedisCache::InitDB(unsigned int cachetype, unsigned int hashbase)
     return true;
 }
 
-bool RedisCache::ConnectRedisDB(unsigned int cahcetype, unsigned int dbindex, const char *host, 
+bool RedisCache::ConnectRedisDB(unsigned int cahcetype, unsigned int dbindex, const char *host,
     unsigned int port, const char *passwd, unsigned int poolsize, unsigned int timeout, unsigned int role)
 {
     mDBList[dbindex].Init(cahcetype, dbindex);

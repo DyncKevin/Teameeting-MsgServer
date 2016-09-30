@@ -87,6 +87,7 @@ public:
     virtual void OnWakeupEvent(const char*pData, int nLen);
     virtual void OnPushEvent(const char*pData, int nLen);
     virtual void OnTickEvent(const char*pData, int nLen);
+    virtual void OnRedisEvent(const char*pData, int nSize);
 
 // from RTTransfer
 public:
@@ -137,6 +138,8 @@ private:
     OSMutex                     m_mutexQueueData;
 
     unsigned int                m_wNewMsgId;
+    std::queue<std::string>             m_RecvMsgBuf;
+    bool                                m_IsValid;
 };
 
 #endif /* defined(__MsgServerRTLive__LRTTransferSession__) */

@@ -39,11 +39,7 @@ protected:
     // Observer
     void AddObserver(RTObserverConnection* conn);
     void DelObserver(RTObserverConnection* conn);
-    //CONSTANTS:
-    enum
-    {
-        kRequestBufferSizeInBytes = 2048        //UInt32
-    };
+
     //Each TCP session has a unique number that identifies it.
     UInt32              fSessionID;
 private:

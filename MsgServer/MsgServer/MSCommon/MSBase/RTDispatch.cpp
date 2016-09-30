@@ -99,6 +99,12 @@ int RTDispatch::PushData(const char*pData, int nLen)
     return nLen;
 }
 
+void RTDispatch::NotifyRedis()
+{
+     this->Signal(kRedisEvent);
+}
+
+
 SInt64 RTDispatch::Run()
 {
 	EventFlags events = this->GetEvents();
@@ -154,6 +160,11 @@ SInt64 RTDispatch::Run()
             }
 			events -= Task::kWriteEvent;
 		}
+        else if(events&Task::kRedisEvent)
+        {
+            OnRedisEvent("", 0);
+            events -= Task::kRedisEvent;
+        }
 		else if(events&Task::kWakeupEvent)
 		{
             ListElement *elem = NULL;

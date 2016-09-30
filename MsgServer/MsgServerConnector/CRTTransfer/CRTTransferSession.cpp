@@ -24,12 +24,19 @@ CRTTransferSession::CRTTransferSession()
 : RTJSBuffer()
 , RTTransfer()
 , m_transferSessId("")
+, m_IsValid(true)
 {
     AddObserver(this);
+    GenericSessionId(m_transferSessId);
 }
 
 CRTTransferSession::~CRTTransferSession()
 {
+    m_IsValid = false;
+    while(m_RecvMsgBuf.size()>0)
+    {
+         m_RecvMsgBuf.pop();
+    }
     DelObserver(this);
     Unit();
 }
@@ -183,9 +190,31 @@ void CRTTransferSession::OnRecvData(const char*pData, int nLen)
     RTJSBuffer::RecvData(pData, nLen);
 }
 
+void CRTTransferSession::OnRedisEvent(const char*pData, int nLen)
+{
+    int64_t c=0;
+    if (m_RecvMsgBuf.size()>0)
+    {
+        std::string v = m_RecvMsgBuf.front();
+        LI("CRTTransferSession::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, val:%s\n", v.length(), v.c_str());
+        RTTransfer::DoProcessData(v.c_str(), v.length());
+        m_RecvMsgBuf.pop();
+    }
+
+    if (m_IsValid && m_RecvMsgBuf.size()<5)
+    {
+        //this->NotifyRedis();
+    }
+}
+
 void CRTTransferSession::OnRecvMessage(const char*message, int nLen)
 {
-    RTTransfer::DoProcessData(message, nLen);
+    //write redis to store msg
+    std::string s(message, nLen);
+    LI("CRTTransferSession::OnRecvMessage nLen:%d, message:%s, s:%s, s.len:%d\n", nLen, message, s.c_str(), s.length());
+    m_RecvMsgBuf.push(s);
+    if (m_IsValid)
+        this->NotifyRedis();
 }
 
 // from RTTransfer
@@ -213,20 +242,17 @@ void CRTTransferSession::OnMsgAck(pms::TransferMsg& tmsg)
 void CRTTransferSession::OnTypeConn(const std::string& str)
 {
 #if DEF_PROTO
+    LI("%s was called\n", __FUNCTION__);
     pms::ConnMsg c_msg;
     if (!c_msg.ParseFromString(str)) {
         LE("OnTypeConn c_msg.ParseFromString error\n");
     }
-    //c_msg.PrintDebugString();
 
     if ((c_msg.conn_tag() == pms::EConnTag::THI)) {
         // when other connect to ME:
         // generate TransferSessionId
         // send self ModuleId and TransferSessionId to other
         pms::TransferMsg t_msg;
-        std::string trid;
-        GenericSessionId(trid);
-        m_transferSessId = trid;
 
         //this is for transfer
         t_msg.set_type(pms::ETransferType::TCONN);
@@ -235,13 +261,14 @@ void CRTTransferSession::OnTypeConn(const std::string& str)
 
         c_msg.set_tr_module(pms::ETransferModule::MCONNECTOR);
         c_msg.set_conn_tag(pms::EConnTag::THELLO);
-        c_msg.set_transferid(trid);
+        c_msg.set_transferid(m_transferSessId);
         //send self connector to other
         c_msg.set_moduleid(CRTConnManager::Instance().ConnectorId());
 
         t_msg.set_content(c_msg.SerializeAsString());
         std::string s = t_msg.SerializeAsString();
         SendTransferData(s.c_str(), (int)s.length());
+        LI("%s was called, hi sessId:%s\n", __FUNCTION__, m_transferSessId.c_str());
     } else if ((c_msg.conn_tag() == pms::EConnTag::THELLOHI)) {
         // when other connect to ME:
         //get other's TransferSessionId and ModuleId
@@ -259,6 +286,7 @@ void CRTTransferSession::OnTypeConn(const std::string& str)
                 //c_msg._moduleid: store other's module id
                 CRTConnManager::Instance().AddTypeModuleSession(c_msg.tr_module(), c_msg.moduleid(), m_transferSessId);
 
+                LI("%s was called, hellohi sessId:%s\n", __FUNCTION__, m_transferSessId.c_str());
             } else {
                 LE("new ModuleInfo error!!!\n");
             }
@@ -288,6 +316,7 @@ void CRTTransferSession::OnTypeDispatch(const std::string& str)
 {
 #if DEF_PROTO
     pms::RelayMsg dmsg;
+    LI("%s was called\n", __FUNCTION__);
     if (!dmsg.ParseFromString(str)) {
         LE("OnTypeDispatch dmsg.ParseFromString error\n");
         return;
@@ -323,6 +352,7 @@ void CRTTransferSession::ConnectionDisconnected()
 {
     if (m_transferSessId.length()>0) {
         LI("ConnectionDisconnected m_transferSessId:%s\n", m_transferSessId.c_str());
+        m_IsValid = false;
         CRTConnManager::Instance().TransferSessionLostNotify(m_transferSessId);
     }
 }

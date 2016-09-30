@@ -290,8 +290,16 @@ bool xRedisClient::command_string(const RedisDBIdx& dbi, string &data, const cha
 
     va_list args;
     va_start(args, cmd);
+    if (!pRedisConn->getCtx()) {
+        printf("xRedisClient::command_string pRedisConn->getCtx() is null\n");
+        return false;
+    }
     redisReply *reply = static_cast<redisReply *>(redisvCommand(pRedisConn->getCtx(), cmd, args));
     va_end(args);
+    if (!reply) {
+         printf("xRedisClient::command_string reply is null\n");
+         return false;
+    }
     if (RedisPool::CheckReply(reply)) {
         data.assign(reply->str, reply->len);
         bRet = true;

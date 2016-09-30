@@ -5,6 +5,7 @@ AM_CFLAGS=-g -std=c++11 -Wall -fPIC -D__PTHREADS__ -D__PTHREADS_MUTEXES__
 AM_CPPFLAGS=$(AM_CFLAGS)
 
 AM_CPPFLAGS+= -I$(top_srcdir)/../ \
+		   -I$(top_srcdir)/MSCommon/ \
 		   -I$(top_srcdir)/MSCommon/MSBase/ \
 		   -I$(top_srcdir)/MSCommon/MSCommon/ \
 		   -I$(top_srcdir)/MSCommon/MSHttp/ \

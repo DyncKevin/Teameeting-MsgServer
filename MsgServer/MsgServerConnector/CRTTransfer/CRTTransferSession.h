@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <iostream>
+#include <queue>
 #include "SocketUtils.h"
 #include "TCPSocket.h"
 #include "RTTcp.h"
@@ -52,6 +53,7 @@ public:
     virtual void OnWakeupEvent(const char*pData, int nLen) {}
     virtual void OnPushEvent(const char*pData, int nLen) {}
     virtual void OnTickEvent(const char*pData, int nLen) {}
+    virtual void OnRedisEvent(const char*pData, int nLen);
 
 // from RTTransfer
 public:
@@ -72,6 +74,10 @@ protected:
 private:
     std::string     m_transferSessId;
     CRTDispatchConnection  m_dispatchConnection;
+
+    std::queue<std::string>             m_RecvMsgBuf;
+    bool                                m_IsValid;
+
 
 };
 

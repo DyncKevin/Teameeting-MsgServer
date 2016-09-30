@@ -6,6 +6,7 @@
 #include "RTUtils.hpp"
 #include "CRTConnection.h"
 #include "CRTConnectionTcp.h"
+#include "StatusCode.h"
 
 #define DEF_PTORO 1
 #include "ProtoCommon.h"
@@ -15,7 +16,7 @@ CRTWebServerWaiter::CRTWebServerWaiter(void)
 , m_nBufLen(0)
 , m_nBufOffset(0)
 {
-	m_nBufLen = kRequestBufferSizeInBytes;
+	m_nBufLen = REQUEST_BUFFER_SIZE_IN_BYTES_32;
 	m_pBuffer = new char[m_nBufLen];
     AddObserver(this);
     LI("CRTWebServerWaiter::CRTWebServerWaiter\n");
@@ -42,7 +43,7 @@ void CRTWebServerWaiter::OnRecvData(const char*data, int size)
 	{//
         while ((m_nBufOffset + size) > m_nBufLen)
         {
-            int newLen = m_nBufLen + kRequestBufferSizeInBytes;
+            int newLen = m_nBufLen + REQUEST_BUFFER_SIZE_IN_BYTES_32;
             if (size > newLen)
                 newLen = m_nBufLen + size;
             char* temp = new char[newLen];

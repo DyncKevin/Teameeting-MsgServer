@@ -24,12 +24,19 @@ CRTConnectionTcp::CRTConnectionTcp()
 , m_nname("")
 , m_uuid("")
 , m_login(false)
+, m_IsValid(true)
 {
     AddObserver(this);
+    GenericSessionId(m_SessionId);
 }
 
 CRTConnectionTcp::~CRTConnectionTcp()
 {
+    m_IsValid = false;
+    while(m_RecvMsgBuf.size()>0)
+    {
+         m_RecvMsgBuf.pop();
+    }
     DelObserver(this);
 }
 
@@ -106,9 +113,33 @@ void CRTConnectionTcp::OnRecvData(const char*pData, int nLen)
     RTJSBuffer::RecvData(pData, nLen);
 }
 
+void CRTConnectionTcp::OnRedisEvent(const char*pData, int nLen)
+{
+    int64_t c=0;
+    LI("CRTConnectionTcp::OnRedisEvent\n");
+    if (m_RecvMsgBuf.size()>0)
+    {
+        std::string v = m_RecvMsgBuf.front();
+        LI("CRTConnectionTcp::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, val:%s\n", v.length(), v.c_str());
+        CRTConnTcp::DoProcessData(v.c_str(), v.length());
+        m_RecvMsgBuf.pop();
+    }
+
+    if (m_IsValid && m_RecvMsgBuf.size()<5)
+    {
+        //this->NotifyRedis();
+    }
+}
+
+
 void CRTConnectionTcp::OnRecvMessage(const char*message, int nLen)
 {
-    CRTConnTcp::DoProcessData(message, nLen);
+    //write redis to store msg
+    std::string s(message, nLen);
+    LI("SRTTransferSession::OnRecvMessage nLen:%d, message:%s, s:%s, s.len:%d\n", nLen, message, s.c_str(), s.length());
+    m_RecvMsgBuf.push(s);
+    if (m_IsValid)
+        this->NotifyRedis();
 }
 
 
@@ -144,14 +175,12 @@ void CRTConnectionTcp::OnLogin(pms::EServerCmd cmd, pms::EModuleType module, con
 
     CRTConnManager::Instance().TransferToPusher(cmd, module, m_userId, msg);
     LI("Onlogin user:%s login\n", m_userId.c_str());
-    std::string sid;
     {
         //store userid & pass
         CRTConnManager::ConnectionInfo* pci = new CRTConnManager::ConnectionInfo();
         if (pci) {
-            GenericSessionId(sid);
             m_connectorId = CRTConnManager::Instance().ConnectorId();
-            pci->_connId = sid;
+            pci->_connId = m_SessionId;
             pci->_connAddr = CRTConnManager::Instance().ConnectorIp();
             pci->_connPort = CRTConnManager::Instance().ConnectorPort();
             pci->_userId = m_userId;
@@ -346,6 +375,7 @@ void CRTConnectionTcp::ConnectionDisconnected()
         m_nname = "";
         m_uuid = "";
         m_login = false;
+        m_IsValid = false;
     }
 }
 

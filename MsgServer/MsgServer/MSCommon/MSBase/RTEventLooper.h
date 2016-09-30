@@ -23,6 +23,8 @@ public:
 	void SetTickTimer(int time){Assert(time > 0);fTickTime = time;};
 	void UpdateTimer(){fTimeoutTask.RefreshTimeout();};
 
+    void NotifyRedis();
+
 	int PostData(const char*pData, int nSize);
 	int SendData(const void*pData, int nSize);
 	int PushData(const char*pData, int nSize);
@@ -36,6 +38,7 @@ public:
 	virtual void OnWakeupEvent(const void*pData, int nSize) = 0;
 	virtual void OnPushEvent(const char*pData, int nSize) = 0;
 	virtual void OnTickEvent(const void*pData, int nSize) = 0;
+    virtual void OnRedisEvent(const char*pData, int nLen) = 0;
 
 protected:
 	//* For Task

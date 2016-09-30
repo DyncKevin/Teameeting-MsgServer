@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <iostream>
+#include <queue>
 #include "SocketUtils.h"
 #include "TCPSocket.h"
 #include "RTTcpNoTimeout.h"
@@ -56,6 +57,7 @@ public:
     virtual void OnWakeupEvent(const char*pData, int nLen) {}
     virtual void OnPushEvent(const char*pData, int nLen) {}
     virtual void OnTickEvent(const char*pData, int nLen) {}
+    virtual void OnRedisEvent(const char*pData, int nSize);
 
 // from RTTransfer
 public:
@@ -82,6 +84,8 @@ private:
     std::string     m_addr;
     int             m_port;
     int             m_connectingStatus;
+    std::queue<std::string>             m_RecvMsgBuf;
+    bool                                m_IsValid;
 };
 
 #endif /* defined(__MsgServerModule__MRTTransferSession__) */

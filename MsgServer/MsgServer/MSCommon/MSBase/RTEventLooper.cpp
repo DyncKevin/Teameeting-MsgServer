@@ -70,6 +70,11 @@ int RTEventLooper::PushData(const char*pData, int nSize)
     return nSize;
 }
 
+void RTEventLooper::NotifyRedis()
+{
+     this->Signal(kRedisEvent);
+}
+
 SInt64 RTEventLooper::Run()
 {
 	EventFlags events = this->GetEvents();
@@ -125,6 +130,11 @@ SInt64 RTEventLooper::Run()
             }
 			events -= Task::kWriteEvent;
 		}
+        else if(events&Task::kRedisEvent)
+        {
+            OnRedisEvent("", 0);
+            events -= Task::kRedisEvent;
+        }
 		else if(events&Task::kWakeupEvent)
 		{
             OnWakeupEvent(NULL, 0);

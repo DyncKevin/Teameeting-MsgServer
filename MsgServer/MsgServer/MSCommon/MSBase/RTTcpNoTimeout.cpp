@@ -1,6 +1,7 @@
 #include "RTTcpNoTimeout.h"
 #include "RTJSBuffer.h"
 #include "atomic.h"
+#include "StatusCode.h"
 
 unsigned int RTTcpNoTimeout::sSessionIDCounterNo = kFirstTCPNoTimeoutSessionID;
 
@@ -76,6 +77,12 @@ int RTTcpNoTimeout::SendTransferData(const char*pData, int nLen)
     return nLen;
 }
 
+void RTTcpNoTimeout::NotifyRedis()
+{
+     this->Signal(kRedisEvent);
+}
+
+
 SInt64 RTTcpNoTimeout::Run()
 {
 	EventFlags events = this->GetEvents();
@@ -106,12 +113,12 @@ SInt64 RTTcpNoTimeout::Run()
 		if(events&Task::kReadEvent)
 		{
 			UInt32	readed = 0;
-			char	fRequestBuffer[kRequestBufferSizeInBytes];
+			char	fRequestBuffer[REQUEST_BUFFER_SIZE_IN_BYTES_32];
 			while(1)
 			{
 				readed = 0;
 				// We don't have any new data, get some from the socket...
-				OS_Error sockErr = fSocket.Read(fRequestBuffer, kRequestBufferSizeInBytes - 1, &readed);
+				OS_Error sockErr = fSocket.Read(fRequestBuffer, REQUEST_BUFFER_SIZE_IN_BYTES_32 - 1, &readed);
 				if (sockErr == EAGAIN)
 					break;
 				if (sockErr != OS_NoErr)
@@ -177,6 +184,11 @@ SInt64 RTTcpNoTimeout::Run()
 			events -= Task::kWriteEvent;
 #endif
 		}
+        else if(events&Task::kRedisEvent)
+        {
+            OnRedisEvent("", 0);
+            events -= Task::kRedisEvent;
+        }
 		else if(events&Task::kWakeupEvent)
 		{
 			OnWakeupEvent("", 0);

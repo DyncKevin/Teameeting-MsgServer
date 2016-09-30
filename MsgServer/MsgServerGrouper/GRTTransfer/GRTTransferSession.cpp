@@ -28,12 +28,19 @@ GRTTransferSession::GRTTransferSession()
 , m_connectingStatus(0)
 , m_pGrpMsgProcesser(nullptr)
 , m_module(pms::EModuleType::TLIVE)
+, m_IsValid(true)
 {
     AddObserver(this);
+    GenericSessionId(m_transferSessId);
 }
 
 GRTTransferSession::~GRTTransferSession()
 {
+    m_IsValid = false;
+    while(m_RecvMsgBuf.size()>0)
+    {
+         m_RecvMsgBuf.pop();
+    }
     if (m_pGrpMsgProcesser)
     {
         m_pGrpMsgProcesser->Unin();
@@ -300,10 +307,32 @@ void GRTTransferSession::OnWakeupEvent(const char*pData, int nLen)
         this->Signal(kWakeupEvent);
 }
 
+void GRTTransferSession::OnRedisEvent(const char*pData, int nLen)
+{
+    int64_t c=0;
+    LI("GRTTransferSession::OnRedisEvent\n");
+    if (m_RecvMsgBuf.size()>0)
+    {
+        std::string v = m_RecvMsgBuf.front();
+        LI("GRTTransferSession::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, val:%s\n", v.length(), v.c_str());
+        RTTransfer::DoProcessData(v.c_str(), v.length());
+        m_RecvMsgBuf.pop();
+    }
+
+    if (m_IsValid && m_RecvMsgBuf.size()<5)
+    {
+        //this->NotifyRedis();
+    }
+}
 
 void GRTTransferSession::OnRecvMessage(const char*message, int nLen)
 {
-    RTTransfer::DoProcessData(message, nLen);
+    //write redis to store msg
+    std::string s(message, nLen);
+    LI("GRTTransferSession::OnRecvMessage nLen:%d, message:%s, s:%s, s.len:%d\n", nLen, message, s.c_str(), s.length());
+    m_RecvMsgBuf.push(s);
+    if (m_IsValid)
+        this->NotifyRedis();
 }
 
 
@@ -341,9 +370,6 @@ void GRTTransferSession::OnTypeConn(const std::string& str)
         // when other connect to ME:
         // send the transfersessionid and GrouperId to other
         pms::TransferMsg t_msg;
-        std::string trid;
-        GenericSessionId(trid);
-        m_transferSessId = trid;
 
         c_msg.set_tr_module(pms::ETransferModule::MGRPNOTIFY);
         c_msg.set_conn_tag(pms::EConnTag::THELLO);
@@ -525,6 +551,7 @@ void GRTTransferSession::ConnectionDisconnected()
 {
     if (m_transferSessId.length()>0) {
         m_connectingStatus = 0;
+        m_IsValid = false;
         GRTConnManager::Instance().TransferSessionLostNotify(m_transferSessId);
     }
 }

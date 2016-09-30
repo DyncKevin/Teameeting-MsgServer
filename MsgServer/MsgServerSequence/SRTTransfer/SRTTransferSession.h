@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <iostream>
+#include <queue>
 #include "SocketUtils.h"
 #include "TCPSocket.h"
 #include "RTTcpNoTimeout.h"
@@ -58,6 +59,7 @@ public:
     virtual void OnWakeupEvent(const char*pData, int nLen) {}
     virtual void OnPushEvent(const char*pData, int nLen) {}
     virtual void OnTickEvent(const char*pData, int nLen) {}
+    virtual void OnRedisEvent(const char*pData, int nLen);
 
 // from RTLstorage
 public:
@@ -88,6 +90,8 @@ private:
     int             m_port;
     int             m_connectingStatus;
     SRTSequenceGenerator                m_SequenceGenerator;
+    std::queue<std::string>             m_RecvMsgBuf;
+    bool                                m_IsValid;
 };
 
 #endif /* defined(__MsgServerSequence__SRTTransferSession__) */

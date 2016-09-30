@@ -35,11 +35,14 @@ public:
 	void SetTickTimer(int time){Assert(time > 0);fTickTime = time;};
 	void UpdateTimer(){fTimeoutTask.RefreshTimeout();};
 
+    void NotifyRedis();
+
     virtual void OnRecvData(const char*pData, int nLen) = 0;
     virtual void OnSendEvent(const char*pData, int nLen) = 0;
     virtual void OnWakeupEvent(const char*pData, int nLen) = 0;
     virtual void OnPushEvent(const char*pData, int nLen) = 0;
     virtual void OnTickEvent(const char*pData, int nLen) = 0;
+    virtual void OnRedisEvent(const char*pData, int nLen) = 0;
 
 protected:
 	//* For Task
@@ -49,11 +52,6 @@ protected:
     void AddObserver(RTObserverConnection* conn);
     void DelObserver(RTObserverConnection* conn);
 
-	//CONSTANTS:
-    enum
-    {
-        kRequestBufferSizeInBytes = 2048        //UInt32
-    };
 	//Each TCP session has a unique number that identifies it.
     UInt32              fSessionID;
 

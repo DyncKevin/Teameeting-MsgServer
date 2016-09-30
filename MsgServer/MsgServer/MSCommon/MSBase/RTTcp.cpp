@@ -1,6 +1,7 @@
 #include "RTTcp.h"
 #include "RTJSBuffer.h"
 #include "atomic.h"
+#include "StatusCode.h"
 
 unsigned int RTTcp::sSessionIDCounter = kFirstTCPSessionID;
 RTTcp::RTTcp()
@@ -66,6 +67,11 @@ int RTTcp::SendTransferData(const char*pData, int nLen)
     return nLen;
 }
 
+void RTTcp::NotifyRedis()
+{
+     this->Signal(kRedisEvent);
+}
+
 SInt64 RTTcp::Run()
 {
 	EventFlags events = this->GetEvents();
@@ -94,12 +100,12 @@ SInt64 RTTcp::Run()
 		if(events&Task::kReadEvent)
 		{
 			UInt32	readed = 0;
-			char	fRequestBuffer[kRequestBufferSizeInBytes];
+			char	fRequestBuffer[REQUEST_BUFFER_SIZE_IN_BYTES_32];
 			while(1)
 			{
 				readed = 0;
 				// We don't have any new data, get some from the socket...
-				OS_Error sockErr = fSocket.Read(fRequestBuffer, kRequestBufferSizeInBytes - 1, &readed);
+				OS_Error sockErr = fSocket.Read(fRequestBuffer, REQUEST_BUFFER_SIZE_IN_BYTES_32 - 1, &readed);
 				if (sockErr == EAGAIN)
 					break;
 				if (sockErr != OS_NoErr)
@@ -141,6 +147,11 @@ SInt64 RTTcp::Run()
             //OnSendEvent("", 0);
 			events -= Task::kWriteEvent;
 		}
+        else if(events&Task::kRedisEvent)
+        {
+            OnRedisEvent("", 0);
+            events -= Task::kRedisEvent;
+        }
 		else if(events&Task::kWakeupEvent)
 		{
 			OnWakeupEvent("", 0);

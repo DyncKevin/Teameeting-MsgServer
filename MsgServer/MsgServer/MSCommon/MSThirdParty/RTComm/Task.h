@@ -77,7 +77,8 @@ class Task
             kUpdateEvent =      0x1 << 0x6,
 			//user defined event
 			kWakeupEvent =			0x1 << 0x7,
-			kPushEvent =		0x1 << 0x8
+			kPushEvent =		0x1 << 0x8,
+			kRedisEvent =		0x1 << 0x9 // for redis write or read
         };
 
         //CONSTRUCTOR / DESTRUCTOR

@@ -34,12 +34,14 @@ int RTTransfer::DoProcessData(const char *pData, int nLen)
             OnMsgAck(m_msg);
         } else if (m_msg.flag() == pms::ETransferFlag::FACK) {
             // handle ack
+            LI("RTTransfer::DoProcessData recv FACK:%d\n", m_msg.flag());
             return nLen;
         } else {
             //return nLen;
         }
     }
 
+    LI("RTTransfer::DoProcessData m_msg.type:%d\n", m_msg.type());
     {
         if (m_msg.type() == pms::ETransferType::TCONN) {
             OnTypeConn(m_msg.content());

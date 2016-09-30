@@ -16,7 +16,7 @@ RTHttpSender::RTHttpSender(void)
 , m_meetmsg()
 {
     SetTimer(HTTP_SENDER_TIMEOUT);
-	m_nBufLen = kRequestBufferSizeInBytes;
+	m_nBufLen = REQUEST_BUFFER_SIZE_IN_BYTES_32;
 	m_pBuffer = new char[m_nBufLen];
 }
 
@@ -60,6 +60,11 @@ bool RTHttpSender::ConnHttpHost(const std::string& addr, const unsigned short po
     return true;
 }
 
+void RTHttpSender::NotifyRedis()
+{
+     this->Signal(kRedisEvent);
+}
+
 ////////////////////////////////////////////////////
 
 //* For RCTcp
@@ -68,7 +73,7 @@ void RTHttpSender::OnRecvData(const char*data, int size)
 	{
         while ((m_nBufOffset + size) > m_nBufLen)
         {
-            int newLen = m_nBufLen + kRequestBufferSizeInBytes;
+            int newLen = m_nBufLen + REQUEST_BUFFER_SIZE_IN_BYTES_32;
             if (size > newLen)
                 newLen = m_nBufLen + size;
             char* temp = new char[newLen];

@@ -2,6 +2,7 @@
 #include "SocketUtils.h"
 #include "RTHttpSvrConn.h"
 #include "RTHttpSender.h"
+#include "StatusCode.h"
 
 
 RTHttpSvrConn::RTHttpSvrConn(void)
@@ -10,7 +11,7 @@ RTHttpSvrConn::RTHttpSvrConn(void)
 , m_nBufOffset(0)
 
 {
-	m_nBufLen = kRequestBufferSizeInBytes;
+	m_nBufLen = REQUEST_BUFFER_SIZE_IN_BYTES_32;
 	m_pBuffer = new char[m_nBufLen];
 }
 
@@ -28,7 +29,7 @@ void RTHttpSvrConn::OnReadEvent(const char*data, int size)
 	{
         while ((m_nBufOffset + size) > m_nBufLen)
         {
-            int newLen = m_nBufLen + kRequestBufferSizeInBytes;
+            int newLen = m_nBufLen + REQUEST_BUFFER_SIZE_IN_BYTES_32;
             if (size > newLen)
                 newLen = m_nBufLen + size;
             char* temp = new char[newLen];
@@ -39,7 +40,7 @@ void RTHttpSvrConn::OnReadEvent(const char*data, int size)
             m_pBuffer = temp;
             m_nBufLen = newLen;
         }
-        
+
         memcpy(m_pBuffer + m_nBufOffset, data, size);
         m_nBufOffset += size;
 	}

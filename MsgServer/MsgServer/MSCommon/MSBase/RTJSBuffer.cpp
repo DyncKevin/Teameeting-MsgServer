@@ -3,9 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "rtklog.h"
-
-//const int	kRequestBufferSizeInBytes = 2048;
-const int	kRequestBufferSizeInBytes = 1024*1024*128;
+#include "StatusCode.h"
 
 void RTJSBuffer::writeShort(char** pptr, unsigned short anInt)
 {
@@ -26,9 +24,9 @@ unsigned short RTJSBuffer::readShort(char** pptr)
 RTJSBuffer::RTJSBuffer()
 	: m_nBufOffset(0)
 {
-	m_nBufLen = kRequestBufferSizeInBytes;
+	m_nBufLen = REQUEST_BUFFER_SIZE_IN_BYTES_32;
 	m_pBuffer = new char[m_nBufLen];
-	m_nParseBufLen = kRequestBufferSizeInBytes;
+	m_nParseBufLen = REQUEST_BUFFER_SIZE_IN_BYTES_32;
 	m_pParseBuf = new char[m_nParseBufLen];
 }
 
@@ -46,7 +44,7 @@ void RTJSBuffer::RecvData(const char*data, int size)
 	{
 		while ((m_nBufOffset + size) > m_nBufLen)
 		{
-			int newLen = m_nBufLen + kRequestBufferSizeInBytes;
+			int newLen = m_nBufLen + REQUEST_BUFFER_SIZE_IN_BYTES_32;
 			if (size > newLen)
 				newLen = m_nBufLen + size;
 			char* temp = new char[newLen];

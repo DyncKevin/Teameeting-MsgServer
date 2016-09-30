@@ -78,10 +78,10 @@ void PRTXRedis::Unin()
 
 bool PRTXRedis::Echo()
 {
-     RedisDBIdx dbi(&m_xRedisClient);
-     dbi.CreateDBIndex("echo", APHash, CACHE_TYPE_1);
+    m_RedisDBIdx->CreateDBIndex("echo", APHash, CACHE_TYPE_1);
+
      std::string val;
-     m_xRedisClient.echo(dbi, "echo", val);
+     m_xRedisClient.echo(*m_RedisDBIdx, "echo", val);
      if (val.compare("echo")==0)
      {
         return true;
@@ -99,6 +99,7 @@ bool PRTXRedis::SetSettingPush(const std::string& userid, int module, const std:
 
     char key[128] = {0};
     sprintf(key, "push:set:%d:%s", module, userid.c_str());
+    m_RedisDBIdx->CreateDBIndex(key, APHash, CACHE_TYPE_1);
 
     if (!m_xRedisClient.hmset(*m_RedisDBIdx, key, vdata))
     {
@@ -119,6 +120,7 @@ bool PRTXRedis::GetSettingPush(const std::string& userid, int module, const std:
 
     char key[128] = {0};
     sprintf(key, "push:set:%d:%s", module, userid.c_str());
+    m_RedisDBIdx->CreateDBIndex(key, APHash, CACHE_TYPE_1);
 
     if (!m_xRedisClient.hmget(*m_RedisDBIdx, key, vdata, reply))
     {
@@ -141,6 +143,8 @@ bool PRTXRedis::SetNeedPushMsg(const std::string& devType, const std::string& va
     vVal.push_back(value);
     int64_t count = 0;
     // rpush push to the end
+    m_RedisDBIdx->CreateDBIndex(key, APHash, CACHE_TYPE_1);
+
     if (m_xRedisClient.rpush(*m_RedisDBIdx, key, vVal, count)) {
         LI("%s success %ld \r\n", __PRETTY_FUNCTION__, count);
         return true;
@@ -157,6 +161,8 @@ bool PRTXRedis::GetNeedPushMsg(const std::string& devType, ArrayReply& reply, in
     sprintf(key, "push:msg:%s", devType.c_str());
     if (start==stop) {
         std::string value;
+        m_RedisDBIdx->CreateDBIndex(key, APHash, CACHE_TYPE_1);
+
         if (m_xRedisClient.lpop(*m_RedisDBIdx, key, value)) {
             LI("%s success val: %s \r\n", __PRETTY_FUNCTION__, value.c_str());
             DataItem item;
@@ -175,6 +181,8 @@ bool PRTXRedis::GetNeedPushMsg(const std::string& devType, ArrayReply& reply, in
         {
             //TODO:maybe has dead lock???
             OSMutexLocker locker(&m_MutexLPush);
+
+            m_RedisDBIdx->CreateDBIndex(key, APHash, CACHE_TYPE_1);
             if (m_xRedisClient.lrange(*m_RedisDBIdx, key, start, stop, reply)) {
                 LI("xRedisClient lrange ok~~~~~~~\n");
                 m_xRedisClient.ltrim(*m_RedisDBIdx, key, stop+1, -1);
@@ -192,6 +200,8 @@ bool PRTXRedis::LenListMsg(const std::string& devType, int64_t& count)
     char key[128] = {0};
     sprintf(key, "push:msg:%s", devType.c_str());
     // length list
+
+    m_RedisDBIdx->CreateDBIndex(key, APHash, CACHE_TYPE_1);
     if (m_xRedisClient.llen(*m_RedisDBIdx, key, count)) {
         LI("%s success count:%lld \r\n", __PRETTY_FUNCTION__, count);
         return true;

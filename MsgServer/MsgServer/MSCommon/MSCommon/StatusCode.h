@@ -29,6 +29,8 @@
 #define REDIS_GROUP_CLIENT (1)
 #define REDIS_GROUP_CLIENT_MAX (REDIS_GROUP_CLIENT*10007)
 
+#define REQUEST_BUFFER_SIZE_IN_BYTES_32    (1024*1024*32)
+
 
 
 #endif /* StatusCode_h */

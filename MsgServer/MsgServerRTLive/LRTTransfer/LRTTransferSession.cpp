@@ -35,12 +35,19 @@ LRTTransferSession::LRTTransferSession()
 , m_port(0)
 , m_connectingStatus(0)
 , m_wNewMsgId(0)
+, m_IsValid(true)
 {
     AddObserver(this);
+    GenericSessionId(m_transferSessId);
 }
 
 LRTTransferSession::~LRTTransferSession()
 {
+    m_IsValid = false;
+    while(m_RecvMsgBuf.size()>0)
+    {
+         m_RecvMsgBuf.pop();
+    }
     DelObserver(this);
     Unit();
 }
@@ -212,9 +219,32 @@ void LRTTransferSession::OnRecvData(const char*pData, int nLen)
     RTJSBuffer::RecvData(pData, nLen);
 }
 
+void LRTTransferSession::OnRedisEvent(const char*pData, int nLen)
+{
+    int64_t c=0;
+    LI("LRTTransferSession::OnRedisEvent\n");
+    if (m_RecvMsgBuf.size()>0)
+    {
+        std::string v = m_RecvMsgBuf.front();
+        LI("LRTTransferSession::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, val:%s\n", v.length(), v.c_str());
+        RTTransfer::DoProcessData(v.c_str(), v.length());
+        m_RecvMsgBuf.pop();
+    }
+
+    if (m_IsValid && m_RecvMsgBuf.size()<5)
+    {
+        //this->NotifyRedis();
+    }
+}
+
 void LRTTransferSession::OnRecvMessage(const char*message, int nLen)
 {
-    RTTransfer::DoProcessData(message, nLen);
+    //write redis to store msg
+    std::string s(message, nLen);
+    LI("LRTTransferSession::OnRecvMessage nLen:%d, message:%s, s:%s, s.len:%d\n", nLen, message, s.c_str(), s.length());
+    m_RecvMsgBuf.push(s);
+    if (m_IsValid)
+        this->NotifyRedis();
 }
 
 // process seqn read
@@ -384,9 +414,6 @@ void LRTTransferSession::OnTypeConn(const std::string& str)
         // when other connect to ME:
         // send the transfersessionid and ModuleId to other
         pms::TransferMsg t_msg;
-        std::string trid;
-        GenericSessionId(trid);
-        m_transferSessId = trid;
 
         c_msg.set_tr_module(pms::ETransferModule::MLIVE);
         c_msg.set_conn_tag(pms::EConnTag::THELLO);
@@ -1029,6 +1056,7 @@ void LRTTransferSession::ConnectionDisconnected()
 {
     if (m_transferSessId.length()>0) {
         m_connectingStatus = 0;
+        m_IsValid = false;
         LRTConnManager::Instance().TransferSessionLostNotify(m_transferSessId);
     }
 }

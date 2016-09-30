@@ -166,7 +166,7 @@ bool LRTConnManager::DoConnectStorage(const std::string ip, unsigned short port)
     m_storageWriteSession->Init();
     // conn to connector
     while (!m_storageWriteSession->Connect(ip, port)) {
-        LI("connecting to sequence server %s:%u waiting...\n", ip.c_str(), port);
+        LI("connecting to storage server %s:%u waiting...\n", ip.c_str(), port);
         usleep(100*1000);
     }
     LI("%s Storage Write port:%u, socketFD:%d\n", __FUNCTION__, port, m_storageWriteSession->GetSocket()->GetSocketFD());
@@ -176,7 +176,7 @@ bool LRTConnManager::DoConnectStorage(const std::string ip, unsigned short port)
     m_storageReadSession->Init();
     // conn to connector
     while (!m_storageReadSession->Connect(ip, port)) {
-        LI("connecting to sequence server %s:%u waiting...\n", ip.c_str(), port);
+        LI("connecting to storage server %s:%u waiting...\n", ip.c_str(), port);
         usleep(100*1000);
     }
     LI("%s Storage Read port:%u, socketFD:%d\n", __FUNCTION__, port, m_storageReadSession->GetSocket()->GetSocketFD());

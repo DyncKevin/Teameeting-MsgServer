@@ -24,6 +24,8 @@ public:
 	void SetTickTimer(int time){Assert(time > 0);fTickTime = time;};
 	void UpdateTimer(){fTimeoutTask.RefreshTimeout();};
 
+    void NotifyRedis();
+
 	int PostData(const char*pData, int nLen);
 	int SendData(const char*pData, int nLen);
 	int WakeupData(const char*pData, int nLen);
@@ -34,6 +36,7 @@ public:
 	virtual void OnWakeupEvent(const char*pData, int nLen) = 0;
 	virtual void OnPushEvent(const char*pData, int nLen) = 0;
 	virtual void OnTickEvent(const char*pData, int nLen) = 0;
+    virtual void OnRedisEvent(const char*pData, int nLen) = 0;
 
 protected:
 	//* For Task
