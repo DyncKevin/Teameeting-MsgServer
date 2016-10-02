@@ -185,16 +185,15 @@ void MRTTransferSession::OnRecvData(const char*pData, int nLen)
 void MRTTransferSession::OnRedisEvent(const char*pData, int nLen)
 {
     int64_t c=0;
-    LI("SRTTransferSession::OnRedisEvent\n");
     if (m_RecvMsgBuf.size()>0)
     {
         std::string v = m_RecvMsgBuf.front();
-        LI("SRTTransferSession::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, val:%s\n", v.length(), v.c_str());
+        LI("SRTTransferSession::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, m_RecvMsgBuf.size:%d\n", v.length(), m_RecvMsgBuf.size());
         RTTransfer::DoProcessData(v.c_str(), v.length());
         m_RecvMsgBuf.pop();
     }
 
-    if (m_IsValid && m_RecvMsgBuf.size()<5)
+    if (m_IsValid && m_RecvMsgBuf.size()>0)
     {
         this->NotifyRedis();
     }
@@ -204,7 +203,7 @@ void MRTTransferSession::OnRecvMessage(const char*message, int nLen)
 {
     //write redis to store msg
     std::string s(message, nLen);
-    LI("MRTTransferSession::OnRecvMessage nLen:%d, message:%s, s:%s, s.len:%d\n", nLen, message, s.c_str(), s.length());
+    LI("MRTTransferSession::OnRecvMessage nLen:%d, s.len:%d, m_RecvMsgBuf:%d\n", nLen, s.length(), m_RecvMsgBuf.size());
     m_RecvMsgBuf.push(s);
     if (m_IsValid)
         this->NotifyRedis();

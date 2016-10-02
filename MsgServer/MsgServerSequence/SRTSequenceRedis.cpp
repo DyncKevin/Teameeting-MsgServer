@@ -76,6 +76,7 @@ void SRTSequenceRedis::Unin()
 // post for read
 void SRTSequenceRedis::OnPostEvent(const char*pData, int nSize)
 {
+    LI("SRTSequenceRedis::OnPostEvent for read, nsize:%d\n", nSize);
     if (!pData || nSize<=0) return;
     std::string str(pData, nSize);
     pms::StorageMsg request;
@@ -83,6 +84,7 @@ void SRTSequenceRedis::OnPostEvent(const char*pData, int nSize)
     {
         if (request.mflag()==pms::EMsgFlag::FGROUP)
         {
+			LI("SRTSequenceRedis::OnPostEvent for read group, nsize:%d\n", nSize);
             std::string str("");
             char key[512] = {'\0'};
             sprintf(key, "grp:%s", request.storeid().c_str());
@@ -97,6 +99,7 @@ void SRTSequenceRedis::OnPostEvent(const char*pData, int nSize)
                             m_RedisDBIdx->CreateDBIndex(key, APHash, CACHE_TYPE_1);
                             if (m_xRedisClient.get(*m_RedisDBIdx, key, str))
                             {
+								LI("SRTSequenceRedis::OnPostEvent g read seqn key:%s ok\n", key);
                                 seq = std::stoll(str);
                                 request.set_result(Err_Redis_Ok);
                                 ReadResponse(request, seq);
@@ -109,6 +112,7 @@ void SRTSequenceRedis::OnPostEvent(const char*pData, int nSize)
                             request.set_result(Err_Redis_Key_Not_Exist); // groupid not exists
                             ReadResponse(request, 0);
 #else
+                            LI("SRTSequenceRedis::OnPostEvent g read seqn key:%s not exists, do nothing\n", key);
                             m_RedisDBIdx->CreateDBIndex(key, APHash, CACHE_TYPE_1);
                             m_xRedisClient.set(*m_RedisDBIdx, key, "0");
                             request.set_result(Err_Redis_Ok);
@@ -185,6 +189,7 @@ void SRTSequenceRedis::OnPushEvent(const char*pData, int nSize)
         LE("SRTSequenceRedis::OnPushEvent pData is null or nSize:%d", nSize);
         return;
     }
+    LI("SRTSequenceRedis::OnPushEvent for write, nsize:%d\n", nSize);
     std::string str(pData, nSize);
     pms::StorageMsg request;
     if (!request.ParseFromString(str)) return;

@@ -27,31 +27,45 @@ SRTResponseCollection::~SRTResponseCollection()
 
 void SRTResponseCollection::AddResponse(const pms::StorageMsg& request, int64 seqn)
 {
+	LI("SRTResponseCollection::AddResponse storeid:%s, ruserid:%s, seqn:%lld, msgid:%s, m_ReqType:%d\n"\
+			, request.storeid().c_str()\
+			, request.ruserid().c_str()\
+			, seqn\
+			, request.msgid().c_str()\
+			, m_ReqType);
     if (m_ReqType==REQUEST_TYPE_READ)
     {
-        SeqnResponseMapCIt cit = m_ReadSeqnResponse.find(request.msgid());
-        if (cit != m_ReadSeqnResponse.end())
-        {
-            if (cit->second->AddAndCheckRead(seqn))
-            {
-                delete cit->second;
-                m_ReadSeqnResponse.erase(cit);
-            }
-        } else {
-            m_ReadSeqnResponse.insert(make_pair(request.msgid(), new SRTResponseCollection::MsgSeqn(m_ClientNum, seqn, m_pRedisManager, request)));
+		LI("SRTResponseCollection::AddResponse 1\n");
+		SeqnResponseMapCIt cit = m_ReadSeqnResponse.find(request.msgid());
+		if (cit != m_ReadSeqnResponse.end())
+		{
+			LI("SRTResponseCollection::AddResponse 2\n");
+			if (cit->second->AddAndCheckRead(seqn))
+			{
+				LI("SRTResponseCollection::AddResponse 3\n");
+				delete cit->second;
+				m_ReadSeqnResponse.erase(cit);
+			}
+		} else {
+			LI("SRTResponseCollection::AddResponse 4\n");
+			m_ReadSeqnResponse.insert(make_pair(request.msgid(), new SRTResponseCollection::MsgSeqn(m_ClientNum, seqn, m_pRedisManager, request)));
         }
     } else if (m_ReqType==REQUEST_TYPE_WRITE)
-    {
-        SeqnResponseMapCIt cit = m_WriteSeqnResponse.find(request.msgid());
-        if (cit != m_WriteSeqnResponse.end())
-        {
-            if (cit->second->AddAndCheckWrite(seqn))
-            {
-                delete cit->second;
-                m_WriteSeqnResponse.erase(cit);
-            }
-        } else {
-            m_WriteSeqnResponse.insert(make_pair(request.msgid(), new SRTResponseCollection::MsgSeqn(m_ClientNum, seqn, m_pRedisManager, request)));
+	{
+		LI("SRTResponseCollection::AddResponse 5\n");
+		SeqnResponseMapCIt cit = m_WriteSeqnResponse.find(request.msgid());
+		if (cit != m_WriteSeqnResponse.end())
+		{
+			LI("SRTResponseCollection::AddResponse 6\n");
+			if (cit->second->AddAndCheckWrite(seqn))
+			{
+				LI("SRTResponseCollection::AddResponse 7\n");
+				delete cit->second;
+				m_WriteSeqnResponse.erase(cit);
+			}
+		} else {
+			LI("SRTResponseCollection::AddResponse 8\n");
+			m_WriteSeqnResponse.insert(make_pair(request.msgid(), new SRTResponseCollection::MsgSeqn(m_ClientNum, seqn, m_pRedisManager, request)));
         }
     }
 }

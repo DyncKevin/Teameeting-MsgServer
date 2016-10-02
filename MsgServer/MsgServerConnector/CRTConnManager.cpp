@@ -186,7 +186,7 @@ void CRTConnManager::ConnectionConnNotify(const std::string& uid, const std::str
     if (pmi && pmi->pModule) {
         pmi->pModule->ConnectionConnNotify(uid, token);
     } else {
-        LE("ConnectionConnNotify not find meeting module!!!\n");
+        LE("ConnectionConnNotify not find MLIVE module!!!\n");
         Assert(false);
     }
     pmi = findModuleInfo(uid, pms::ETransferModule::MMSGQUEUE);

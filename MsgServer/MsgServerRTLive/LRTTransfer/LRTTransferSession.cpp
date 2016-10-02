@@ -222,18 +222,17 @@ void LRTTransferSession::OnRecvData(const char*pData, int nLen)
 void LRTTransferSession::OnRedisEvent(const char*pData, int nLen)
 {
     int64_t c=0;
-    LI("LRTTransferSession::OnRedisEvent\n");
     if (m_RecvMsgBuf.size()>0)
     {
         std::string v = m_RecvMsgBuf.front();
-        LI("LRTTransferSession::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, val:%s\n", v.length(), v.c_str());
+        LI("LRTTransferSession::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, m_RecvMsgBuf.size:%d\n", v.length(), m_RecvMsgBuf.size());
         RTTransfer::DoProcessData(v.c_str(), v.length());
         m_RecvMsgBuf.pop();
     }
 
-    if (m_IsValid && m_RecvMsgBuf.size()<5)
+    if (m_IsValid && m_RecvMsgBuf.size()>0)
     {
-        //this->NotifyRedis();
+        this->NotifyRedis();
     }
 }
 
@@ -241,7 +240,7 @@ void LRTTransferSession::OnRecvMessage(const char*message, int nLen)
 {
     //write redis to store msg
     std::string s(message, nLen);
-    LI("LRTTransferSession::OnRecvMessage nLen:%d, message:%s, s:%s, s.len:%d\n", nLen, message, s.c_str(), s.length());
+    LI("LRTTransferSession::OnRecvMessage nLen:%d, s.len:%d, m_RecvMsgBuf:%d\n", nLen, s.length(), m_RecvMsgBuf.size());
     m_RecvMsgBuf.push(s);
     if (m_IsValid)
         this->NotifyRedis();
@@ -701,6 +700,7 @@ void LRTTransferSession::OnTypeQueue(const std::string& str)
                     //how to let others server connect to here, find the special group users relayer
                     //send to
                     const std::string sn("wensiwensi");
+					LI("LRTTransferSession::OnTypeQueue newmsg group recver sendtoGroup\n");
                     if (LRTConnManager::Instance().SendToGroupModule(sn, s))
                     {
                     } else {
@@ -791,6 +791,7 @@ void LRTTransferSession::OnTypeQueue(const std::string& str)
             //how to let others server connect to here, find the special group users relayer
             //send to
             const std::string sn("wensiwensi");
+			LI("LRTTransferSession::OnTypeQueue createseqn sendtoGroup\n");
             if (LRTConnManager::Instance().SendToGroupModule(sn, s))
             {
             } else {
@@ -813,6 +814,7 @@ void LRTTransferSession::OnTypeQueue(const std::string& str)
             //how to let others server connect to here, find the special group users relayer
             //send to
             const std::string sn("wensiwensi");
+			LI("LRTTransferSession::OnTypeQueue deleteseqn sendtoGroup\n");
             if (LRTConnManager::Instance().SendToGroupModule(sn, s))
             {
             } else {
@@ -924,6 +926,7 @@ void LRTTransferSession::OnTypeDispatch(const std::string& str)
                     //how to let others server connect to here, find the special group users relayer
                     //send to
                     const std::string sn("wensiwensi");
+					LI("LRTTransferSession::OnTypeQueue pgetdata sendtopusher\n");
                     if (LRTConnManager::Instance().SendToPushModule(sn, s))
                     {
                     } else {

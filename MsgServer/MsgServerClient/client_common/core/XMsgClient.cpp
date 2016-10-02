@@ -296,6 +296,7 @@ int XMsgClient::FetchGroupSeqn(const std::string& groupid)
     if (outstr.length()==0) {
         return -1;
     }
+	LOG(INFO) << "XMsgClient::FetchGroupSeqn groupid:" << groupid;
     return SendEncodeMsg(outstr);
 }
 
@@ -310,6 +311,7 @@ int XMsgClient::SyncGroupSeqn(const std::string& groupid, int64 seqn, int role)
     if (outstr.length()==0) {
         return -1;
     }
+	LOG(INFO) << "XMsgClient::SyncGroupSeqn groupid:" << groupid;
     return SendEncodeMsg(outstr);
 }
 

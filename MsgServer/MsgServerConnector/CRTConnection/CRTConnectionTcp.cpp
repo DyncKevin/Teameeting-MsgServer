@@ -116,18 +116,17 @@ void CRTConnectionTcp::OnRecvData(const char*pData, int nLen)
 void CRTConnectionTcp::OnRedisEvent(const char*pData, int nLen)
 {
     int64_t c=0;
-    LI("CRTConnectionTcp::OnRedisEvent\n");
     if (m_RecvMsgBuf.size()>0)
     {
         std::string v = m_RecvMsgBuf.front();
-        LI("CRTConnectionTcp::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, val:%s\n", v.length(), v.c_str());
+        LI("CRTConnectionTcp::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, m_RecvMsgBuf.size:%d\n", v.length(), m_RecvMsgBuf.size());
         CRTConnTcp::DoProcessData(v.c_str(), v.length());
         m_RecvMsgBuf.pop();
     }
 
-    if (m_IsValid && m_RecvMsgBuf.size()<5)
+    if (m_IsValid && m_RecvMsgBuf.size()>0)
     {
-        //this->NotifyRedis();
+        this->NotifyRedis();
     }
 }
 
@@ -136,8 +135,8 @@ void CRTConnectionTcp::OnRecvMessage(const char*message, int nLen)
 {
     //write redis to store msg
     std::string s(message, nLen);
-    LI("SRTTransferSession::OnRecvMessage nLen:%d, message:%s, s:%s, s.len:%d\n", nLen, message, s.c_str(), s.length());
     m_RecvMsgBuf.push(s);
+    LI("SRTTransferSession::OnRecvMessage nLen:%d, s.len:%d, m_RecvMsgBuf:%d\n", nLen, s.length(), m_RecvMsgBuf.size());
     if (m_IsValid)
         this->NotifyRedis();
 }

@@ -16,6 +16,7 @@
 #include <unordered_map>
 #include <utility>
 #include "sigslot.h"
+#include "rtklog.h"
 
 #define REQUEST_TYPE_READ (1)
 #define REQUEST_TYPE_WRITE (2)
@@ -49,9 +50,11 @@ public:
         sigslot::signal1<const std::string&> ReadResponse;
         bool AddAndCheckWrite(int64 seq)
         {
+			LI("MsgSeqn AddAndCheckWrite counter :%d, cnumber:%d\n", counter, cnumber);
             seqns.insert(seq);
             if ((++counter) == cnumber)
             {
+				LI("MsgSeqn AddAndCheckWrite counter222 :%d, cnumber:%d\n", counter, cnumber);
                 storage.set_sequence(*seqns.rbegin());
                 WriteResponse(storage.SerializeAsString());
                 return true;
@@ -61,9 +64,11 @@ public:
         }
         bool AddAndCheckRead(int64 seq)
         {
+			LI("MsgSeqn AddAndCheckRead counter :%d, cnumber:%d\n", counter, cnumber);
             seqns.insert(seq);
             if ((++counter) == cnumber)
             {
+				LI("MsgSeqn AddAndCheckRead counter222 :%d, cnumber:%d\n", counter, cnumber);
                 storage.set_maxseqn(*seqns.rbegin());
                 ReadResponse(storage.SerializeAsString());
                 return true;

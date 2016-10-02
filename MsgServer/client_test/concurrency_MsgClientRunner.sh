@@ -77,6 +77,7 @@ function testClient()
             echo "load client:" $PARAM_PATH/$PARAM_NAME ",user:" $testName
             rest=`$PARAM_PATH/$PARAM_NAME $testName`
             echo "load done..."
+			sleep 1
         }&
     done
     echo "wait for ending..."
@@ -96,7 +97,7 @@ function testClient()
 
 #################################################
 rm test*
-testNum=2;
+testNum=3;
 PARAM_NAME="MsgServerClient"
 PARAM_PATH=$CUR_PATH/../MsgServerClient
 echo "kill PARAM_PATH/PARAM_NAME:" $PARAM_PATH/$PARAM_NAME

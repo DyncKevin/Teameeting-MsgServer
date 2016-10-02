@@ -240,18 +240,17 @@ void LRTTransferSession::OnRecvData(const char*pData, int nLen)
 void LRTTransferSession::OnRedisEvent(const char*pData, int nLen)
 {
     int64_t c=0;
-    LI("LRTTransferSession::OnRedisEvent\n");
     if (m_RecvMsgBuf.size()>0)
     {
         std::string v = m_RecvMsgBuf.front();
-        LI("LRTTransferSession::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, val:%s\n", v.length(), v.c_str());
+        LI("LRTTransferSession::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, m_RecvMsgBuf:%d\n", v.length(), m_RecvMsgBuf.size());
         RTLstorage::DoProcessData(v.c_str(), v.length());
         m_RecvMsgBuf.pop();
     }
 
-    if (m_IsValid && m_RecvMsgBuf.size()<5)
+    if (m_IsValid && m_RecvMsgBuf.size()>0)
     {
-        //this->NotifyRedis();
+        this->NotifyRedis();
     }
 }
 
@@ -259,8 +258,8 @@ void LRTTransferSession::OnRecvMessage(const char*message, int nLen)
 {
     //write redis to store msg
     std::string s(message, nLen);
-    LI("SRTTransferSession::OnRecvMessage nLen:%d, message:%s, s:%s, s.len:%d\n", nLen, message, s.c_str(), s.length());
     m_RecvMsgBuf.push(s);
+    LI("SRTTransferSession::OnRecvMessage nLen:%d, s.len:%d, m_RecvMsgBuf:%d\n", nLen, s.length(), m_RecvMsgBuf.size());
     if (m_IsValid)
         this->NotifyRedis();
 }
@@ -629,6 +628,7 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
             int64 seqn = -1;
             if (LRTLogicalManager::Instance().ReadLocalSeqn(store.mutable_msgs(i), &seqn))
             {
+				LI("LRTTransferSession::OnTypeReadRequest was called, SYNCSEQN ruserid:%s, read local seqn:%lld\n", store.msgs(i).ruserid().c_str(), seqn);
                 // update max seqn
                 if (seqn<0) continue;
                 store.mutable_msgs(i)->set_maxseqn(seqn);
@@ -637,6 +637,7 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
                 char msgid[16] = {0};
                 sprintf(msgid, "rs:%u", m_tmpRSeqnId++);
                 store.mutable_msgs(i)->set_msgid(msgid);
+				LI("LRTTransferSession::OnTypeReadRequest was called, SYNCSEQN ruserid:%s, read remote redis seqn, msgid:%s\n", store.msgs(i).ruserid().c_str(), msgid);
                 LRTLogicalManager::Instance().InsertSeqnRead(this, store.mutable_msgs(i));
                 s_store.add_msgs()->MergeFrom(store.msgs(i));
             }
@@ -670,12 +671,21 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
             // sync the pointed sequence data
             if (store.msgs(i).rsvrcmd()==pms::EServerCmd::CPGETDATA)
             {
+				char msgid[16] = {0};
+				sprintf(msgid, "prd:%u", m_tmpRDataId++);
+				store.mutable_msgs(i)->set_msgid(msgid);
                 store.mutable_msgs(i)->set_sdmaxseqn(store.mutable_msgs(i)->sequence());
                 d_store.add_msgs()->MergeFrom(store.msgs(i));
             } else if (store.msgs(i).rsvrcmd()==pms::EServerCmd::CSYNCONEDATA) {
+				char msgid[16] = {0};
+				sprintf(msgid, "ord:%u", m_tmpOData2Id++);
+				store.mutable_msgs(i)->set_msgid(msgid);
                 store.mutable_msgs(i)->set_sdmaxseqn(store.mutable_msgs(i)->sequence());
                 d_store.add_msgs()->MergeFrom(store.msgs(i));
             } else if (store.msgs(i).rsvrcmd()==pms::EServerCmd::CSYNCONEGROUPDATA) {
+				char msgid[16] = {0};
+				sprintf(msgid, "ogrd:%u", m_tmpOGData2Id++);
+				store.mutable_msgs(i)->set_msgid(msgid);
                 store.mutable_msgs(i)->set_sdmaxseqn(store.mutable_msgs(i)->sequence());
                 d_store.add_msgs()->MergeFrom(store.msgs(i));
             } else { // this is from pusher CPGETDATA
@@ -692,6 +702,9 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
                             , ms);
                     // ???????? shoule be eauql here?
                     if (ms<s)continue;
+					char msgid[16] = {0};
+					sprintf(msgid, "rd:%u", m_tmpRDataId++);
+					//store.mutable_msgs(i)->set_msgid(msgid);
                     store.mutable_msgs(i)->set_maxseqn(seqn);// update maxseqn
                     store.mutable_msgs(i)->set_sdmaxseqn(seqn);
                     // fix later, problem msgid
@@ -701,6 +714,10 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
                             , store.msgs(i).ruserid().c_str()\
                             , store.msgs(i).sequence()\
                             , store.msgs(i).maxseqn());
+
+					char msgid[16] = {0};
+					sprintf(msgid, "drs:%u", m_tmpRSeqn4DataId++);
+					store.mutable_msgs(i)->set_msgid(msgid);
                     store.mutable_msgs(i)->set_tsvrcmd(pms::EServerCmd::CSSEQN4DATA); // modify cmd, to sync seqn from remote
                     store.mutable_msgs(i)->set_maxseqn(store.mutable_msgs(i)->sequence()); // is this ok?right?
                     s_store.add_msgs()->MergeFrom(store.msgs(i));
@@ -742,6 +759,9 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
             // because pusher has give the pointed sequence, so sync data request directly
             // this should be ok
             {
+				char msgid[16] = {0};
+				sprintf(msgid, "prd:%u", m_tmpRDataId++);
+				//store.mutable_msgs(i)->set_msgid(msgid);
                 store.mutable_msgs(i)->set_sdmaxseqn(store.mutable_msgs(i)->sequence());
                 d_store.add_msgs()->MergeFrom(store.msgs(i));
             }
@@ -767,6 +787,7 @@ void LRTTransferSession::OnTypeReadResponse(const std::string& str)
     pms::RelayMsg rmsg;
     if (!rmsg.ParseFromString(str)) return;
 
+	LI("LRTTransferSession::OnTypeReadResponse was called, rmsg.svr_cmd:%d\n", rmsg.svr_cmds());
     if (rmsg.svr_cmds()==pms::EServerCmd::CSEQN)
     {
         pms::PackedStoreMsg store, d_store;
@@ -792,6 +813,9 @@ void LRTTransferSession::OnTypeReadResponse(const std::string& str)
                 LRTLogicalManager::Instance().DeleteSeqnRead(store.mutable_msgs(i));
                 assert(pSess);
 
+				char msgid[16] = {0};
+				sprintf(msgid, "drd:%u", m_tmpRData2Id++);
+				//store.mutable_msgs(i)->set_msgid(msgid);
                 store.mutable_msgs(i)->set_sdmaxseqn(store.mutable_msgs(i)->sequence());// modify the sequence, which msg you sync
                 d_store.add_msgs()->MergeFrom(store.msgs(i));
             }

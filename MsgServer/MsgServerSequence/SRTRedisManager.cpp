@@ -114,6 +114,7 @@ void SRTRedisManager::PostRedisRequest(const std::string& request)
 {
     for(auto x : m_RedisGroupMgr)
     {
+		LI("SRTRedisManager::PostRedisRequest......for read\n");
         LoopupForRedis((RedisGroup*)x.second)->PostData(request.c_str(), request.length());
     }
 }
@@ -123,6 +124,7 @@ void SRTRedisManager::PushRedisRequest(const std::string& request)
 {
     for(auto x : m_RedisGroupMgr)
     {
+		LI("SRTRedisManager::PostRedisRequest......for write\n");
         LoopupForRedis((RedisGroup*)x.second)->PushData(request.c_str(), request.length());
     }
 }
@@ -177,12 +179,15 @@ void SRTRedisManager::OnAddAndCheckWrite(const std::string& msg)
  */
 void SRTRedisManager::OnReadSeqn(const pms::StorageMsg& request, int64 seqn)
 {
+	LI("SRTRedisManager::OnReadSeqn was called, storeid:%s, seqn:%lld\n", request.storeid().c_str(), seqn);
     OSMutexLocker locker(&m_MutexReadCollection);
     std::unordered_map<std::string, SRTResponseCollection*>::const_iterator cit = m_ReadResponseCollections.find(request.ruserid());
     if (cit != m_ReadResponseCollections.end())
     {
+		LI("SRTRedisManager::OnReadSeqn AddResponse was called, storeid:%s, seqn:%lld\n", request.storeid().c_str(), seqn);
         cit->second->AddResponse(request, seqn);
     } else {
+		LI("SRTRedisManager::OnReadSeqn Insert was called, storeid:%s, seqn:%lld\n", request.storeid().c_str(), seqn);
         m_ReadResponseCollections.insert(make_pair(request.ruserid(), new SRTResponseCollection(this, REQUEST_TYPE_READ, m_RedisNum, request, seqn)));
     }
 }
@@ -197,6 +202,7 @@ void SRTRedisManager::OnReadSeqn(const pms::StorageMsg& request, int64 seqn)
  */
 void SRTRedisManager::OnAddAndCheckRead(const std::string& msg)
 {
+	LI("SRTRedisManager::OnAddAndCheckRead was called\n");
     {
         OSMutexLocker locker(&m_Mutex4Read);
         m_SeqnResp4Read.push(msg);
@@ -209,6 +215,7 @@ void SRTRedisManager::OnAddAndCheckRead(const std::string& msg)
 // this is for read
 void SRTRedisManager::OnWakeupEvent(const void*pData, int nSize)
 {
+	LI("SRTRedisManager::OnAddAndCheckRead was called, m_SeqnResp4Read.size:%d\n\n", m_SeqnResp4Read.size());
     if (m_SeqnResp4Read.size()==0) return;
     bool hasData = false;
     for (int i=0;i<PACKED_MSG_ONCE_NUM;++i)
