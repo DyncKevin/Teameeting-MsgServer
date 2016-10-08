@@ -31,6 +31,7 @@
 
 #define REQUEST_BUFFER_SIZE_IN_BYTES_32    (1024*1024*32)
 
+#define USE_QUEUE_TO_CACHE (0)
 
 
 #endif /* StatusCode_h */

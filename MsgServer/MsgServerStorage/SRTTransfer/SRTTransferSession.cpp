@@ -192,9 +192,9 @@ void SRTTransferSession::OnRedisEvent(const char*pData, int nLen)
     if (m_RecvMsgBuf.size()>0)
     {
         std::string v = m_RecvMsgBuf.front();
-        LI("SRTTransferSession::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, m_RecvMsgBuf.size:%d\n", v.length(), m_RecvMsgBuf.size());
         RTLstorage::DoProcessData(v.c_str(), v.length());
         m_RecvMsgBuf.pop();
+        LI("SRTTransferSession::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, m_RecvMsgBuf.size:%d\n", v.length(), m_RecvMsgBuf.size());
     }
 
     if (m_IsValid && m_RecvMsgBuf.size()>0)
@@ -205,11 +205,11 @@ void SRTTransferSession::OnRedisEvent(const char*pData, int nLen)
 
 void SRTTransferSession::OnRecvMessage(const char*message, int nLen)
 {
-#if 1
+#if USE_QUEUE_TO_CACHE
     //write redis to store msg
     std::string s(message, nLen);
-    LI("SRTTransferSession::OnRecvMessage nLen:%d, s.len:%d, m_RecvMsgBuf:%d\n", nLen, s.length(), m_RecvMsgBuf.size());
     m_RecvMsgBuf.push(s);
+    LI("SRTTransferSession::OnRecvMessage nLen:%d, s.len:%d, m_RecvMsgBuf:%d\n", nLen, s.length(), m_RecvMsgBuf.size());
     if (m_IsValid)
         this->NotifyRedis();
 #else

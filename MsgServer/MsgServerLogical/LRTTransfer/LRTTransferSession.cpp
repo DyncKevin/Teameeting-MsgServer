@@ -243,9 +243,9 @@ void LRTTransferSession::OnRedisEvent(const char*pData, int nLen)
     if (m_RecvMsgBuf.size()>0)
     {
         std::string v = m_RecvMsgBuf.front();
-        LI("LRTTransferSession::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, m_RecvMsgBuf:%d\n", v.length(), m_RecvMsgBuf.size());
         RTLstorage::DoProcessData(v.c_str(), v.length());
         m_RecvMsgBuf.pop();
+        LI("LRTTransferSession::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, m_RecvMsgBuf:%d\n", v.length(), m_RecvMsgBuf.size());
     }
 
     if (m_IsValid && m_RecvMsgBuf.size()>0)
@@ -256,12 +256,16 @@ void LRTTransferSession::OnRedisEvent(const char*pData, int nLen)
 
 void LRTTransferSession::OnRecvMessage(const char*message, int nLen)
 {
+#if USE_QUEUE_TO_CACHE
     //write redis to store msg
     std::string s(message, nLen);
     m_RecvMsgBuf.push(s);
     LI("SRTTransferSession::OnRecvMessage nLen:%d, s.len:%d, m_RecvMsgBuf:%d\n", nLen, s.length(), m_RecvMsgBuf.size());
     if (m_IsValid)
         this->NotifyRedis();
+#else
+    RTLstorage::DoProcessData(message, nLen);
+#endif
 }
 
 // for read
@@ -704,7 +708,8 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
                     if (ms<s)continue;
 					char msgid[16] = {0};
 					sprintf(msgid, "rd:%u", m_tmpRDataId++);
-					//store.mutable_msgs(i)->set_msgid(msgid);
+					store.mutable_msgs(i)->set_msgid(msgid);
+
                     store.mutable_msgs(i)->set_maxseqn(seqn);// update maxseqn
                     store.mutable_msgs(i)->set_sdmaxseqn(seqn);
                     // fix later, problem msgid
@@ -761,7 +766,8 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
             {
 				char msgid[16] = {0};
 				sprintf(msgid, "prd:%u", m_tmpRDataId++);
-				//store.mutable_msgs(i)->set_msgid(msgid);
+				store.mutable_msgs(i)->set_msgid(msgid);
+
                 store.mutable_msgs(i)->set_sdmaxseqn(store.mutable_msgs(i)->sequence());
                 d_store.add_msgs()->MergeFrom(store.msgs(i));
             }
@@ -815,7 +821,8 @@ void LRTTransferSession::OnTypeReadResponse(const std::string& str)
 
 				char msgid[16] = {0};
 				sprintf(msgid, "drd:%u", m_tmpRData2Id++);
-				//store.mutable_msgs(i)->set_msgid(msgid);
+				store.mutable_msgs(i)->set_msgid(msgid);
+
                 store.mutable_msgs(i)->set_sdmaxseqn(store.mutable_msgs(i)->sequence());// modify the sequence, which msg you sync
                 d_store.add_msgs()->MergeFrom(store.msgs(i));
             }

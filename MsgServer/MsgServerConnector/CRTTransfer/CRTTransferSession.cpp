@@ -196,9 +196,9 @@ void CRTTransferSession::OnRedisEvent(const char*pData, int nLen)
     if (m_RecvMsgBuf.size()>0)
     {
         std::string v = m_RecvMsgBuf.front();
-        LI("CRTTransferSession::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, m_RecvMsgBuf.size:%d\n", v.length(), m_RecvMsgBuf.size());
         RTTransfer::DoProcessData(v.c_str(), v.length());
         m_RecvMsgBuf.pop();
+        LI("CRTTransferSession::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, m_RecvMsgBuf.size:%d\n", v.length(), m_RecvMsgBuf.size());
     }
 
     if (m_IsValid && m_RecvMsgBuf.size()>0)
@@ -209,7 +209,7 @@ void CRTTransferSession::OnRedisEvent(const char*pData, int nLen)
 
 void CRTTransferSession::OnRecvMessage(const char*message, int nLen)
 {
-#if 1
+#if USE_QUEUE_TO_CACHE
     //write redis to store msg
     std::string s(message, nLen);
     m_RecvMsgBuf.push(s);
@@ -217,7 +217,6 @@ void CRTTransferSession::OnRecvMessage(const char*message, int nLen)
     if (m_IsValid)
         this->NotifyRedis();
 #else
-    LI("CRTTransferSession::OnRecvMessage nLen:%d\n", nLen);
     RTTransfer::DoProcessData(message, nLen);
 #endif
 }

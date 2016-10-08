@@ -108,7 +108,7 @@ bool GRTGrouperManager::GetGroupMembersRedis(const std::string& groupid)
         std::unordered_set<std::string>* uset = new std::unordered_set<std::string>();
         for(std::string s : vValue)
         {
-            LE("store insert GroupMembers:%s\n", s.c_str());
+            LI("store insert GroupMembers:%s\n", s.c_str());
             uset->insert(s);
         }
         {
