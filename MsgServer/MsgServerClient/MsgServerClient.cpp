@@ -127,9 +127,12 @@ void MsgServerClient::DoTick()
 {
 #if 1
     test_times++;
-    //if (test_times >10 && test_times <=250)
-    if (test_times >10 && test_times <=15)
+    //if (test_times >10 && test_times <=3000)
+    //if (test_times >10 && test_times <=75)
+    if (test_times >10 && test_times <=500)
     //if (test_times >10 && test_times <=11)
+    //if (test_times >10000 && test_times <=10005)
+    //if (test_times >10000 && test_times <=10001)
     //if (test_times >10)
     //if (test_times <0)
         ClientManager::Instance().SendGroupMsg();
@@ -138,4 +141,5 @@ void MsgServerClient::DoTick()
 
 void MsgServerClient::Stop()
 {
+    ClientManager::Instance().UninClient();
 }

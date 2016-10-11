@@ -179,7 +179,7 @@ int XMsgProcesser::EncodeSyncSeqn(std::string& outstr, const std::string& userid
     return 0;
 }
 
-int XMsgProcesser::EncodeSyncData(std::string& outstr, const std::string& userid, const std::string& token, int64 seqn, int module, int tag, int flag)
+int XMsgProcesser::EncodeSyncData(std::string& outstr, const std::string& userid, const std::string& token, int64 seqn, int64 sdmaxseqn, int module, int tag, int flag)
 {
 #if DEF_PROTO
     pms::MsgReq req;
@@ -191,6 +191,7 @@ int XMsgProcesser::EncodeSyncData(std::string& outstr, const std::string& userid
     store.set_storeid(userid);
     store.set_ruserid(userid);
     store.set_sequence(seqn);
+    store.set_sdmaxseqn(sdmaxseqn);
     store.set_version(MSG_VERSION);
     store.set_module((pms::EModuleType)module);
 
@@ -229,7 +230,7 @@ int XMsgProcesser::EncodeSyncGroupSeqn(std::string& outstr, const std::string& u
     return 0;
 }
 
-int XMsgProcesser::EncodeSyncGroupData(std::string& outstr, const std::string& userid, const std::string& token, const std::string& groupid, int64 seqn, int module, int tag, int flag)
+int XMsgProcesser::EncodeSyncGroupData(std::string& outstr, const std::string& userid, const std::string& token, const std::string& groupid, int64 seqn, int64 sdmaxseqn, int module, int tag, int flag)
 {
 #if DEF_PROTO
     pms::MsgReq req;
@@ -242,6 +243,7 @@ int XMsgProcesser::EncodeSyncGroupData(std::string& outstr, const std::string& u
     store.set_ruserid(userid);
     store.set_groupid(groupid);
     store.set_sequence(seqn);
+    store.set_sdmaxseqn(sdmaxseqn);
     store.set_version(MSG_VERSION);
     store.set_module((pms::EModuleType)module);
 

@@ -121,7 +121,7 @@ void CRTConnectionTcp::OnRedisEvent(const char*pData, int nLen)
         std::string v = m_RecvMsgBuf.front();
         CRTConnTcp::DoProcessData(v.c_str(), v.length());
         m_RecvMsgBuf.pop();
-        LI("CRTConnectionTcp::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, m_RecvMsgBuf.size:%d\n", v.length(), m_RecvMsgBuf.size());
+        //LI("CRTConnectionTcp::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, m_RecvMsgBuf.size:%d\n", v.length(), m_RecvMsgBuf.size());
     }
 
     if (m_IsValid && m_RecvMsgBuf.size()>0)
@@ -137,7 +137,7 @@ void CRTConnectionTcp::OnRecvMessage(const char*message, int nLen)
     //write redis to store msg
     std::string s(message, nLen);
     m_RecvMsgBuf.push(s);
-    LI("SRTTransferSession::OnRecvMessage nLen:%d, s.len:%d, m_RecvMsgBuf:%d\n", nLen, s.length(), m_RecvMsgBuf.size());
+    //LI("SRTTransferSession::OnRecvMessage nLen:%d, s.len:%d, m_RecvMsgBuf:%d\n", nLen, s.length(), m_RecvMsgBuf.size());
     if (m_IsValid)
         this->NotifyRedis();
 #else
@@ -221,7 +221,7 @@ void CRTConnectionTcp::OnSndMsg(pms::EServerCmd cmd, pms::EModuleType module, co
 {
 #if DEF_PROTO
     if (!m_login) {
-        LE("m_login false, can not transfer msg\n");
+        LE("m_login false, can not transfer msg, uid:%s\n", m_userId.c_str());
         return;
     }
 

@@ -58,6 +58,7 @@ void parse_file(const char* filename, FILE* fres)
     char textRes[1024] = {0};
     std::string strsplit(":");
     long firstSeqn=0, lastSeqn=0;
+    long long firstTime=0, lastTime = 0;
     if (text.size()>0)
     {
         std::list<std::string>::iterator it = text.begin();
@@ -81,7 +82,9 @@ void parse_file(const char* filename, FILE* fres)
 
         firstSeqn = atoll(FirstResult[4].c_str());
         lastSeqn = atoll(LastResult[4].c_str());
-        sprintf(textRes, "text line number:%lu, firstSeqn:%ld, lastSeqn:%ld,\t", text.size(), firstSeqn, lastSeqn);
+        firstTime = atoll(FirstResult[6].c_str());
+        lastTime = atoll(LastResult[6].c_str());
+        sprintf(textRes, "text line number:%lu, firstSeqn:%ld, lastSeqn:%ld, firstTime:%lld, lastTime:%lld, time:%lld,\t", text.size(), firstSeqn, lastSeqn, firstTime, lastTime, (lastTime-firstTime));
     }
 
     int lll = (int)(lastSeqn - firstSeqn - text.size() + 1);

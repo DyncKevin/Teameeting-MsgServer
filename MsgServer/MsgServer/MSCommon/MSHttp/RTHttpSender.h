@@ -23,8 +23,6 @@ public:
     pms::RelayMsg&     GetTransmsg() { return m_transmsg; }
     pms::Entity&      GetMeetmsg() { return m_meetmsg; }
 
-    void NotifyRedis();
-
 public:
 	//* For RCTcp
 	virtual void OnRecvData(const char*data, int size);

@@ -60,11 +60,6 @@ bool RTHttpSender::ConnHttpHost(const std::string& addr, const unsigned short po
     return true;
 }
 
-void RTHttpSender::NotifyRedis()
-{
-     this->Signal(kRedisEvent);
-}
-
 ////////////////////////////////////////////////////
 
 //* For RCTcp

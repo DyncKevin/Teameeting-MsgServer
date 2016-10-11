@@ -49,6 +49,7 @@ int main(int argc, const char * argv[]) {
     MsConfigParser conf;
     conf.LoadFromFile(argv[2]);
 
+    //int test = 0;
     L_Init(0, NULL);
     SRTSequence::Initialize(1024);
     SRTSequence* pSequence = SRTSequence::Inst();
@@ -57,7 +58,6 @@ int main(int argc, const char * argv[]) {
         //////LI("SRTSequence start failed and goto exit, res:%d\n", res);
         goto EXIT;
     }
-    //int test = 0;
     //while (test++ < 25) {
     while (1) {
         pSequence->DoTick();

@@ -46,7 +46,9 @@ CCFILES :=  webrtc/base/asyncfile.cc \
 			webrtc/base/event_tracer.cc \
 			webrtc/base/ifaddrs-android.cc \
 			webrtc/base/ipaddress.cc \
+			webrtc/base/fileutils.cc \
 			webrtc/base/logging.cc \
+			webrtc/base/logsinks.cc \
 			webrtc/base/location.cc \
 			webrtc/base/messagehandler.cc \
 			webrtc/base/messagequeue.cc \
@@ -59,6 +61,7 @@ CCFILES :=  webrtc/base/asyncfile.cc \
 			webrtc/base/sigslot.cc \
 			webrtc/base/socketaddress.cc \
 			webrtc/base/stringencode.cc \
+			webrtc/base/stream.cc \
 			webrtc/base/thread.cc \
 			webrtc/base/thread_checker_impl.cc \
 			webrtc/base/timeutils.cc

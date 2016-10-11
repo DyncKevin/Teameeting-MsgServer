@@ -86,10 +86,10 @@ public:
 
     int FetchSeqn();
     int SyncSeqn(int64 seqn, int role);
-    int SyncData(int64 seqn);
+    int SyncData(int64 seqn, int64 sdmaxseqn);
     int FetchGroupSeqn(const std::string& groupid);
     int SyncGroupSeqn(const std::string& groupid, int64 seqn, int role);
-    int SyncGroupData(const std::string& gropuid, int64 seqn);
+    int SyncGroupData(const std::string& gropuid, int64 seqn, int64 sdmaxseqn);
     int UpdateSetting(int64 setType, const std::string& jsonSetting);
     int SyncOneData(int64 seqn);
     int SyncOneGroupData(const std::string& groupid, int64 seqn);
@@ -209,6 +209,8 @@ public:
     virtual void OnTick();
     virtual void OnMessageSent(int err);
     virtual void OnMessageRecv(const char*pData, int nLen);
+    virtual void OnClientSyncSeqn();
+    virtual void OnClientSyncGroupSeqn(const std::string& storeid);
 
     // For XMsgClientHelper
     virtual void OnHelpLogin(int code, const std::string& userid);
@@ -302,7 +304,21 @@ private:
         }
         while(1)
         {
-            if (m_uSyncedMsgMap.size()==0) break;
+            if (m_uSyncedMsgMap.size()==0)
+            {
+                // if no data processing
+                // call syncseqn to get max seqn
+
+                //LOG(INFO) << "XMsgClient::UUpdateUserSeqn =======>>>Call NotifySyncSeqn, itCurSeqn:" << itCurSeqn->second << ", m_syncDataMaxSeqn:" << m_syncDataMaxSeqn;
+                if (itCurSeqn->second == m_syncDataMaxSeqn)
+                {
+                    if (m_pClientImpl)
+                    {
+                        m_pClientImpl->NotifySyncSeqn();
+                    }
+                }
+                break;
+            }
             char sk[256] = {0};
             sprintf(sk, "%s:%lld", m_uid.c_str(), itCurSeqn->second +1);
             SyncedMsgMapIt it = m_uSyncedMsgMap.find(sk);
@@ -414,7 +430,20 @@ private:
         }
         while(1)
         {
-            if (m_gSyncedMsgMap.size()==0) break;
+            if (m_gSyncedMsgMap.size()==0)
+            {
+                // if no data processing
+                // call syncseqn to get max seqn
+                //LOG(INFO) << "XMsgClient::GUpdateUserSeqn =======>>>Call NotifySyncGroupSeqn, itCurSeqn:" << itCurSeqn->second << ", m_syncGroupDataMaxSeqn:" << m_syncGroupDataMaxSeqn;
+                if (itCurSeqn->second == m_syncGroupDataMaxSeqn)
+                {
+                    if (m_pClientImpl)
+                    {
+                        m_pClientImpl->NotifySyncGroupSeqn(storeid);
+                    }
+                }
+                break;
+            }
             char sk[256] = {0};
             sprintf(sk, "%s:%lld", storeid.c_str(), itCurSeqn->second +1);
             SyncedMsgMapIt it = m_gSyncedMsgMap.find(sk);
@@ -473,6 +502,13 @@ private:
 
                 continue;
             } else {
+                // just for test for a while
+
+                LOG(INFO) << "XMsgClient::GUpdateUserSeqn =======NOTFIND NOTFIND NOT FIND>>>Call NotifySyncGroupSeqn, itCurSeqn:" << itCurSeqn->second << ", m_syncGroupDataMaxSeqn:" << m_syncGroupDataMaxSeqn;
+                break;
+
+
+
                 UserSeqnMapIt uit = m_MaxSeqnMap.find(storeid);
                 if (uit==m_MaxSeqnMap.end()) {
                     break;
@@ -485,6 +521,8 @@ private:
                     }
                     break;
                 } else { // find sk
+
+                    LOG(INFO) << "XMsgClient::GUpdateUserSeqn =======>>>SyncOneGroupData uid:" << m_uid << ", time:" << skit->second;
                     if (skit->second > SYNC_DATA_RETRY_TIMES) { // has try sync data 5 times
                         // if curseqn < maxseqn, drop current seqn sync, itCurSeqn->second += 1;
                         // sync the next one
@@ -560,6 +598,8 @@ private:
 
     rtc::CriticalSection    m_csWait4CheckSeqnKey;
 
+    int64                   m_syncGroupDataMaxSeqn;
+    int64                   m_syncDataMaxSeqn;
 
 };
 

@@ -7,6 +7,7 @@
 //
 
 #include <list>
+#include <sys/time.h>
 #include "DRTTransferSession.h"
 #include "DRTConnManager.h"
 #include "RTUtils.hpp"
@@ -189,7 +190,7 @@ void DRTTransferSession::OnRedisEvent(const char*pData, int nLen)
         std::string v = m_RecvMsgBuf.front();
         RTTransfer::DoProcessData(v.c_str(), v.length());
         m_RecvMsgBuf.pop();
-        LI("DRTTransferSession::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, m_RecvMsgBuf.size:%d\n", v.length(), m_RecvMsgBuf.size());
+        //LI("DRTTransferSession::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, m_RecvMsgBuf.size:%d\n", v.length(), m_RecvMsgBuf.size());
     }
 
     if (m_IsValid && m_RecvMsgBuf.size()>0)
@@ -206,7 +207,7 @@ void DRTTransferSession::OnRecvMessage(const char*message, int nLen)
     //write redis to store msg
     std::string s(message, nLen);
     m_RecvMsgBuf.push(s);
-    LI("SRTTransferSession::OnRecvMessage nLen:%d, m_RecvMsgBuf:%d\n", nLen, m_RecvMsgBuf.size());
+    //LI("SRTTransferSession::OnRecvMessage nLen:%d, m_RecvMsgBuf:%d\n", nLen, m_RecvMsgBuf.size());
     if (m_IsValid)
         this->NotifyRedis();
 #else
@@ -404,6 +405,10 @@ void DRTTransferSession::OnTypeQueue(const std::string& str)
         }
     }
 #else
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+
+    LI("DRTTransferSession::OnTypeQueue ----auser:%s,---time:%lld\n", auser.users(0).c_str(), (long long)tv.tv_sec);
     std::string sd = rmsg.SerializeAsString();
     m_msgDispatch.SendData(sd.c_str(), (int)sd.length());
 #endif

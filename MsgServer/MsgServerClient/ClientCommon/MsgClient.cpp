@@ -443,7 +443,7 @@ void MsgClient::OnCmdCallback(int code, int cmd, const std::string& groupid, con
 void MsgClient::OnRecvMsg(int64 seqn, const std::string& msg)
 {
     UpdateLocalSeqn(m_strUserId, seqn);
-    UpdateSeqnToDb(m_strUserId, seqn);
+    //////UpdateSeqnToDb(m_strUserId, seqn);
 
     pms::Entity entity;
     if (!entity.ParseFromString(msg)) {
@@ -523,7 +523,7 @@ void MsgClient::OnRecvMsg(int64 seqn, const std::string& msg)
 void MsgClient::OnRecvGroupMsg(int64 seqn, const std::string& seqnid, const std::string& msg)
 {
     UpdateLocalSeqn(seqnid, seqn);
-    UpdateSeqnToDb(seqnid, seqn);
+    ///////UpdateSeqnToDb(seqnid, seqn);
 
     pms::Entity entity;;
     if (!entity.ParseFromString(msg)) {

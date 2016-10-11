@@ -198,7 +198,7 @@ void CRTTransferSession::OnRedisEvent(const char*pData, int nLen)
         std::string v = m_RecvMsgBuf.front();
         RTTransfer::DoProcessData(v.c_str(), v.length());
         m_RecvMsgBuf.pop();
-        LI("CRTTransferSession::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, m_RecvMsgBuf.size:%d\n", v.length(), m_RecvMsgBuf.size());
+        //LI("CRTTransferSession::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, m_RecvMsgBuf.size:%d\n", v.length(), m_RecvMsgBuf.size());
     }
 
     if (m_IsValid && m_RecvMsgBuf.size()>0)
@@ -213,7 +213,7 @@ void CRTTransferSession::OnRecvMessage(const char*message, int nLen)
     //write redis to store msg
     std::string s(message, nLen);
     m_RecvMsgBuf.push(s);
-    LI("CRTTransferSession::OnRecvMessage nLen:%d, m_RecvMsgBuf:%d\n", nLen, m_RecvMsgBuf.size());
+    //LI("CRTTransferSession::OnRecvMessage nLen:%d, m_RecvMsgBuf:%d\n", nLen, m_RecvMsgBuf.size());
     if (m_IsValid)
         this->NotifyRedis();
 #else
@@ -320,7 +320,6 @@ void CRTTransferSession::OnTypeDispatch(const std::string& str)
 {
 #if DEF_PROTO
     pms::RelayMsg dmsg;
-    LI("%s was called\n", __FUNCTION__);
     if (!dmsg.ParseFromString(str)) {
         LE("OnTypeDispatch dmsg.ParseFromString error\n");
         return;

@@ -10,6 +10,9 @@
 #include "ClientManager.h"
 #include "RTUtils.hpp"
 #include "rtklog.h"
+#include "webrtc/base/logging.h"
+
+#include <sys/time.h>
 
 static long s_send_msg_times = 0;
 static long s_recv_msg_times = 0;
@@ -107,11 +110,16 @@ void ClientSession::OnSendMessage(const std::string& msgId, int code)
 void ClientSession::OnRecvTxtMessage(MSMessage* txtMsg)
 {
     //LI("%s was called, msg:%s\n", __FUNCTION__, txtMsg->GetContent().c_str());
+
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+
     char buf[256] = {0};
-    sprintf(buf, "Grp:%s:Usr:%s:%ld\n", mGroupId.c_str(), mUserId.c_str(), s_recv_msg_times++);
+    sprintf(buf, "Grp:%s:Usr:%s:%ld:time:%lld\n", mGroupId.c_str(), mUserId.c_str(), s_recv_msg_times++, (long long)tv.tv_sec);
     fwrite(buf, 1, strlen(buf), mRecvLog);
     fflush(mRecvLog);
-    LI("%s was called, userid:%s, recv msg times:%ld\n", __FUNCTION__, mUserId.c_str(), s_recv_msg_times);
+    //LI("%s was called, userid:%s, recv msg times:%ld, time:%lld\n", __FUNCTION__, mUserId.c_str(), s_recv_msg_times, (long long)tv.tv_sec);
+    LOG(INFO) << buf;
 
 }
 
@@ -245,11 +253,19 @@ int ClientSession::SendGroupMsg(const std::string& groupid, const std::string& m
     txtMsg->SetContent(msg);
     txtMsg->SetPush(0);
     const char* msgid = mMessageManager->SendTxtMsg(txtMsg);
-    if (!msgid) return -1;
+    if (!msgid)
+    {
+        delete txtMsg;
+        txtMsg = nullptr;
+        return -1;
+    }
+
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
 
     char buf[256] = {0};
-    sprintf(buf, "Grp:%s:Usr:%s:%ld\n", mGroupId.c_str(), mUserId.c_str(), s_send_msg_times++);
-    LI("ClientSession::SendGroupMsg write log msg:%s\n", buf);
+    sprintf(buf, "Grp:%s:Usr:%s:%ld:time:%lld\n", mGroupId.c_str(), mUserId.c_str(), s_send_msg_times++, (long long)tv.tv_sec);
+    //LI("ClientSession::SendGroupMsg write log msg:%s\n", buf);
     size_t n = fwrite(buf, 1, strlen(buf), mSendLog);
     fflush(mSendLog);
 
@@ -257,6 +273,11 @@ int ClientSession::SendGroupMsg(const std::string& groupid, const std::string& m
     {
          free((void*)msgid);
          msgid = nullptr;
+    }
+    if (txtMsg)
+    {
+         delete txtMsg;
+         txtMsg = nullptr;
     }
     return 0;
 }

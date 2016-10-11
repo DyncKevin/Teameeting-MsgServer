@@ -81,71 +81,91 @@ void SRTStorageRedis::Unin()
 void SRTStorageRedis::OnWakeupEvent(const void*pData, int nSize)
 {
     if (m_QueuePostMsg.size()==0) return;
-    pms::StorageMsg store = m_QueuePostMsg.front();
 
-    if (store.sequence()==store.sdmaxseqn())
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+
+
+    if (m_QueuePostMsg.size()>0)
     {
-        //LI("SRTStorageRedis::OnWakeupEvent ruserid:%s, storeid:%s, sequence:%lld, sdmaxseqn:%lld\n", store.ruserid().c_str(), store.storeid().c_str(), store.sequence(), store.sdmaxseqn());
-        // 1, clean up
-        for (int i=0;i<PACKED_MSG_ONCE_NUM;++i)
+        pms::StorageMsg store = m_QueuePostMsg.front();
+
+        LI("SRTStorageRedis::OnWakeupEvent was enter called, ruserid:%s, storeid:%s, sequence:%lld, sdmaxseqn:%lld\n"\
+                , store.ruserid().c_str()\
+                , store.storeid().c_str()\
+                , store.sequence(), store.sdmaxseqn());
+        if (store.sequence()==store.sdmaxseqn())
         {
-            m_ReadedMsg.mutable_msgs(i)->Clear();
-        }
-        *store.mutable_content() = "";
-        // 2, get msg and store
-        int times = 1;
-        ProcessRead(&store, times);
-        // 3, send back
-        if (m_RedisGroup)
-        {
-            m_RedisGroup->PostData(store.SerializeAsString());
-        }
-    } else {
-        int64 s = store.sequence(), ms = store.sdmaxseqn();
-        int count = ms-s;// the msg numbers client can sync
-        // because when the sequence == sdmaxseqn, this 'sequence' is the msg you wanted
-        // if sequence < sdmaxseqn, this 'sequence' is the client's current sequence
-        // so here sequence+1
-        store.set_sequence(s+1);
-        for(int j=0;j<=count;j+=PACKED_MSG_ONCE_NUM)
-        {
-            //LI("SRTStorageRedis::OnWakeupEvent ruserid:%s, storeid:%s, sequence:%lld, sdmaxseqn:%lld, s:%lld, ms:%lld, count:%d, j:%d\n"\
+            LI("SRTStorageRedis::OnWakeupEvent ruserid:%s, storeid:%s, sequence:%lld, sdmaxseqn:%lld, time:%lld\n"\
                     , store.ruserid().c_str()\
+                    , store.storeid().c_str()\
+                    , store.sequence(), store.sdmaxseqn()\
+                    , (long long)tv.tv_sec);
+            // 1, clean up
+            for (int i=0;i<PACKED_MSG_ONCE_NUM;++i)
+            {
+                m_ReadedMsg.mutable_msgs(i)->Clear();
+            }
+            *store.mutable_content() = "";
+            // 2, get msg and store
+            int times = 1;
+            ProcessRead(&store, times);
+            // 3, send back
+            if (m_RedisGroup)
+            {
+                m_RedisGroup->PostData(store.SerializeAsString());
+            }
+        } else {
+            int64 s = store.sequence(), ms = store.sdmaxseqn();
+            int count = ms-s;// the msg numbers client can sync
+            // because when the sequence == sdmaxseqn, this 'sequence' is the msg you wanted
+            // if sequence < sdmaxseqn, this 'sequence' is the client's current sequence
+            // so here sequence+1
+            //for(int j=0;j<=count;j+=PACKED_MSG_ONCE_NUM)
+            while(count>0)
+            {
+
+                //at most, sync PACKED_MSG_ONCE_NUM msgs once, if more msgs, then sync more times
+                int times = (count < PACKED_MSG_ONCE_NUM)?(count):(PACKED_MSG_ONCE_NUM);
+                LI("SRTStorageRedis::OnWakeupEvent ruserid:%s, storeid:%s, sequence:%lld, sdmaxseqn:%lld, s:%lld, ms:%lld, count:%d, times:%d, time:%lld\n"\
+                , store.ruserid().c_str()\
                     , store.storeid().c_str()\
                     , store.sequence()\
                     , store.sdmaxseqn()\
                     , s\
                     , ms\
                     , count\
-                    , j);
-            //at most, sync PACKED_MSG_ONCE_NUM msgs once, if more msgs, then sync more times
-            int times = (count < PACKED_MSG_ONCE_NUM)?(count):(PACKED_MSG_ONCE_NUM);
-            // 1, clean up
-            for (int i=0;i<PACKED_MSG_ONCE_NUM;++i)
-            {
-                m_ReadedMsg.mutable_msgs(i)->Clear();
-            }
-            // clean last useless msg
-            store.set_sequence(s+j);
-            *store.mutable_content() = "";
-            // 2, get msg and store
-            ProcessRead(&store, times);
-            //LI("SRTStorageRedis::OnWakeupEvent times:%d, store.content.length:%d\n", times, store.content().length());
-            // 3, send back
-            if (m_RedisGroup)
-            {
-                m_RedisGroup->PostData(store.SerializeAsString());
+                    , times\
+                    , (long long)tv.tv_sec);
+                // 1, clean up
+                for (int i=0;i<PACKED_MSG_ONCE_NUM;++i)
+                {
+                    m_ReadedMsg.mutable_msgs(i)->Clear();
+                }
+                // clean last useless msg
+                //store.set_sequence(s+j);
+                *store.mutable_content() = "";
+                // 2, get msg and store
+                store.set_sequence(store.sequence()+1);
+                ProcessRead(&store, times);
+                count -= times;
+                //LI("SRTStorageRedis::OnWakeupEvent times:%d, store.content.length:%d\n", times, store.content().length());
+                // 3, send back
+                if (m_RedisGroup)
+                {
+                    m_RedisGroup->PostData(store.SerializeAsString());
+                }
             }
         }
-    }
 
-    {
-        OSMutexLocker locker(&m_MutexRecvPost);
-        m_QueuePostMsg.pop();
-    }
-    if (m_QueuePostMsg.size()>0)
-    {
-        this->Signal(Task::kWakeupEvent);
+        {
+            OSMutexLocker locker(&m_MutexRecvPost);
+            m_QueuePostMsg.pop();
+        }
+        if (m_QueuePostMsg.size()>0)
+        {
+            this->Signal(Task::kWakeupEvent);
+        }
     }
 }
 
@@ -153,20 +173,23 @@ void SRTStorageRedis::OnWakeupEvent(const void*pData, int nSize)
 void SRTStorageRedis::OnTickEvent(const void*pData, int nSize)
 {
     if (m_QueuePushMsg.size()==0) return;
-    pms::StorageMsg store = m_QueuePushMsg.front();
-    ProcessWrite(&store);
-    if (m_RedisGroup)
-    {
-        m_RedisGroup->PushData(store.SerializeAsString());
-    }
-
-    {
-        OSMutexLocker locker(&m_MutexRecvPush);
-        m_QueuePushMsg.pop();
-    }
     if (m_QueuePushMsg.size()>0)
     {
-        this->Signal(Task::kIdleEvent);
+        pms::StorageMsg store = m_QueuePushMsg.front();
+        ProcessWrite(&store);
+        if (m_RedisGroup)
+        {
+            m_RedisGroup->PushData(store.SerializeAsString());
+        }
+
+        {
+            OSMutexLocker locker(&m_MutexRecvPush);
+            m_QueuePushMsg.pop();
+        }
+        if (m_QueuePushMsg.size()>0)
+        {
+            this->Signal(Task::kIdleEvent);
+        }
     }
 }
 
@@ -202,8 +225,9 @@ int SRTStorageRedis::ProcessRead(pms::StorageMsg* store, int times)
 {
     for (int i=0;i<times;++i)
     {
-        store->set_sequence(store->sequence()+i);// modify the sequence, which msg you sync
-
+        if (i > 0) {
+            store->set_sequence(store->sequence()+1);// modify the sequence, which msg you sync
+        }
         std::string str("");
         char key[512] = {'\0'};
         if (store->mflag()==pms::EMsgFlag::FGROUP)
@@ -213,10 +237,13 @@ int SRTStorageRedis::ProcessRead(pms::StorageMsg* store, int times)
         {
             sprintf(key, "sgl:%s:%lld", store->storeid().c_str(), store->sequence());
         } else {
+
+            LI("SRTStorageRedis::OnWakeupEvent ruserid:%s, store->mflag:%d is not group or single, os Err_Redis_Key_Not_Exist\n", store->ruserid().c_str(), store->mflag());
             store->set_result(Err_Redis_Key_Not_Exist);// key is not exists
             continue;
         }
 
+        LI("SRTStorageRedis::OnWakeupEvent ruserid:%s, store->sequence:%lld, times:%d\n", store->ruserid().c_str(), store->sequence(), times);
         // grp:store->d:mtype:push:sequence
         m_RedisDBIdx->CreateDBIndex(key, APHash, CACHE_TYPE_1);
         if (m_xRedisClient.exists(*m_RedisDBIdx, key))
@@ -260,6 +287,7 @@ int SRTStorageRedis::ProcessRead(pms::StorageMsg* store, int times)
                 *store->mutable_content() = str;
             }
         } else {
+            LI("SRTStorageRedis::OnWakeupEvent ruserid:%s, key:%s is not fucking exists, os Err_Redis_Key_Not_Exist\n", store->ruserid().c_str(), key);
             store->set_result(Err_Redis_Key_Not_Exist);// key is not exists
             *store->mutable_content() = str;
         }

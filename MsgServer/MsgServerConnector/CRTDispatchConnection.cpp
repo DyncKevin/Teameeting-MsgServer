@@ -12,6 +12,8 @@
 #include "CRTConnectionTcp.h"
 #include "rtklog.h"
 
+#include <sys/time.h>
+
 
 void CRTDispatchConnection::DispatchMsg(const std::string& uid, pms::RelayMsg& r_msg)
 {
@@ -24,7 +26,7 @@ void CRTDispatchConnection::DispatchMsg(const std::string& uid, pms::RelayMsg& r
                 || r_msg.handle_data().length()==0 \
                 ||  r_msg.handle_data().compare("1")!=0)
         {
-            LE("CRTDispatchConnection::DispatchMsg this type of message is no need to push, so return\n");
+            //LE("CRTDispatchConnection::DispatchMsg this type of message is no need to push, so return\n");
             return;
         }
 
@@ -32,7 +34,7 @@ void CRTDispatchConnection::DispatchMsg(const std::string& uid, pms::RelayMsg& r
         // user set mute notification
         if (!CRTConnManager::Instance().CouldPush(uid, r_msg.cont_module()))
         {
-            LE("CRTDispatchConnection::DispatchMsg user set do not accept push or mute notify, so return\n");
+            //LE("CRTDispatchConnection::DispatchMsg user set do not accept push or mute notify, so return\n");
             return;
         }
         // get redis setting enablepush
@@ -52,7 +54,7 @@ void CRTDispatchConnection::DispatchMsg(const std::string& uid, pms::RelayMsg& r
             std::string s = t_msg.SerializeAsString();
             pmodule->pModule->SendTransferData(s.c_str(), (int)s.length());
         } else {
-            LE("CRTDispatchConnection::DispatchMsg module pusher is not liveeeeeeeeeeee!!!\n");
+            //LE("CRTDispatchConnection::DispatchMsg module pusher is not liveeeeeeeeeeee!!!\n");
         }
         return;
     } else { //!pci
@@ -63,6 +65,10 @@ void CRTDispatchConnection::DispatchMsg(const std::string& uid, pms::RelayMsg& r
                     c->SendDispatch(uid, r_msg.content());
                 }
             } else if (pci->_connType == pms::EConnType::TTCP) {
+                struct timeval tv;
+                gettimeofday(&tv, NULL);
+
+                LI("CRTDispatchConnection::DispatchMsg to user:%s, time:%lld, rmsg.content.length:%d\n", uid.c_str(), (long long)tv.tv_sec, r_msg.content().length());
                 CRTConnectionTcp *ct = dynamic_cast<CRTConnectionTcp*>(pci->_pConn);
                 if (ct) {
                     ct->SendDispatch(uid, r_msg.content());

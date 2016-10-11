@@ -167,7 +167,7 @@ void CRTConnManager::ConnectionLostNotify(const std::string& uid, const std::str
     if (pmi && pmi->pModule) {
         pmi->pModule->ConnectionLostNotify(uid, token);
     } else {
-        LE("ConnectionLostNotify not find meeting module!!!\n");
+        LE("ConnectionLostNotify not find mlive module!!!\n");
         Assert(false);
     }
     pmi = findModuleInfo(uid, pms::ETransferModule::MMSGQUEUE);

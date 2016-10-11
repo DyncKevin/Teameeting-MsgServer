@@ -7,6 +7,7 @@
 //
 
 #include <list>
+#include <sys/time.h>
 #include "LRTTransferSession.h"
 #include "RTUtils.hpp"
 #include "LRTConnManager.h"
@@ -245,7 +246,7 @@ void LRTTransferSession::OnRedisEvent(const char*pData, int nLen)
         std::string v = m_RecvMsgBuf.front();
         RTLstorage::DoProcessData(v.c_str(), v.length());
         m_RecvMsgBuf.pop();
-        LI("LRTTransferSession::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, m_RecvMsgBuf:%d\n", v.length(), m_RecvMsgBuf.size());
+        //LI("LRTTransferSession::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, m_RecvMsgBuf:%d\n", v.length(), m_RecvMsgBuf.size());
     }
 
     if (m_IsValid && m_RecvMsgBuf.size()>0)
@@ -260,7 +261,7 @@ void LRTTransferSession::OnRecvMessage(const char*message, int nLen)
     //write redis to store msg
     std::string s(message, nLen);
     m_RecvMsgBuf.push(s);
-    LI("SRTTransferSession::OnRecvMessage nLen:%d, s.len:%d, m_RecvMsgBuf:%d\n", nLen, s.length(), m_RecvMsgBuf.size());
+    //LI("SRTTransferSession::OnRecvMessage nLen:%d, s.len:%d, m_RecvMsgBuf:%d\n", nLen, s.length(), m_RecvMsgBuf.size());
     if (m_IsValid)
         this->NotifyRedis();
 #else
@@ -624,7 +625,7 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
             {
                 break;
             }
-            LI("LRTTransferSession::OnTypeReadRequest was called, SYNCSEQN ruserid:%s\n", store.msgs(i).ruserid().c_str());
+            //LI("LRTTransferSession::OnTypeReadRequest was called, SYNCSEQN ruserid:%s\n", store.msgs(i).ruserid().c_str());
 
             // first get seqn from local server
             // if not find seqn in local server,
@@ -632,7 +633,7 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
             int64 seqn = -1;
             if (LRTLogicalManager::Instance().ReadLocalSeqn(store.mutable_msgs(i), &seqn))
             {
-				LI("LRTTransferSession::OnTypeReadRequest was called, SYNCSEQN ruserid:%s, read local seqn:%lld\n", store.msgs(i).ruserid().c_str(), seqn);
+				//LI("LRTTransferSession::OnTypeReadRequest was called, SYNCSEQN ruserid:%s, read local seqn:%lld\n", store.msgs(i).ruserid().c_str(), seqn);
                 // update max seqn
                 if (seqn<0) continue;
                 store.mutable_msgs(i)->set_maxseqn(seqn);
@@ -641,7 +642,7 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
                 char msgid[16] = {0};
                 sprintf(msgid, "rs:%u", m_tmpRSeqnId++);
                 store.mutable_msgs(i)->set_msgid(msgid);
-				LI("LRTTransferSession::OnTypeReadRequest was called, SYNCSEQN ruserid:%s, read remote redis seqn, msgid:%s\n", store.msgs(i).ruserid().c_str(), msgid);
+				//LI("LRTTransferSession::OnTypeReadRequest was called, SYNCSEQN ruserid:%s, read remote redis seqn, msgid:%s\n", store.msgs(i).ruserid().c_str(), msgid);
                 LRTLogicalManager::Instance().InsertSeqnRead(this, store.mutable_msgs(i));
                 s_store.add_msgs()->MergeFrom(store.msgs(i));
             }
@@ -665,7 +666,7 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
             {
                 break;
             }
-            LI("LRTTransferSession::OnTypeReadRequest was called, SYNCDATA ruserid:%s\n", store.msgs(i).ruserid().c_str());
+            //LI("LRTTransferSession::OnTypeReadRequest was called, SYNCDATA ruserid:%s\n", store.msgs(i).ruserid().c_str());
 
             // first get seqn from local server
             // if not find seqn in local server,
@@ -692,17 +693,20 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
 				store.mutable_msgs(i)->set_msgid(msgid);
                 store.mutable_msgs(i)->set_sdmaxseqn(store.mutable_msgs(i)->sequence());
                 d_store.add_msgs()->MergeFrom(store.msgs(i));
-            } else { // this is from pusher CPGETDATA
+            } else {
                 // sync the client current seqn +1 data
+#if 0
                 int64 seqn = -1;
                 if (LRTLogicalManager::Instance().ReadLocalSeqn(store.mutable_msgs(i), &seqn))
                 {
                     // update max seqn
 
                     int64 s = store.msgs(i).sequence(), ms = seqn;
-                    LI("LRTTransferSession::OnTypeReadRequest CSYNCDATA read local, store.msgs(i).ruserid:%s, store.msgs(i).sequence:%lld, maxsequence:%lld\n"\
+                    LI("LRTTransferSession::OnTypeReadRequest CSYNCDATA read local\
+                            , store.msgs(i).ruserid:%s, store.msgs(i).sequence:%lld, sdmaxseqn:%lld, maxsequence:%lld\n"\
                             , store.msgs(i).ruserid().c_str()\
                             , store.msgs(i).sequence()\
+                            , store.msgs(i).sdmaxseqn()
                             , ms);
                     // ???????? shoule be eauql here?
                     if (ms<s)continue;
@@ -727,6 +731,20 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
                     store.mutable_msgs(i)->set_maxseqn(store.mutable_msgs(i)->sequence()); // is this ok?right?
                     s_store.add_msgs()->MergeFrom(store.msgs(i));
                 }
+#else
+                struct timeval tv;
+                gettimeofday(&tv, NULL);
+
+                LI("LRTTransferSession::OnTypeReadRequest ====>>>CSYNCDATA read local, store.msgs(i).ruserid:%s, store.msgs(i).sequence:%lld, sdmaxseqn:%lld, time:%lld\n"\
+                        , store.msgs(i).ruserid().c_str()\
+                        , store.msgs(i).sequence()\
+                        , store.msgs(i).sdmaxseqn()\
+                        , (long long)tv.tv_sec);
+                char msgid[16] = {0};
+                sprintf(msgid, "rd:%u", m_tmpRDataId++);
+                store.mutable_msgs(i)->set_msgid(msgid);
+                d_store.add_msgs()->MergeFrom(store.msgs(i));
+#endif
             } // this is for others
         }
         if (d_store.msgs_size()>0)
@@ -760,7 +778,7 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
             {
                 break;
             }
-            LI("LRTTransferSession::OnTypeReadRequest was called, PGETDATA ruserid:%s\n", store.msgs(i).ruserid().c_str());
+            //LI("LRTTransferSession::OnTypeReadRequest was called, PGETDATA ruserid:%s\n", store.msgs(i).ruserid().c_str());
             // because pusher has give the pointed sequence, so sync data request directly
             // this should be ok
             {
@@ -793,7 +811,6 @@ void LRTTransferSession::OnTypeReadResponse(const std::string& str)
     pms::RelayMsg rmsg;
     if (!rmsg.ParseFromString(str)) return;
 
-	LI("LRTTransferSession::OnTypeReadResponse was called, rmsg.svr_cmd:%d\n", rmsg.svr_cmds());
     if (rmsg.svr_cmds()==pms::EServerCmd::CSEQN)
     {
         pms::PackedStoreMsg store, d_store;
@@ -853,6 +870,12 @@ void LRTTransferSession::OnTypeReadResponse(const std::string& str)
                 //TODO:
                 if (pMd->pModule && pMd->pModule->IsLiveSession())
                 {
+                    struct timeval tv;
+                    gettimeofday(&tv, NULL);
+
+                    LI("LRTTransferSession::OnTypeReadResponse was called, CDATA ruserid:%s, time:%lld\n"\
+                            , store.msgs(i).ruserid().c_str()\
+                            , (long long)tv.tv_sec);
                      pMd->pModule->PushReadMsg(store.msgs(i));
                 }
             } else {

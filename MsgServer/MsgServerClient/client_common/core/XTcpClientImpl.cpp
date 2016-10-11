@@ -9,6 +9,8 @@
 #include "webrtc/base/win32socketserver.h"
 #endif
 
+#include <sys/time.h>
+
 #ifdef WEBRTC_ANDROID
 #include <android/log.h>
 #define  LOG_TAG    "XTcpClientImpl"
@@ -19,6 +21,7 @@
 const int kDefaultServerPort = 80;
 const int kReconnectDelay = 2000;
 const int kTryReconnectDelay = 3000;
+const int kNotifyDelay = 1;
 const int kBufferSizeInBytes = 2048;
 
 rtc::AsyncSocket* CreateClientSocket(int family) {
@@ -177,6 +180,24 @@ void XTcpClientImpl::OnMessage(rtc::Message* msg)
             rtc::Thread::Current()->PostDelayed(RTC_FROM_HERE, kReconnectDelay, this, 0);
         }
     }
+    else if (msg->message_id == 1002)
+    {
+        m_rCallback.OnClientSyncSeqn();
+    }
+    else if (msg->message_id == 1003)
+    {
+        if (msg->pdata) {
+            RelayedMsgData* pd = static_cast< RelayedMsgData* >(msg->pdata);
+            if (pd) {
+                //LOG(INFO) << "XTcpClientImpl::OnMessage OnClientSyncGroupSeqn msg->pdata " << pd->data();
+                m_rCallback.OnClientSyncGroupSeqn(pd->data());
+            }
+            delete pd;
+            pd = nullptr;
+        } else {
+            LOG(LERROR) << "XTcpClientImpl::OnMessage OnClientSyncGroupSeqn msg->pdata is null";
+        }
+    }
 }
 
 void XTcpClientImpl::DoResolver()
@@ -195,6 +216,8 @@ void XTcpClientImpl::DoConnect()
 {
 	m_nState = CONNECTTING;
 	m_asynSock.reset(CreateClientSocket(m_svrSockAddr.ipaddr().family()));
+    // 1024*1024*16 // 16M
+    m_asynSock->SetOption(rtc::Socket::Option::OPT_RCVBUF, 1024*1024*16);
 	InitSocketSignals();
 
 	bool ret = ConnectControlSocket();
@@ -241,6 +264,19 @@ bool XTcpClientImpl::ConnectControlSocket()
 	return true;
 }
 
+void XTcpClientImpl::NotifySyncSeqn()
+{
+
+    rtc::Thread::Current()->PostDelayed(RTC_FROM_HERE, kNotifyDelay, this, 1002);
+}
+
+void XTcpClientImpl::NotifySyncGroupSeqn(const std::string& storeid)
+{
+    RelayedMsgData *pd = new RelayedMsgData(storeid);
+    rtc::Thread::Current()->PostDelayed(RTC_FROM_HERE, kNotifyDelay, this, 1003, pd);
+}
+
+
 
 void XTcpClientImpl::OnConnect(rtc::AsyncSocket* socket)
 {
@@ -250,14 +286,17 @@ void XTcpClientImpl::OnConnect(rtc::AsyncSocket* socket)
 
 void XTcpClientImpl::OnRead(rtc::AsyncSocket* socket)
 {
-	char buffer[0xffff];
+	char buffer[1024*512];
     int64_t timestamp = 0;
+    int i=0;
+
 	do {
 		int bytes = socket->Recv(buffer, sizeof(buffer), &timestamp);
 		if (bytes <= 0)
 			break;
 		m_rCallback.OnMessageRecv(buffer, bytes);
-	} while (true);
+	//} while (true);
+	} while (i++ < 30);
 }
 
 void XTcpClientImpl::OnClose(rtc::AsyncSocket* socket, int err)

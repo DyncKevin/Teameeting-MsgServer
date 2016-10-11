@@ -2,8 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "core/XJSBuffer.h"
+#include "webrtc/base/logging.h"
 
-#define REQUEST_BUFFER_SIZE_IN_BYTES_32 (1024*1024*16)
+//#define REQUEST_BUFFER_SIZE_IN_BYTES_32 (1024*1024*32)
+#define REQUEST_BUFFER_SIZE_IN_BYTES_32 (1024*1024*1) // 1M
 
 void XJSBuffer::writeShort(char** pptr, unsigned short anInt)
 {
@@ -65,6 +67,7 @@ void XJSBuffer::RecvData(const char*data, int size)
 		int parsed = 0;
 		if (m_pBuffer[0] != '$')
 		{// Hase error!
+            LOG(INFO) << "XJSBuffer::RecvData m_pBuffer[0] is notnotnotnotnotnotno $, m_nBufOffet:" << m_nBufOffset;
 			parsed = m_nBufOffset;
 		}
 		else
@@ -78,6 +81,7 @@ void XJSBuffer::RecvData(const char*data, int size)
 			}
 			else
 			{
+                LOG(INFO) << "XJSBuffer::RecvData packLen:" << packLen << " +3 >>>>>>>>>>>>>>>>> m_nBufOffset, so break, m_nBufOffet:" << m_nBufOffset;
 				break;
 			}
 		}
