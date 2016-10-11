@@ -22,7 +22,6 @@ CRTConnTcp::~CRTConnTcp()
 
 int CRTConnTcp::DoProcessData(const char* pData, int nLen)
 {
-#if DEF_PROTO
     std::string msg(pData, nLen);
     pms::MsgReq request;
     if (!request.ParseFromString(msg)) {
@@ -55,9 +54,6 @@ int CRTConnTcp::DoProcessData(const char* pData, int nLen)
     } else {
         LE("parse MsgReq params error\n");
     }
-#else
-    LE("not define DEF_PROTO\n");
-#endif
     return nLen;
 }
 

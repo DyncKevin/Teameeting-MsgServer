@@ -11,7 +11,6 @@
 #define M_HTTP_CMD_GET_MEETING_INFO     (1)
 #define M_HTTP_CMD_GET_MEMBER_LIST      (2)
 
-#define DEF_PROTO 1
 #include "ProtoCommon.h"
 
 class MRTHttpSvrConn : public RTHttpSvrConn, public RTObserverConnection

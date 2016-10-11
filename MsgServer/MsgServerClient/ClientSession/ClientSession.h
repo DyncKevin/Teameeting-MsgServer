@@ -20,7 +20,6 @@
 #include "MSClientManager.h"
 #include "MSMessageManager.h"
 
-#define DEF_PROTO 1
 #include "client_common/proto/common_msg.pb.h"
 #include "client_common/proto/entity_msg.pb.h"
 #include "client_common/proto/entity_msg_type.pb.h"

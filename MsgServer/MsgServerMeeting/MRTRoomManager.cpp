@@ -434,12 +434,9 @@ void MRTRoomManager::ProcessTickEvent(const char*pData, int nLen)
 
 int MRTRoomManager::ChangeToJson(const std::string from, std::string& users)
 {
-#if DEF_PROTO
     pms::ToUser touser;
     touser.add_users(from);
     users = touser.SerializeAsString();
-#else
-#endif
     return 0;
 }
 
@@ -466,7 +463,6 @@ void MRTRoomManager::SendWaitingMsgs(MeetingRoomMapIt mit)
 
 void MRTRoomManager::OnGetMemberList(pms::RelayMsg& rmsg, pms::Entity& mmsg, std::string& data)
 {
-#if DEF_PROTO
     //* 1, Update room member list.
     //* 2, Set GetMembersStatus to Done, and notify other members(not in room) meeting is opened.
     //* 3, Check msgs list, and send to notify other members(not in room)
@@ -490,9 +486,6 @@ void MRTRoomManager::OnGetMemberList(pms::RelayMsg& rmsg, pms::Entity& mmsg, std
 
     it->second->SetGetMembersStatus(MRTMeetingRoom::GetMembersStatus::GMS_DONE);
     SendWaitingMsgs(it);
-#else
-    LE("not define DEF_PROTO\n");
-#endif
 }
 
 void MRTRoomManager::GenericResponse(pms::EServerCmd cmd, const pms::RelayMsg& rmsg, const pms::Entity& mmsg, const pms::ToUser* tos, std::string& response)
@@ -519,7 +512,6 @@ void MRTRoomManager::GenericConnLostResponse(const std::string& uid
                                             , const pms::ToUser* tos
                                             , std::string& response)
 {
-#if DEF_PROTO
     //LI("GenericConnLostResponse cont:%s\n", cont.c_str());
     pms::TransferMsg t_msg;
     pms::RelayMsg r_msg;
@@ -554,13 +546,10 @@ void MRTRoomManager::GenericConnLostResponse(const std::string& uid
     t_msg.set_type(pms::ETransferType::TQUEUE);
     t_msg.set_content(r_msg.SerializeAsString());
     response = t_msg.SerializeAsString();
-#else
-#endif
 }
 
 void MRTRoomManager::ResponseSndMsg(pms::EServerCmd cmd, const pms::RelayMsg& rmsg, const pms::Entity& mmsg, const pms::ToUser* tos,  std::string& response)
 {
-#if DEF_PROTO
     pms::TransferMsg t_msg;
     pms::RelayMsg r_msg;
     pms::MsgRep resp;
@@ -584,7 +573,4 @@ void MRTRoomManager::ResponseSndMsg(pms::EServerCmd cmd, const pms::RelayMsg& rm
     t_msg.set_type(pms::ETransferType::TQUEUE);
     t_msg.set_content(r_msg.SerializeAsString());
     response = t_msg.SerializeAsString();
-#else
-    LE("not define DEF_PROTO\n");
-#endif
 }

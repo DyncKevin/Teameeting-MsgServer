@@ -13,8 +13,6 @@
 #include "OS.h"
 
 
-#define MAX_PROCESS_MSG_ONCE 200
-
 static long long gRecvCounter = 0;
 static long long gSendCounter = 0;
 

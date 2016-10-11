@@ -20,7 +20,6 @@
 #include "RTType.h"
 #include "RTSingleton.h"
 
-#define DEF_PROTO 1
 #include "MsgServer/proto/storage_msg.pb.h"
 
 class PRTTransferSession;

@@ -11,7 +11,6 @@
 
 #include <stdio.h>
 
-#define DEF_PROTO 1
 #include "ProtoCommon.h"
 
 class CRTConnTcp {

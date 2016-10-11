@@ -10,8 +10,6 @@
 #include "SRTRedisManager.h"
 
 
-#define DEF_PROTO 1
-
 SRTResponseCollection::SRTResponseCollection(SRTRedisManager* manager, int reqType, int clientNum, const pms::StorageMsg& request, int64 seqn)
 : m_pRedisManager(manager)
 , m_ClientNum(clientNum)

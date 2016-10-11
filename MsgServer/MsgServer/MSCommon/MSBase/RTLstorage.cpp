@@ -21,7 +21,6 @@ RTLstorage::~RTLstorage()
 
 int RTLstorage::DoProcessData(const char *pData, int nLen)
 {
-#if DEF_PROTO
     pms::TransferMsg m_msg;
     const std::string msg(pData, nLen);
     if (!m_msg.ParseFromString(msg)) {
@@ -63,8 +62,5 @@ int RTLstorage::DoProcessData(const char *pData, int nLen)
             LE("invalid type::%d", m_msg.type());
         }
     }
-#else
-    LE("not define DEF_PROTO\n");
-#endif
     return nLen;
 }

@@ -90,7 +90,6 @@ void CRTTransferSession::TestConnection()
 
 void CRTTransferSession::EstablishConnection()
 {
-#if DEF_PROTO
     pms::TransferMsg t_msg;
     pms::ConnMsg c_msg;
 
@@ -104,9 +103,6 @@ void CRTTransferSession::EstablishConnection()
 
     std::string s = t_msg.SerializeAsString();
     SendTransferData(s.c_str(), (int)s.length());
-#else
-    LE("not define DEF_PROTO\n");
-#endif
 }
 
 void CRTTransferSession::SendTransferData(const char* pData, int nLen)
@@ -117,7 +113,6 @@ void CRTTransferSession::SendTransferData(const char* pData, int nLen)
 
 void CRTTransferSession::ConnectionLostNotify(const std::string& uid, const std::string& token)
 {
-#if DEF_PROTO
     pms::TransferMsg t_msg;
     pms::RelayMsg r_msg;
     pms::ToUser *pto = r_msg.mutable_touser();
@@ -132,14 +127,10 @@ void CRTTransferSession::ConnectionLostNotify(const std::string& uid, const std:
 
     const std::string s = t_msg.SerializeAsString();
     SendTransferData(s.c_str(), (int)s.length());
-#else
-    LE("not define DEF_PROTO\n");
-#endif
 }
 
 void CRTTransferSession::ConnectionConnNotify(const std::string& uid, const std::string& token)
 {
-#if DEF_PROTO
     pms::TransferMsg t_msg;
     pms::RelayMsg r_msg;
     pms::ToUser *pto = r_msg.mutable_touser();
@@ -155,14 +146,10 @@ void CRTTransferSession::ConnectionConnNotify(const std::string& uid, const std:
 
     const std::string s = t_msg.SerializeAsString();
     SendTransferData(s.c_str(), (int)s.length());
-#else
-    LE("not define DEF_PROTO\n");
-#endif
 }
 
 void CRTTransferSession::TransferMsg(pms::EServerCmd cmd, const std::string& msg)
 {
-#if DEF_PROTO
     pms::TransferMsg t_msg;
     pms::RelayMsg r_msg;
 
@@ -176,9 +163,6 @@ void CRTTransferSession::TransferMsg(pms::EServerCmd cmd, const std::string& msg
 
     const std::string s = t_msg.SerializeAsString();
     SendTransferData(s.c_str(), (int)s.length());
-#else
-    LE("not define DEF_PROTO\n");
-#endif
 }
 
 // from RTTcp
@@ -198,7 +182,6 @@ void CRTTransferSession::OnRedisEvent(const char*pData, int nLen)
         std::string v = m_RecvMsgBuf.front();
         RTTransfer::DoProcessData(v.c_str(), v.length());
         m_RecvMsgBuf.pop();
-        //LI("CRTTransferSession::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, m_RecvMsgBuf.size:%d\n", v.length(), m_RecvMsgBuf.size());
     }
 
     if (m_IsValid && m_RecvMsgBuf.size()>0)
@@ -213,7 +196,6 @@ void CRTTransferSession::OnRecvMessage(const char*message, int nLen)
     //write redis to store msg
     std::string s(message, nLen);
     m_RecvMsgBuf.push(s);
-    //LI("CRTTransferSession::OnRecvMessage nLen:%d, m_RecvMsgBuf:%d\n", nLen, m_RecvMsgBuf.size());
     if (m_IsValid)
         this->NotifyRedis();
 #else
@@ -230,7 +212,6 @@ void CRTTransferSession::OnTransfer(const std::string& str)
 
 void CRTTransferSession::OnMsgAck(pms::TransferMsg& tmsg)
 {
-#if DEF_PROTO
     pms::TransferMsg ack_msg;
     ack_msg.set_type(tmsg.type());
     ack_msg.set_flag(pms::ETransferFlag::FACK);
@@ -238,14 +219,10 @@ void CRTTransferSession::OnMsgAck(pms::TransferMsg& tmsg)
 
     const std::string s = ack_msg.SerializeAsString();
     OnTransfer(s);
-#else
-    LE("not define DEF_PROTO\n");
-#endif
 }
 
 void CRTTransferSession::OnTypeConn(const std::string& str)
 {
-#if DEF_PROTO
     LI("%s was called\n", __FUNCTION__);
     pms::ConnMsg c_msg;
     if (!c_msg.ParseFromString(str)) {
@@ -301,9 +278,6 @@ void CRTTransferSession::OnTypeConn(const std::string& str)
     } else {
         LE("%s invalid msg tag\n", __FUNCTION__);
     }
-#else
-    LE("not define DEF_PROTO\n");
-#endif
 }
 
 void CRTTransferSession::OnTypeTrans(const std::string& str)
@@ -318,7 +292,6 @@ void CRTTransferSession::OnTypeQueue(const std::string& str)
 
 void CRTTransferSession::OnTypeDispatch(const std::string& str)
 {
-#if DEF_PROTO
     pms::RelayMsg dmsg;
     if (!dmsg.ParseFromString(str)) {
         LE("OnTypeDispatch dmsg.ParseFromString error\n");
@@ -331,9 +304,6 @@ void CRTTransferSession::OnTypeDispatch(const std::string& str)
             m_dispatchConnection.DispatchMsg(to.users(i), dmsg);
         }
     }
-#else
-    LE("not define DEF_PROTO\n");
-#endif
 }
 
 void CRTTransferSession::OnTypePush(const std::string& str)

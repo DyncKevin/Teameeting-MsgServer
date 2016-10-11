@@ -15,7 +15,6 @@
 #include "RTObserverConnection.h"
 #include <queue>
 
-#define DEF_PROTO 1
 #include "ProtoCommon.h"
 
 class CRTConnectionTcp

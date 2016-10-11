@@ -22,7 +22,6 @@ LRTModuleConnTcp::~LRTModuleConnTcp()
 
 int LRTModuleConnTcp::DoProcessData(const char* pData, int nLen)
 {
-#if DEF_PROTO
     std::string msg(pData, nLen);
     pms::MsgReq request;
     if (!request.ParseFromString(msg)) {
@@ -45,9 +44,6 @@ int LRTModuleConnTcp::DoProcessData(const char* pData, int nLen)
     } else {
         LE("parse MsgReq params svr_cmds not handle:%d\n", request.svr_cmds());
     }
-#else
-    LE("not define DEF_PROTO\n");
-#endif
     return nLen;
 }
 

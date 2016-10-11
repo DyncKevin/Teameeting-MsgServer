@@ -14,7 +14,6 @@
 #include "rtklog.h"
 #include "OSMutex.h"
 
-#define DEF_PROTO 1
 #include "../../ProtoCommon.h"
 
 class RTLstorage{

@@ -43,7 +43,6 @@ static std::string GetStrMicroSecond()
 
 int XMsgProcesser::EncodeLogin(std::string& outstr, const std::string& userid, const std::string& token, const std::string& nname, const std::string& uuid, int devType, int enablePush, int module)
 {
-#if DEF_PROTO
     pms::MsgReq req;
     pms::Login login;
     login.set_usr_from(userid);
@@ -58,14 +57,11 @@ int XMsgProcesser::EncodeLogin(std::string& outstr, const std::string& userid, c
     req.set_mod_type((pms::EModuleType)module);
     req.set_content(login.SerializeAsString());
     outstr = req.SerializeAsString();
-#else
-#endif
     return 0;
 }
 
 int XMsgProcesser::EncodeSndMsg(std::string& outstr, std::string& outmsgid, const std::string& userid, const std::string& token, const std::string& nname, const std::string& roomid, const std::string& rname, const std::vector<std::string>& to, const std::string& msg, int tag, int type, int module, int flag, int push)
 {
-#if DEF_PROTO
     pms::MsgReq req;
     pms::Entity entity;
     entity.set_msg_head(pms::EMsgHead::HSND);
@@ -95,14 +91,11 @@ int XMsgProcesser::EncodeSndMsg(std::string& outstr, std::string& outmsgid, cons
     req.set_mod_type((pms::EModuleType)module);
     req.set_content(entity.SerializeAsString());
     outstr = req.SerializeAsString();
-#else
-#endif
     return 0;
 }
 
 int XMsgProcesser::EncodeGetMsg(std::string& outstr, const std::string& userid, const std::string& token, int tag, int module)
 {
-#if DEF_PROTO
     pms::MsgReq req;
     pms::Entity entity;
     entity.set_msg_tag((pms::EMsgTag)tag);
@@ -114,14 +107,11 @@ int XMsgProcesser::EncodeGetMsg(std::string& outstr, const std::string& userid, 
     req.set_mod_type((pms::EModuleType)module);
     req.set_content(entity.SerializeAsString());
     outstr = req.SerializeAsString();
-#else
-#endif
     return 0;
 }
 
 int XMsgProcesser::EncodeLogout(std::string& outstr, const std::string& userid, const std::string& token, int module)
 {
-#if DEF_PROTO
     pms::MsgReq req;
     pms::Logout logout;
     logout.set_usr_from(userid);
@@ -132,14 +122,11 @@ int XMsgProcesser::EncodeLogout(std::string& outstr, const std::string& userid, 
     req.set_mod_type((pms::EModuleType)module);
     req.set_content(logout.SerializeAsString());
     outstr = req.SerializeAsString();
-#else
-#endif
     return 0;
 }
 
 int XMsgProcesser::EncodeKeepAlive(std::string& outstr, const std::string& userid, int module)
 {
-#if DEF_PROTO
     pms::MsgReq req;
     pms::Keep keep;
     keep.set_usr_from(userid);
@@ -149,14 +136,11 @@ int XMsgProcesser::EncodeKeepAlive(std::string& outstr, const std::string& useri
     req.set_mod_type((pms::EModuleType)module);
     req.set_content(keep.SerializeAsString());
     outstr = req.SerializeAsString();
-#else
-#endif
     return 0;
 }
 
 int XMsgProcesser::EncodeSyncSeqn(std::string& outstr, const std::string& userid, const std::string& token, int64 seqn, int module, int tag, int flag, int role)
 {
-#if DEF_PROTO
     pms::MsgReq req;
     pms::StorageMsg store;
     store.set_rsvrcmd(pms::EServerCmd::CSYNCSEQN);
@@ -174,14 +158,11 @@ int XMsgProcesser::EncodeSyncSeqn(std::string& outstr, const std::string& userid
     req.set_mod_type((pms::EModuleType)module);
     req.set_content(store.SerializeAsString());
     outstr = req.SerializeAsString();
-#else
-#endif
     return 0;
 }
 
 int XMsgProcesser::EncodeSyncData(std::string& outstr, const std::string& userid, const std::string& token, int64 seqn, int64 sdmaxseqn, int module, int tag, int flag)
 {
-#if DEF_PROTO
     pms::MsgReq req;
     pms::StorageMsg store;
     store.set_rsvrcmd(pms::EServerCmd::CSYNCDATA);
@@ -199,14 +180,11 @@ int XMsgProcesser::EncodeSyncData(std::string& outstr, const std::string& userid
     req.set_mod_type((pms::EModuleType)module);
     req.set_content(store.SerializeAsString());
     outstr = req.SerializeAsString();
-#else
-#endif
     return 0;
 }
 
 int XMsgProcesser::EncodeSyncGroupSeqn(std::string& outstr, const std::string& userid, const std::string& groupid, const std::string& token, int64 seqn, int module, int tag, int flag, int role)
 {
-#if DEF_PROTO
     pms::MsgReq req;
     pms::StorageMsg store;
     store.set_rsvrcmd(pms::EServerCmd::CSYNCSEQN);
@@ -225,14 +203,11 @@ int XMsgProcesser::EncodeSyncGroupSeqn(std::string& outstr, const std::string& u
     req.set_mod_type((pms::EModuleType)module);
     req.set_content(store.SerializeAsString());
     outstr = req.SerializeAsString();
-#else
-#endif
     return 0;
 }
 
 int XMsgProcesser::EncodeSyncGroupData(std::string& outstr, const std::string& userid, const std::string& token, const std::string& groupid, int64 seqn, int64 sdmaxseqn, int module, int tag, int flag)
 {
-#if DEF_PROTO
     pms::MsgReq req;
     pms::StorageMsg store;
     store.set_rsvrcmd(pms::EServerCmd::CSYNCGROUPDATA);
@@ -251,8 +226,6 @@ int XMsgProcesser::EncodeSyncGroupData(std::string& outstr, const std::string& u
     req.set_mod_type((pms::EModuleType)module);
     req.set_content(store.SerializeAsString());
     outstr = req.SerializeAsString();
-#else
-#endif
     return 0;
 }
 
@@ -317,7 +290,6 @@ int XMsgProcesser::EncodeUpdateSetting(std::string& outstr, const std::string& u
 
 int XMsgProcesser::EncodeSyncOneData(std::string& outstr, const std::string& userid, const std::string& token, int64 seqn, int module, int tag, int flag)
 {
-#if DEF_PROTO
     pms::MsgReq req;
     pms::StorageMsg store;
     store.set_rsvrcmd(pms::EServerCmd::CSYNCONEDATA);
@@ -334,14 +306,11 @@ int XMsgProcesser::EncodeSyncOneData(std::string& outstr, const std::string& use
     req.set_mod_type((pms::EModuleType)module);
     req.set_content(store.SerializeAsString());
     outstr = req.SerializeAsString();
-#else
-#endif
     return 0;
 }
 
 int XMsgProcesser::EncodeSyncOneGroupData(std::string& outstr, const std::string& userid, const std::string& token, const std::string& groupid, int64 seqn, int module, int tag, int flag)
 {
-#if DEF_PROTO
     pms::MsgReq req;
     pms::StorageMsg store;
     store.set_rsvrcmd(pms::EServerCmd::CSYNCONEGROUPDATA);
@@ -359,8 +328,6 @@ int XMsgProcesser::EncodeSyncOneGroupData(std::string& outstr, const std::string
     req.set_mod_type((pms::EModuleType)module);
     req.set_content(store.SerializeAsString());
     outstr = req.SerializeAsString();
-#else
-#endif
     return 0;
 }
 
@@ -373,7 +340,6 @@ int XMsgProcesser::EncodeSyncOneGroupData(std::string& outstr, const std::string
 
 int XMsgProcesser::DecodeRecvData(const char* pData, int nLen)
 {
-#if DEF_PROTO
     const std::string strmsg(pData, nLen);
     pms::MsgRep resp;
     if (!resp.ParseFromString(strmsg)) {
@@ -440,8 +406,6 @@ int XMsgProcesser::DecodeRecvData(const char* pData, int nLen)
             LOG(LS_ERROR) << "invalid svr_cmds type:" << resp.svr_cmds();
             break;
     }
-#else
-#endif
     return nLen;
 }
 

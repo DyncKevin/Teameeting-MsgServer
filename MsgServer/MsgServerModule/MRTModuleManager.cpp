@@ -13,10 +13,7 @@
 #include "OS.h"
 
 
-#define DEF_PROTO 1
 #include "MsgServer/proto/storage_msg.pb.h"
-
-#define MAX_PROCESS_MSG_ONCE 200
 
 static long long gRecvCounter = 0;
 static long long gSendCounter = 0;

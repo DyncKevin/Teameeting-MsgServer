@@ -25,7 +25,6 @@ DRTMsgDispatch::~DRTMsgDispatch()
 
 void DRTMsgDispatch::OnPushEvent(const char* pData, int nLen)
 {
-#if DEF_PROTO
     if (!pData || nLen<= 0) {
         LE("DRTMsgDispatch::OnPushEvent params error\n");
         return;
@@ -78,14 +77,10 @@ void DRTMsgDispatch::OnPushEvent(const char* pData, int nLen)
         DRTConnManager::Instance().PushMeetingMsg(mmsg.rom_id(), mmsg.usr_from(), pushUser.ToJson(), mmsg.msg_cont(), no, strPushMsg);
     }
 #endif
-#else
-    LE("not define DEF_PROTO\n");
-#endif
 }
 
 void DRTMsgDispatch::OnSendEvent(const char*pData, int nLen)
 {
-#if DEF_PROTO
     if (!pData || nLen<=0) {
         return;
     }
@@ -108,9 +103,6 @@ void DRTMsgDispatch::OnSendEvent(const char*pData, int nLen)
     } else {
         LE("DRTMsgDispatch::OnSendEvent connector module %s is NULL\n", dmsg.connector().c_str());
     }
-#else
-    LE("not define DEF_PROTO\n");
-#endif
 }
 
 

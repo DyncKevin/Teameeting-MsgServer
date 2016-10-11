@@ -20,7 +20,6 @@
 #include "RTObserverConnection.h"
 #include "DRTMsgDispatch.hpp"
 
-#define DEF_PROTO 1
 #include "ProtoCommon.h"
 
 class DRTTransferSession

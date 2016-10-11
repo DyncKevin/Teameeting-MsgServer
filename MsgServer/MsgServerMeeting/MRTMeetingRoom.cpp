@@ -90,7 +90,6 @@ void MRTMeetingRoom::DelMemberFmMeeting(const std::string& uid)
 
 int MRTMeetingRoom::GetRoomMemberJson(const std::string from, pms::ToUser* users)
 {
-#if DEF_PROTO
     if (!users) return -1;
     {
         OSMutexLocker locker(&m_memberMutex);
@@ -104,15 +103,11 @@ int MRTMeetingRoom::GetRoomMemberJson(const std::string from, pms::ToUser* users
             }
         }
     }
-#else
-    LI("not define DEF_PROTO\n");
-#endif
     return 0;
 }
 
 int MRTMeetingRoom::GetAllRoomMemberJson(pms::ToUser* users)
 {
-#if DEF_PROTO
     if (!users) return -1;
     {
         OSMutexLocker locker(&m_memberMutex);
@@ -124,15 +119,11 @@ int MRTMeetingRoom::GetAllRoomMemberJson(pms::ToUser* users)
             users->add_users(*rit);
         }
     }
-#else
-    LI("not define DEF_PROTO\n");
-#endif
     return 0;
 }
 
 int MRTMeetingRoom::GetMeetingMemberJson(const std::string from, pms::ToUser* users)
 {
-#if DEF_PROTO
     if (!users) return -1;
     {
         OSMutexLocker locker(&m_memberMutex);
@@ -147,15 +138,11 @@ int MRTMeetingRoom::GetMeetingMemberJson(const std::string from, pms::ToUser* us
             }
         }
     }
-#else
-    LI("not define DEF_PROTO\n");
-#endif
     return 0;
 }
 
 int MRTMeetingRoom::GetAllMeetingMemberJson(pms::ToUser* users)
 {
-#if DEF_PROTO
     if (!users) return -1;
     {
         OSMutexLocker locker(&m_memberMutex);
@@ -168,9 +155,6 @@ int MRTMeetingRoom::GetAllMeetingMemberJson(pms::ToUser* users)
             users->add_users(*mit);
         }
     }
-#else
-    LI("not define DEF_PROTO\n");
-#endif
     return 0;
 
 }

@@ -153,7 +153,6 @@ bool LRTTransferSession::RefreshTime()
 
 void LRTTransferSession::KeepAlive()
 {
-#if DEF_PROTO
     pms::TransferMsg t_msg;
     pms::ConnMsg c_msg;
 
@@ -167,9 +166,6 @@ void LRTTransferSession::KeepAlive()
 
     std::string s = t_msg.SerializeAsString();
     SendTransferData(s.c_str(), (int)s.length());
-#else
-    LE("not define DEF_PROTO\n");
-#endif
 }
 
 void LRTTransferSession::TestConnection()
@@ -179,7 +175,6 @@ void LRTTransferSession::TestConnection()
 
 void LRTTransferSession::EstablishConnection()
 {
-#if DEF_PROTO
     pms::TransferMsg t_msg;
     pms::ConnMsg c_msg;
 
@@ -193,9 +188,6 @@ void LRTTransferSession::EstablishConnection()
 
     std::string s = t_msg.SerializeAsString();
     SendTransferData(s.c_str(), (int)s.length());
-#else
-    LE("not define DEF_PROTO\n");
-#endif
 }
 
 void LRTTransferSession::SendTransferData(const char* pData, int nLen)
@@ -246,7 +238,6 @@ void LRTTransferSession::OnRedisEvent(const char*pData, int nLen)
         std::string v = m_RecvMsgBuf.front();
         RTLstorage::DoProcessData(v.c_str(), v.length());
         m_RecvMsgBuf.pop();
-        //LI("LRTTransferSession::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, m_RecvMsgBuf:%d\n", v.length(), m_RecvMsgBuf.size());
     }
 
     if (m_IsValid && m_RecvMsgBuf.size()>0)
@@ -261,7 +252,6 @@ void LRTTransferSession::OnRecvMessage(const char*message, int nLen)
     //write redis to store msg
     std::string s(message, nLen);
     m_RecvMsgBuf.push(s);
-    //LI("SRTTransferSession::OnRecvMessage nLen:%d, s.len:%d, m_RecvMsgBuf:%d\n", nLen, s.length(), m_RecvMsgBuf.size());
     if (m_IsValid)
         this->NotifyRedis();
 #else
@@ -360,21 +350,16 @@ void LRTTransferSession::OnTransfer(const std::string& str)
 
 void LRTTransferSession::OnMsgAck(pms::TransferMsg& tmsg)
 {
-#if DEF_PROTO
     pms::TransferMsg ack_msg;
     ack_msg.set_type(tmsg.type());
     ack_msg.set_flag(pms::ETransferFlag::FACK);
     ack_msg.set_priority(tmsg.priority());
 
     //OnTransfer(ack_msg.SerializeAsString());
-#else
-    LE("not define DEF_PROTO\n");
-#endif
 }
 
 void LRTTransferSession::OnTypeConn(const std::string& str)
 {
-#if DEF_PROTO
     pms::ConnMsg c_msg;
     if (!c_msg.ParseFromString(str)) {
         LE("OnTypeConn c_msg ParseFromString error\n");
@@ -468,9 +453,6 @@ void LRTTransferSession::OnTypeConn(const std::string& str)
     } else {
         LE("%s invalid msg tag\n", __FUNCTION__);
     }
-#else
-    LE("not define DEF_PROTO\n");
-#endif
 }
 
 void LRTTransferSession::OnTypeTrans(const std::string& str)

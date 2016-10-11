@@ -80,7 +80,7 @@ int main(int argc, const char * argv[]) {
         goto EXIT;
     }
     //while (test++ < 60*1000) {
-    while (test++ < 600) {
+    while (test++ < 3000) {
     //while (test++ < 20) {
     //while (1) {
         pSClient->DoTick();

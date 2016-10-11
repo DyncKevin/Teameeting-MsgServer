@@ -17,7 +17,6 @@
 #include "RTMsgCommon.h"
 
 #define MSG_VERSION "1.0.1"
-#define DEF_PROTO 1
 
 class XMsgClientHelper;
 
@@ -33,7 +32,7 @@ public:
     int EncodeLogout(std::string& outstr, const std::string& userid, const std::string& token, int module);
     int EncodeKeepAlive(std::string& outstr, const std::string& userid, int module);
 
-    
+
     int EncodeSyncSeqn(std::string& outstr, const std::string& userid, const std::string& token, int64 seqn, int module, int tag, int flag, int role);
     int EncodeSyncData(std::string& outstr, const std::string& userid, const std::string& token, int64 seqn, int module, int tag, int flag);
     int EncodeSyncGroupSeqn(std::string& outstr, const std::string& userid, const std::string& groupid, const std::string& token, int64 seqn, int module, int tag, int flag, int role);
@@ -41,11 +40,11 @@ public:
 
     int EncodeCreateSeqn(std::string& outstr, const std::string& userid, const std::string& storeid, int64 seqn, int module, int tag, int flag);
     int EncodeDeleteSeqn(std::string& outstr, const std::string& userid, const std::string& storeid, int64 seqn, int module, int tag, int flag);
-    
+
     int EncodeUpdateSetting(std::string& outstr, const std::string& userid, int64 setType, const std::string& json, int module);
     int EncodeSyncOneData(std::string& outstr, const std::string& userid, const std::string& token, int64 seqn, int module, int tag, int flag);
     int EncodeSyncOneGroupData(std::string& outstr, const std::string& userid, const std::string& token, const std::string& groupid, int64 seqn, int module, int tag, int flag);
-    
+
     int DecodeRecvData(const char* pData, int nLen);
 
 protected:

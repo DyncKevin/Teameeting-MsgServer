@@ -3,7 +3,6 @@
 #include "RTTcp.h"
 #include "RTConnHttp.h"
 
-#define DEF_PROTO 1
 #include "../../ProtoCommon.h"
 
 class RTHttpSender

@@ -22,7 +22,6 @@
 #include "RTEventTimer.h"
 #include "RTSingleton.h"
 
-#define DEF_PROTO 1
 #include "ProtoCommon.h"
 
 class MRTRoomManager : public RTSingleton< MRTRoomManager >{

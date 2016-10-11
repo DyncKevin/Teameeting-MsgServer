@@ -22,7 +22,6 @@
 #include "scoped_ref_ptr.h"
 #include "OSMutex.h"
 
-#define DEF_PROTO
 #include "ProtoCommon.h"
 
 class MRTMeetingRoom : public rtc::RefCountedObject< rtc::scoped_ptr<MRTMeetingRoom> >{

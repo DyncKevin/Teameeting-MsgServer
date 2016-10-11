@@ -129,7 +129,7 @@ void MsgServerClient::DoTick()
     test_times++;
     //if (test_times >10 && test_times <=3000)
     //if (test_times >10 && test_times <=75)
-    if (test_times >10 && test_times <=500)
+    if (test_times >10 && test_times <=2000)
     //if (test_times >10 && test_times <=11)
     //if (test_times >10000 && test_times <=10005)
     //if (test_times >10000 && test_times <=10001)

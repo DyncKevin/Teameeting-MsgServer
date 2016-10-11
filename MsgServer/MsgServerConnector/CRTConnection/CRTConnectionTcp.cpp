@@ -48,7 +48,6 @@ int CRTConnectionTcp::SendDispatch(const std::string &id, const std::string &msg
 
 void CRTConnectionTcp::GenericResponse(pms::EServerCmd cmd, pms::EModuleType module, int code, std::string& result, std::string& resp)
 {
-#if DEF_PROTO
     pms::MsgRep response;
 
     response.set_svr_cmds(cmd);
@@ -56,10 +55,6 @@ void CRTConnectionTcp::GenericResponse(pms::EServerCmd cmd, pms::EModuleType mod
     response.set_rsp_code(code);
     response.set_rsp_cont(result);
     resp = response.SerializeAsString();
-
-#else
-    LE("not define DEF_PROTO\n");
-#endif
 }
 
 // the WebServer notify here, the user was login in other place
@@ -121,7 +116,6 @@ void CRTConnectionTcp::OnRedisEvent(const char*pData, int nLen)
         std::string v = m_RecvMsgBuf.front();
         CRTConnTcp::DoProcessData(v.c_str(), v.length());
         m_RecvMsgBuf.pop();
-        //LI("CRTConnectionTcp::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, m_RecvMsgBuf.size:%d\n", v.length(), m_RecvMsgBuf.size());
     }
 
     if (m_IsValid && m_RecvMsgBuf.size()>0)
@@ -137,7 +131,6 @@ void CRTConnectionTcp::OnRecvMessage(const char*message, int nLen)
     //write redis to store msg
     std::string s(message, nLen);
     m_RecvMsgBuf.push(s);
-    //LI("SRTTransferSession::OnRecvMessage nLen:%d, s.len:%d, m_RecvMsgBuf:%d\n", nLen, s.length(), m_RecvMsgBuf.size());
     if (m_IsValid)
         this->NotifyRedis();
 #else
@@ -149,7 +142,6 @@ void CRTConnectionTcp::OnRecvMessage(const char*message, int nLen)
 //* For RTConnTcp
 void CRTConnectionTcp::OnLogin(pms::EServerCmd cmd, pms::EModuleType module, const std::string& msg)
 {
-#if DEF_PROTO
     pms::MsgReq request;
     if (!request.ParseFromString(msg)) {
         LE("request.ParseFromString MsgReq error\n");
@@ -211,15 +203,11 @@ void CRTConnectionTcp::OnLogin(pms::EServerCmd cmd, pms::EModuleType module, con
             return;
         }
     }
-#else
-    LE("not define DEF_PROTO\n");
-#endif
 
 }
 
 void CRTConnectionTcp::OnSndMsg(pms::EServerCmd cmd, pms::EModuleType module, const std::string& msg)
 {
-#if DEF_PROTO
     if (!m_login) {
         LE("m_login false, can not transfer msg, uid:%s\n", m_userId.c_str());
         return;
@@ -237,9 +225,6 @@ void CRTConnectionTcp::OnSndMsg(pms::EServerCmd cmd, pms::EModuleType module, co
     std::string resp;
     GenericResponse(pms::EServerCmd::CSNDMSG, module, 0, *request.mutable_cmsg_id(), resp);
     SendResponse(0, resp.c_str());
-#else
-    LE("not define DEF_PROTO\n");
-#endif
 }
 
 void CRTConnectionTcp::OnGetMsg(pms::EServerCmd cmd, pms::EModuleType module, const std::string& msg)
@@ -249,7 +234,6 @@ void CRTConnectionTcp::OnGetMsg(pms::EServerCmd cmd, pms::EModuleType module, co
 
 void CRTConnectionTcp::OnLogout(pms::EServerCmd cmd, pms::EModuleType module, const std::string& msg)
 {
-#if DEF_PROTO
     if (!m_login) return;
     pms::Logout logout;
     if (!logout.ParseFromString(msg)) {
@@ -272,14 +256,10 @@ void CRTConnectionTcp::OnLogout(pms::EServerCmd cmd, pms::EModuleType module, co
     SendResponse(0, resp.c_str());
     m_login = false;
     return;
-#else
-    LE("not define DEF_PROTO\n");
-#endif
 }
 
 void CRTConnectionTcp::OnKeepAlive(pms::EServerCmd cmd, pms::EModuleType module, const std::string& msg)
 {
-#if DEF_PROTO
     if (m_login) {
         pms::Keep keep;
         if (!keep.ParseFromString(msg)) {
@@ -289,76 +269,49 @@ void CRTConnectionTcp::OnKeepAlive(pms::EServerCmd cmd, pms::EModuleType module,
         //RTTcp::UpdateTimer();
         this->UpdateTimer();
     }
-#else
-    LE("not define DEF_PROTO\n");
-#endif
 }
 
 void CRTConnectionTcp::OnSyncSeqn(pms::EServerCmd cmd, pms::EModuleType module, const std::string& msg)
 {
-#if DEF_PROTO
     if (m_login) {
         CRTConnManager::Instance().TransferMsg(cmd, module, m_userId, msg);
     }
-#else
-    LE("not define DEF_PROTO\n");
-#endif
 }
 
 void CRTConnectionTcp::OnSyncData(pms::EServerCmd cmd, pms::EModuleType module, const std::string& msg)
 {
-#if DEF_PROTO
     if (m_login) {
         CRTConnManager::Instance().TransferMsg(cmd, module, m_userId, msg);
     }
-#else
-    LE("not define DEF_PROTO\n");
-#endif
 }
 
 void CRTConnectionTcp::OnCreateSeqn(pms::EServerCmd cmd, pms::EModuleType module, const std::string& msg)
 {
-#if DEF_PROTO
     if (m_login) {
         CRTConnManager::Instance().TransferMsg(cmd, module, m_userId, msg);
     }
-#else
-    LE("not define DEF_PROTO\n");
-#endif
 }
 
 void CRTConnectionTcp::OnDeleteSeqn(pms::EServerCmd cmd, pms::EModuleType module, const std::string& msg)
 {
-#if DEF_PROTO
     if (m_login) {
         CRTConnManager::Instance().TransferMsg(cmd, module, m_userId, msg);
     }
-#else
-    LE("not define DEF_PROTO\n");
-#endif
 }
 
 void CRTConnectionTcp::OnUpdateSetting(pms::EServerCmd cmd, pms::EModuleType module, const std::string& msg)
 {
-#if DEF_PROTO
     if (m_login) {
         CRTConnManager::Instance().TransferToPusher(cmd, module, m_userId, msg);
     }
-#else
-    LE("not define DEF_PROTO\n");
-#endif
 }
 
 // this callback maybe useless...
 void CRTConnectionTcp::OnOtherLogin(pms::EServerCmd cmd, pms::EModuleType module, const std::string& msg)
 {
-#if DEF_PROTO
     if (m_login) {
         LE("CRTConnectionTcp::OnOtherLogin was called, this callback should not be called!!!!!\n");
     }
-#else
-    LE("not define DEF_PROTO\n");
-#endif
 }
 
 void CRTConnectionTcp::OnResponse(const char*pData, int nLen)

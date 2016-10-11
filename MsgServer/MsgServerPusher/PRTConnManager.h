@@ -21,7 +21,6 @@
 #include "PRTConnDispatcher.h"
 #include "RTEventTimer.h"
 
-#define DEF_PROTO 1
 #include "ProtoCommon.h"
 
 class PRTTransferSession;

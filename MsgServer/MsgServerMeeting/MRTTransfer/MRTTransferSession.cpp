@@ -115,7 +115,6 @@ bool MRTTransferSession::RefreshTime()
 
 void MRTTransferSession::KeepAlive()
 {
-#if DEF_PROTO
     pms::TransferMsg t_msg;
     pms::ConnMsg c_msg;
 
@@ -129,9 +128,6 @@ void MRTTransferSession::KeepAlive()
 
     std::string s = t_msg.SerializeAsString();
     SendTransferData(s.c_str(), (int)s.length());
-#else
-    LE("not define DEF_PROTO\n")
-#endif
 }
 
 
@@ -142,7 +138,6 @@ void MRTTransferSession::TestConnection()
 
 void MRTTransferSession::EstablishConnection()
 {
-#if DEF_PROTO
     pms::TransferMsg t_msg;
     pms::ConnMsg c_msg;
 
@@ -156,9 +151,6 @@ void MRTTransferSession::EstablishConnection()
 
     std::string s = t_msg.SerializeAsString();
     SendTransferData(s.c_str(), (int)s.length());
-#else
-    LE("not define DEF_PROTO\n")
-#endif
 }
 
 void MRTTransferSession::SendTransferData(const char* pData, int nLen)
@@ -184,7 +176,6 @@ void MRTTransferSession::OnRedisEvent(const char*pData, int nLen)
         std::string v = m_RecvMsgBuf.front();
         RTTransfer::DoProcessData(v.c_str(), v.length());
         m_RecvMsgBuf.pop();
-        //LI("MRTTransferSession::OnRedisEvent after m_RecvMsgBuf.front val.length:%d, m_RecvMsgBuf.size:%d\n", v.length(), m_RecvMsgBuf.size());
     }
 
     if (m_IsValid && m_RecvMsgBuf.size()>0)
@@ -199,7 +190,6 @@ void MRTTransferSession::OnRecvMessage(const char*message, int nLen)
     //write redis to store msg
     std::string s(message, nLen);
     m_RecvMsgBuf.push(s);
-    //LI("MRTTransferSession::OnRecvMessage nLen:%d, s.len:%d, m_RecvMsgBuf:%d\n", nLen, s.length(), m_RecvMsgBuf.size());
     if (m_IsValid)
         this->NotifyRedis();
 #else
@@ -216,21 +206,16 @@ void MRTTransferSession::OnTransfer(const std::string& str)
 
 void MRTTransferSession::OnMsgAck(pms::TransferMsg& tmsg)
 {
-#if DEF_PROTO
     pms::TransferMsg ack_msg;
     ack_msg.set_type(tmsg.type());
     ack_msg.set_flag(pms::ETransferFlag::FACK);
     ack_msg.set_priority(tmsg.priority());
 
     OnTransfer(ack_msg.SerializeAsString());
-#else
-    LE("not define DEF_PROTO\n")
-#endif
 }
 
 void MRTTransferSession::OnTypeConn(const std::string& str)
 {
-#if DEF_PROTO
     pms::ConnMsg c_msg;
     if (!c_msg.ParseFromString(str)) {
         LE("OnTypeConn c_msg.ParseFromString error\n");
@@ -278,14 +263,10 @@ void MRTTransferSession::OnTypeConn(const std::string& str)
             LE("Connection id:%s error!!!\n", c_msg.transferid().c_str());
         }
     }
-#else
-    LE("not define DEF_PROTO\n")
-#endif
 }
 
 void MRTTransferSession::OnTypeTrans(const std::string& str)
 {
-#if DEF_PROTO
     pms::RelayMsg r_msg;
     if (!r_msg.ParseFromString(str)) {
         LE("OnTypeTrans r_msg.ParseFromString error\n");
@@ -316,9 +297,6 @@ void MRTTransferSession::OnTypeTrans(const std::string& str)
         }
             break;
     }
-#else
-    LE("not define DEF_PROTO\n")
-#endif
 }
 
 void MRTTransferSession::OnTypeQueue(const std::string& str)
@@ -338,19 +316,14 @@ void MRTTransferSession::OnTypePush(const std::string& str)
 
 void MRTTransferSession::OnTypeTLogin(const std::string& str)
 {
-#if DEF_PROTO
     pms::RelayMsg r_msg;
     if (!r_msg.ParseFromString(str)) {
         LE("OnTypeTLogin r_msg.ParseFromString error\n");
     }
-#else
-    LE("not define DEF_PROTO\n")
-#endif
 }
 
 void MRTTransferSession::OnTypeTLogout(const std::string& str)
 {
-#if DEF_PROTO
     pms::RelayMsg r_msg;
     if (!r_msg.ParseFromString(str)) {
         LE("OnTypeTLogout r_msg.ParseFromString error\n");
@@ -358,9 +331,6 @@ void MRTTransferSession::OnTypeTLogout(const std::string& str)
     Assert(r_msg.touser().users_size == 1);
     OnConnectionLostNotify(r_msg.touser().users(0), r_msg.content(), r_msg.connector());
     return;
-#else
-    LE("not define DEF_PROTO\n")
-#endif
 }
 
 /**

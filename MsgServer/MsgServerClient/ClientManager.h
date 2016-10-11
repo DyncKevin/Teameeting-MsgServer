@@ -20,7 +20,6 @@
 #include "ClientSession.h"
 #include "RTSingleton.h"
 
-#define DEF_PROTO 1
 #include "client_common/proto/storage_msg.pb.h"
 #include "client_common/proto/storage_msg_type.pb.h"
 #include "client_common/proto/sys_msg.pb.h"

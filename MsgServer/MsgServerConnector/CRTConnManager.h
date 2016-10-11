@@ -21,7 +21,6 @@
 #include "RTSingleton.h"
 #include "CRTXRedis.h"
 
-#define DEF_PROTO 1
 #include "ProtoCommon.h"
 
 #define HR_USERID       "hr_userid"

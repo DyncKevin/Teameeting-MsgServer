@@ -21,7 +21,6 @@
 #define REQUEST_TYPE_READ (1)
 #define REQUEST_TYPE_WRITE (2)
 
-#define DEF_PROTO 1
 #include "ProtoCommon.h"
 
 class SRTRedisManager;
