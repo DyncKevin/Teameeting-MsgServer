@@ -7,6 +7,7 @@
 //
 
 #include "core/XMsgClient.h"
+#include <sys/time.h>
 
 
 #define TIMEOUT_TS (60*1000)
@@ -27,6 +28,8 @@ XMsgClient::XMsgClient()
 , m_autoConnect(true)
 , m_login(false)
 , m_msState(MSNOT_CONNECTED)
+, m_syncGroupDataMaxSeqn(0)
+, m_syncDataMaxSeqn(0)
 {
 #if WEBRTC_ANDROID
     LOGI("XMsgClient XMsgClient ok!!\n");
@@ -259,11 +262,11 @@ int XMsgClient::SyncSeqn(int64 seqn, int role)
     return SendEncodeMsg(outstr);
 }
 
-int XMsgClient::SyncData(int64 seqn)
+int XMsgClient::SyncData(int64 seqn, int64 sdmaxseqn)
 {
     std::string outstr;
     if (m_pMsgProcesser) {
-        m_pMsgProcesser->EncodeSyncData(outstr, m_uid, m_token, seqn, m_module, pms::EStorageTag::TDATA, pms::EMsgFlag::FSINGLE);
+        m_pMsgProcesser->EncodeSyncData(outstr, m_uid, m_token, seqn, sdmaxseqn, m_module, pms::EStorageTag::TDATA, pms::EMsgFlag::FSINGLE);
     } else {
         return -1;
     }
@@ -280,7 +283,6 @@ int XMsgClient::SyncData(int64 seqn)
         } else {
             m_Wait4CheckSeqnKeyMap[seqnKey]++;
         }
-        //LOG(INFO) << "XMsgClient::SyncData m_Wait4CheckSeqnKeyMap userid:" << m_uid << " seqnKey:" << seqnKey << " is :" << m_Wait4CheckSeqnKeyMap[seqnKey];
     }
     return ret;
 }
@@ -313,11 +315,11 @@ int XMsgClient::SyncGroupSeqn(const std::string& groupid, int64 seqn, int role)
     return SendEncodeMsg(outstr);
 }
 
-int XMsgClient::SyncGroupData(const std::string& groupid, int64 seqn)
+int XMsgClient::SyncGroupData(const std::string& groupid, int64 seqn, int64 sdmaxseqn)
 {
     std::string outstr;
     if (m_pMsgProcesser) {
-        m_pMsgProcesser->EncodeSyncGroupData(outstr, m_uid, m_token, groupid, seqn, m_module, pms::EStorageTag::TDATA, pms::EMsgFlag::FGROUP);
+        m_pMsgProcesser->EncodeSyncGroupData(outstr, m_uid, m_token, groupid, seqn, sdmaxseqn, m_module, pms::EStorageTag::TDATA, pms::EMsgFlag::FGROUP);
     } else {
         return -1;
     }
@@ -335,7 +337,6 @@ int XMsgClient::SyncGroupData(const std::string& groupid, int64 seqn)
         } else {
             m_Wait4CheckSeqnKeyMap[seqnKey]++;
         }
-        //LOG(INFO) << "XMsgClient::SyncGroupData m_Wait4CheckSeqnKeyMap uid:" << m_uid << " seqnKey:" << seqnKey << " is :" << m_Wait4CheckSeqnKeyMap[seqnKey];
     }
     return ret;
 }
@@ -375,7 +376,6 @@ int XMsgClient::SyncOneData(int64 seqn)
         } else {
             m_Wait4CheckSeqnKeyMap[seqnKey]++;
         }
-        //LOG(INFO) << "XMsgClient::SyncOneData m_Wait4CheckSeqnKeyMap uid:" << m_uid << " seqnKey:" << seqnKey << " is :" << m_Wait4CheckSeqnKeyMap[seqnKey];
     }
     return ret;
 }
@@ -392,7 +392,9 @@ int XMsgClient::SyncOneGroupData(const std::string& groupid, int64 seqn)
     if (outstr.length()==0) {
         return -1;
     }
+
     int ret = SendEncodeMsg(outstr);
+
     if (ret>0) {
         rtc::CritScope cs(&m_csWait4CheckSeqnKey);
         char seqnKey[256] = {0};
@@ -402,7 +404,6 @@ int XMsgClient::SyncOneGroupData(const std::string& groupid, int64 seqn)
         } else {
             m_Wait4CheckSeqnKeyMap[seqnKey]++;
         }
-        //LOG(INFO) << "XMsgClient::SyncOneGroupData m_Wait4CheckSeqnKeyMap uid:" << m_uid << " seqnKey:" << seqnKey << " is :" << m_Wait4CheckSeqnKeyMap[seqnKey];
     }
     return ret;
 }
@@ -563,7 +564,6 @@ void XMsgClient::OnServerDisconnect()
 
 void XMsgClient::OnServerConnectionFailure()
 {
-    //LOG(INFO) << __FUNCTION__ << " was called";
     m_login = false;
     m_msState = MSNOT_CONNECTED;
     if (m_pCallback)
@@ -580,7 +580,6 @@ void XMsgClient::OnServerConnectionFailure()
 
 void XMsgClient::OnTick()
 {
-    //LOG(INFO) << __FUNCTION__ << " was called";
     if (m_msState == MSCONNECTED) {
         RefreshTime();
     }
@@ -594,12 +593,47 @@ void XMsgClient::OnMessageSent(int err)
 
 void XMsgClient::OnMessageRecv(const char*pData, int nLen)
 {
-    //LOG(INFO) << __FUNCTION__ << " was called nLen:" << nLen << ",pData:" << pData;
     if (!pData) {
         return;
     }
     XJSBuffer::RecvData(pData, nLen);
 }
+
+void XMsgClient::OnClientSyncSeqn()
+{
+    //LOG(INFO) << __FUNCTION__ << " was called ----------";
+    {
+        UserSeqnMapIt  itCurSeqn = m_uUserSeqnMap.find(m_uid);
+        if (itCurSeqn->second<0)
+        {
+#if WEBRTC_ANDROID
+            LOGI("XMsgClient::OnClientSyncSeqn itCurSeqn is <0, so return\n");
+#else
+            LOG(INFO) << "XMsgClient::OnClientSyncSeqn itCurSeqn is <0, so return";
+#endif
+            return;
+        }
+        this->SyncSeqn(itCurSeqn->second, pms::EMsgRole::RSENDER);
+    }
+}
+
+void XMsgClient::OnClientSyncGroupSeqn(const std::string& storeid)
+{
+    {
+        UserSeqnMapIt it = m_gUserSeqnMap.find(storeid);
+        if (it != m_gUserSeqnMap.end())
+        {
+            SyncGroupSeqn(it->first, it->second, pms::EMsgRole::RSENDER);
+        } else {
+#if WEBRTC_ANDROID
+            LOGI("XMsgClient::OnClientSyncGroupSeqn not find storeid:%s\n", storeid.c_str());
+#else
+            LOG(INFO) << "XMsgClient::OnClientSyncGroupSeqn not find storeid:" << storeid;
+#endif
+        }
+    }
+}
+
 
 //////////////////////////////////////////////////
 //////////////XMsgClientHelper////////////////////
@@ -689,6 +723,7 @@ void XMsgClient::OnHelpSyncSeqn(int code, const std::string& cont)
         if (uit == m_MaxSeqnMap.end()) {
             m_MaxSeqnMap.insert(make_pair(store.storeid(), store.maxseqn()));
         } else {
+            ////uit->second = store.maxseqn(); // this line is only for test and skip sync data
             if (uit->second < store.maxseqn()) {
                 uit->second = store.maxseqn();
                 // here means no matter TSEQN or TFETCHSEQN
@@ -701,7 +736,11 @@ void XMsgClient::OnHelpSyncSeqn(int code, const std::string& cont)
                     // then sync data with the smaller seqn
                     if (it != m_gUserSeqnMap.end() && it->second < store.maxseqn())
                     {
-                        SyncGroupData(store.storeid(), it->second);
+                        if (m_gSyncedMsgMap.size()==0) {
+                            m_syncGroupDataMaxSeqn = uit->second;
+                            SyncGroupData(store.storeid(), it->second, uit->second);
+                        } else {
+                        }
                     }
                 } else if (store.mflag()==pms::EMsgFlag::FSINGLE)
                 {
@@ -710,7 +749,11 @@ void XMsgClient::OnHelpSyncSeqn(int code, const std::string& cont)
                     // then sync data with the smaller seqn
                     if (it != m_uUserSeqnMap.end() && it->second < store.maxseqn())
                     {
-                        SyncData(it->second);
+                        if (m_uSyncedMsgMap.size()==0) {
+                            m_syncDataMaxSeqn = uit->second;
+                            SyncData(it->second, uit->second);
+                        } else {
+                        }
                     }
                 }
             }
@@ -845,6 +888,20 @@ void XMsgClient::DoHelpSyncData(const pms::StorageMsg& store)
                     rtc::CritScope cs(&m_csWait4CheckSeqnKey);
                     m_Wait4CheckSeqnKeyMap.erase(sk);
                 }
+                if (m_uSyncedMsgMap.size()==0)
+                {
+                    //if no data waiting for
+                    //call syncseqn to get max seqn
+                    if (itCurSeqn->second == m_syncDataMaxSeqn)
+                    {
+                        if (m_pClientImpl)
+                        {
+                            m_pClientImpl->NotifySyncSeqn();
+                        }
+                    } else {
+
+                    }
+                }
                 return;
             } else {
                 // not reach 5 times, try to sync data again
@@ -861,6 +918,7 @@ void XMsgClient::DoHelpSyncData(const pms::StorageMsg& store)
     char seqnKey[256] = {0};
     sprintf(seqnKey, "%s:%lld", store.storeid().c_str(), store.sequence());
     UAddSyncedMsg(seqnKey, store);
+
     UUpdateUserSeqn();
 
     for (RecvMsgListIt it = m_uRecvMsgList.begin();it!=m_uRecvMsgList.end();++it)
@@ -922,6 +980,12 @@ void XMsgClient::DoHelpSyncGroupData(const pms::StorageMsg& store)
         // if has data, check if 5 times enough
         // if not has, SyncOneGroupData(curseqn +1)
 
+
+        // just test for a while
+
+        return;
+
+
         // because sync data failed, so sync curseqn+1 data
         char sk[256] = {0};
         sprintf(sk, "%s:%lld", store.storeid().c_str(), store.sequence());
@@ -945,6 +1009,19 @@ void XMsgClient::DoHelpSyncGroupData(const pms::StorageMsg& store)
                     rtc::CritScope cs(&m_csWait4CheckSeqnKey);
                     m_Wait4CheckSeqnKeyMap.erase(sk);
                 }
+                if (m_gSyncedMsgMap.size()==0)
+                {
+                    //if no data waiting for
+                    //call syncseqn to get max seqn
+
+                    if (itCurSeqn->second == m_syncGroupDataMaxSeqn)
+                    {
+                        if (m_pClientImpl)
+                        {
+                            m_pClientImpl->NotifySyncGroupSeqn(store.storeid());
+                        }
+                    }
+                }
                 return;
             } else {
                 // not reach 5 times, try to sync data again
@@ -962,8 +1039,6 @@ void XMsgClient::DoHelpSyncGroupData(const pms::StorageMsg& store)
     sprintf(seqnKey, "%s:%lld", store.storeid().c_str(), store.sequence());
     GAddSyncedMsg(seqnKey, store);
     GUpdateUserSeqn(store.storeid());
-    //LOG(INFO) << "XMsgClient::DoHelpSyncGroupData seqnKey:" << seqnKey << ", ruserid:" << store.ruserid() << \
-        ", sequence:" << store.sequence() << ", maxseqn:" << store.maxseqn() << ", sdmaxseqn:" << store.sdmaxseqn();
 
     for (RecvMsgListIt it = m_gRecvMsgList.begin();it!=m_gRecvMsgList.end();++it)
     {

@@ -2,8 +2,21 @@
 #include <stdlib.h>
 #include <string.h>
 #include "core/XJSBuffer.h"
+#include "webrtc/base/logging.h"
 
-const int	kRequestBufferSizeInBytes = 2048;
+#ifdef WEBRTC_ANDROID
+#include <android/log.h>
+#define  LOG_TAG    "XMsgClient"
+#define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
+#define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
+#else
+#include <iostream>
+#include <string>
+#endif
+
+//#define REQUEST_BUFFER_SIZE_IN_BYTES_32 (1024*1024*32)
+#define REQUEST_BUFFER_SIZE_IN_BYTES_32 (1024*1024*1) // 1M
+
 void XJSBuffer::writeShort(char** pptr, unsigned short anInt)
 {
 	**pptr = (char)(anInt / 256);
@@ -23,9 +36,9 @@ unsigned short XJSBuffer::readShort(char** pptr)
 XJSBuffer::XJSBuffer()
 	: m_nBufOffset(0)
 {
-	m_nBufLen = kRequestBufferSizeInBytes;
+	m_nBufLen = REQUEST_BUFFER_SIZE_IN_BYTES_32;
 	m_pBuffer = new char[m_nBufLen];
-	m_nParseBufLen = kRequestBufferSizeInBytes;
+	m_nParseBufLen = REQUEST_BUFFER_SIZE_IN_BYTES_32;
 	m_pParseBuf = new char[m_nParseBufLen];
 }
 
@@ -40,10 +53,10 @@ XJSBuffer::~XJSBuffer()
 
 void XJSBuffer::RecvData(const char*data, int size)
 {
-	{//* 1,将接收到的数据放入缓存中
+	{//* 1
 		while ((m_nBufOffset + size) > m_nBufLen)
 		{
-			int newLen = m_nBufLen + kRequestBufferSizeInBytes;
+			int newLen = m_nBufLen + REQUEST_BUFFER_SIZE_IN_BYTES_32;
 			if (size > newLen)
 				newLen = m_nBufLen + size;
 			char* temp = new char[newLen];
@@ -60,10 +73,15 @@ void XJSBuffer::RecvData(const char*data, int size)
 	}
 
 	while (m_nBufOffset > 3)
-	{//* 2,解压包
+	{//* 2
 		int parsed = 0;
 		if (m_pBuffer[0] != '$')
 		{// Hase error!
+#if WEBRTC_ANDROID
+            LOGI("XJSBuffer::RecvData m_pBuffer[0] is notnotnotnotnotnotno $, m_nBufOffet:%d\n", m_nBufOffset);
+#else
+            LOG(INFO) << "XJSBuffer::RecvData m_pBuffer[0] is notnotnotnotnotnotno $, m_nBufOffet:" << m_nBufOffset;
+#endif
 			parsed = m_nBufOffset;
 		}
 		else
@@ -77,6 +95,11 @@ void XJSBuffer::RecvData(const char*data, int size)
 			}
 			else
 			{
+#if WEBRTC_ANDROID
+                LOGI("XJSBuffer::RecvData packLen:%d+3 >>>>>>>>>>>>>>>>> m_nBufOffset, so break, m_nBufOffet:%d\n", packLen, m_nBufOffset);
+#else
+                LOG(INFO) << "XJSBuffer::RecvData packLen:" << packLen << " +3 >>>>>>>>>>>>>>>>> m_nBufOffset, so break, m_nBufOffet:" << m_nBufOffset;
+#endif
 				break;
 			}
 		}

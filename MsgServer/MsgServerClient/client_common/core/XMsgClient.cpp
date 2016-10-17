@@ -327,8 +327,6 @@ int XMsgClient::SyncGroupData(const std::string& groupid, int64 seqn, int64 sdma
         return -1;
     }
 
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
     int ret = SendEncodeMsg(outstr);
     if (ret>0) {
         rtc::CritScope cs(&m_csWait4CheckSeqnKey);
@@ -394,9 +392,6 @@ int XMsgClient::SyncOneGroupData(const std::string& groupid, int64 seqn)
     if (outstr.length()==0) {
         return -1;
     }
-
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
 
     int ret = SendEncodeMsg(outstr);
 
@@ -1063,9 +1058,6 @@ void XMsgClient::DoHelpSyncGroupData(const pms::StorageMsg& store)
 
 void XMsgClient::OnHelpSyncGroupData(int code, const std::string& cont)
 {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-
     pms::StorageMsg store;
     if (!store.ParseFromString(cont))
     {

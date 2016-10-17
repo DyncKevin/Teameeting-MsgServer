@@ -105,14 +105,6 @@ JNIEXPORT jint JNICALL Java_org_dync_teameeting_sdkmsgclient_jni_JMClientApp_Syn
 
 /*
  * Class:     org_dync_teameeting_sdkmsgclient_jni_JMClientApp
- * Method:    SyncData
- * Signature: (J)I
- */
-JNIEXPORT jint JNICALL Java_org_dync_teameeting_sdkmsgclient_jni_JMClientApp_SyncData
-  (JNIEnv *, jobject, jlong);
-
-/*
- * Class:     org_dync_teameeting_sdkmsgclient_jni_JMClientApp
  * Method:    FetchGroupSeqn
  * Signature: (Ljava/lang/String;)I
  */
@@ -126,14 +118,6 @@ JNIEXPORT jint JNICALL Java_org_dync_teameeting_sdkmsgclient_jni_JMClientApp_Fet
  */
 JNIEXPORT jint JNICALL Java_org_dync_teameeting_sdkmsgclient_jni_JMClientApp_SyncGroupSeqn
   (JNIEnv *, jobject, jstring, jlong, jint);
-
-/*
- * Class:     org_dync_teameeting_sdkmsgclient_jni_JMClientApp
- * Method:    SyncGroupData
- * Signature: (Ljava/lang/String;J)I
- */
-JNIEXPORT jint JNICALL Java_org_dync_teameeting_sdkmsgclient_jni_JMClientApp_SyncGroupData
-  (JNIEnv *, jobject, jstring, jlong);
 
 /*
  * Class:     org_dync_teameeting_sdkmsgclient_jni_JMClientApp

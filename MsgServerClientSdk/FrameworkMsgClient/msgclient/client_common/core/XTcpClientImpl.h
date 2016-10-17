@@ -9,6 +9,7 @@
 #include "webrtc/base/scoped_ptr.h"
 #include "webrtc/base/signalthread.h"
 #include "webrtc/base/sigslot.h"
+#include "webrtc/base/messagequeue.h"
 
 class XTcpClientImpl
 	: public sigslot::has_slots < >
@@ -35,12 +36,18 @@ public:
 
 	//* Implements the MessageHandler interface
 	void OnMessage(rtc::Message* msg);
+
+
+    // public for Client
+    void NotifySyncSeqn();
+    void NotifySyncGroupSeqn(const std::string& storeid);
 protected:
 	void DoResolver();
 	void DoConnect();
 	void Close();
 	void InitSocketSignals();
 	bool ConnectControlSocket();
+
 
 	//* For sigslot
 	void OnConnect(rtc::AsyncSocket* socket);
@@ -49,6 +56,9 @@ protected:
 	void OnResolveResult(rtc::AsyncResolverInterface* resolver);
 
 public:
+
+    typedef rtc::TypedMessageData<const std::string>   RelayedMsgData;
+
 	XTcpClientCallback	&m_rCallback;
 	rtc::SocketAddress	m_svrSockAddr;
 	rtc::AsyncResolver	*m_asynResolver;

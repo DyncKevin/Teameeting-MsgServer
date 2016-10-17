@@ -36,10 +36,12 @@ LOCAL_SRC_FILES +=  webrtc/base/asyncfile.cc \
 					webrtc/base/criticalsection.cc \
 					webrtc/base/event.cc \
 					webrtc/base/event_tracer.cc \
+					webrtc/base/fileutils.cc \
 					webrtc/base/ifaddrs-android.cc \
 					webrtc/base/ipaddress.cc \
 					webrtc/base/location.cc \
 					webrtc/base/logging.cc \
+					webrtc/base/logsinks.cc \
 					webrtc/base/messagehandler.cc \
 					webrtc/base/messagequeue.cc \
 					webrtc/base/nethelpers.cc \
@@ -49,6 +51,7 @@ LOCAL_SRC_FILES +=  webrtc/base/asyncfile.cc \
 					webrtc/base/signalthread.cc \
 					webrtc/base/sigslot.cc \
 					webrtc/base/socketaddress.cc \
+					webrtc/base/stream.cc \
 					webrtc/base/stringencode.cc \
 					webrtc/base/thread.cc \
 					webrtc/base/timeutils.cc \

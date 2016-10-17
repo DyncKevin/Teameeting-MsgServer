@@ -365,7 +365,6 @@ int PhysicalSocket::Recv(void* buffer, size_t length, int64_t* timestamp) {
   }
   UpdateLastError();
   int error = GetError();
-  LOG(INFO) << "Recv error:" << error << ", received:" << received;
   bool success = (received >= 0) || IsBlockingError(error);
   if (udp_ || success) {
     enabled_events_ |= DE_READ;

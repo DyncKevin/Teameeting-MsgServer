@@ -35,10 +35,8 @@ public class JMClientApp {
 
     public native int FetchSeqn();
     public native int SyncSeqn(long seqn, int role);
-    public native int SyncData(long seqn);
     public native int FetchGroupSeqn(String strGroupId);
     public native int SyncGroupSeqn(String strGroupId, long seqn, int role);
-    public native int SyncGroupData(String strGroupId, long seqn);
 
     public native int ConnStatus();
     public native void SetUserId(String strUserid);

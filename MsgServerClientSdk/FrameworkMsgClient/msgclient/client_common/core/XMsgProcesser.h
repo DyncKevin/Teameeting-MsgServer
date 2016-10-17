@@ -34,9 +34,9 @@ public:
 
 
     int EncodeSyncSeqn(std::string& outstr, const std::string& userid, const std::string& token, int64 seqn, int module, int tag, int flag, int role);
-    int EncodeSyncData(std::string& outstr, const std::string& userid, const std::string& token, int64 seqn, int module, int tag, int flag);
+    int EncodeSyncData(std::string& outstr, const std::string& userid, const std::string& token, int64 seqn, int64 sdmaxseqn, int module, int tag, int flag);
     int EncodeSyncGroupSeqn(std::string& outstr, const std::string& userid, const std::string& groupid, const std::string& token, int64 seqn, int module, int tag, int flag, int role);
-    int EncodeSyncGroupData(std::string& outstr, const std::string& userid, const std::string& token, const std::string& groupid, int64 seqn, int module, int tag, int flag);
+    int EncodeSyncGroupData(std::string& outstr, const std::string& userid, const std::string& token, const std::string& groupid, int64 seqn, int64 sdmaxseqn, int module, int tag, int flag);
 
     int EncodeCreateSeqn(std::string& outstr, const std::string& userid, const std::string& storeid, int64 seqn, int module, int tag, int flag);
     int EncodeDeleteSeqn(std::string& outstr, const std::string& userid, const std::string& storeid, int64 seqn, int module, int tag, int flag);

@@ -86,10 +86,10 @@ public:
 
     int FetchSeqn();
     int SyncSeqn(int64 seqn, int role);
-    int SyncData(int64 seqn);
+    int SyncData(int64 seqn, int64 sdmaxseqn);
     int FetchGroupSeqn(const std::string& groupid);
     int SyncGroupSeqn(const std::string& groupid, int64 seqn, int role);
-    int SyncGroupData(const std::string& gropuid, int64 seqn);
+    int SyncGroupData(const std::string& gropuid, int64 seqn, int64 sdmaxseqn);
     int UpdateSetting(int64 setType, const std::string& jsonSetting);
     int SyncOneData(int64 seqn);
     int SyncOneGroupData(const std::string& groupid, int64 seqn);
@@ -133,7 +133,7 @@ public:
             m_MaxSeqnMap[seqnid] = seqn;
          }
     }
-    
+
     void AddGroupInCore(const std::string& seqnid, int64 seqn)
     {
         m_MaxSeqnMap[seqnid] = seqn;
@@ -145,7 +145,7 @@ public:
             }
         }
     }
-    
+
     void RemoveGroupInCore(const std::string& seqnid)
     {
         //m_Wait4CheckSeqnKeyMap
@@ -153,7 +153,7 @@ public:
         //m_gSyncedMsgMap;
         //m_gUserSeqnMap;
         //m_gRecvMsgList;
-        
+
         m_MaxSeqnMap.erase(seqnid);
         {
             rtc::CritScope cs(&m_csWait4CheckSeqnKey);
@@ -179,12 +179,12 @@ public:
                 }
             }
         }
-        
+
         {
             rtc::CritScope cs(&m_csgUserSeqn);
             m_gUserSeqnMap.erase(seqnid);
         }
-        
+
         {
             rtc::CritScope cs(&m_csgRecvMsg);
             for(RecvMsgListIt it=m_gRecvMsgList.begin();it!=m_gRecvMsgList.end();)
@@ -197,7 +197,7 @@ public:
                 }
             }
         }
-        
+
     }
 
 public:
@@ -209,6 +209,8 @@ public:
     virtual void OnTick();
     virtual void OnMessageSent(int err);
     virtual void OnMessageRecv(const char*pData, int nLen);
+    virtual void OnClientSyncSeqn();
+    virtual void OnClientSyncGroupSeqn(const std::string& storeid);
 
     // For XMsgClientHelper
     virtual void OnHelpLogin(int code, const std::string& userid);
@@ -302,7 +304,20 @@ private:
         }
         while(1)
         {
-            if (m_uSyncedMsgMap.size()==0) break;
+            if (m_uSyncedMsgMap.size()==0)
+            {
+                // if no data processing
+                // call syncseqn to get max seqn
+
+                if (itCurSeqn->second == m_syncDataMaxSeqn)
+                {
+                    if (m_pClientImpl)
+                    {
+                        m_pClientImpl->NotifySyncSeqn();
+                    }
+                }
+                break;
+            }
             char sk[256] = {0};
             sprintf(sk, "%s:%lld", m_uid.c_str(), itCurSeqn->second +1);
             SyncedMsgMapIt it = m_uSyncedMsgMap.find(sk);
@@ -414,7 +429,19 @@ private:
         }
         while(1)
         {
-            if (m_gSyncedMsgMap.size()==0) break;
+            if (m_gSyncedMsgMap.size()==0)
+            {
+                // if no data processing
+                // call syncseqn to get max seqn
+                if (itCurSeqn->second == m_syncGroupDataMaxSeqn)
+                {
+                    if (m_pClientImpl)
+                    {
+                        m_pClientImpl->NotifySyncGroupSeqn(storeid);
+                    }
+                }
+                break;
+            }
             char sk[256] = {0};
             sprintf(sk, "%s:%lld", storeid.c_str(), itCurSeqn->second +1);
             SyncedMsgMapIt it = m_gSyncedMsgMap.find(sk);
@@ -473,6 +500,11 @@ private:
 
                 continue;
             } else {
+                // just for test for a while
+                break;
+
+
+
                 UserSeqnMapIt uit = m_MaxSeqnMap.find(storeid);
                 if (uit==m_MaxSeqnMap.end()) {
                     break;
@@ -485,6 +517,7 @@ private:
                     }
                     break;
                 } else { // find sk
+
                     if (skit->second > SYNC_DATA_RETRY_TIMES) { // has try sync data 5 times
                         // if curseqn < maxseqn, drop current seqn sync, itCurSeqn->second += 1;
                         // sync the next one
@@ -560,6 +593,8 @@ private:
 
     rtc::CriticalSection    m_csWait4CheckSeqnKey;
 
+    int64                   m_syncGroupDataMaxSeqn;
+    int64                   m_syncDataMaxSeqn;
 
 };
 

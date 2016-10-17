@@ -20,6 +20,8 @@ public:
 	virtual void OnTick() = 0;
 	virtual void OnMessageSent(int err) = 0;
 	virtual void OnMessageRecv(const char*pData, int nLen) = 0;
+    virtual void OnClientSyncSeqn() = 0;
+    virtual void OnClientSyncGroupSeqn(const std::string& storeid) = 0;
 protected:
 	virtual ~XTcpClientCallback() {}
 };

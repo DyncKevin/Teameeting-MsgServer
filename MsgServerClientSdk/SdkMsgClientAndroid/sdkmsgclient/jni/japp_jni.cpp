@@ -140,13 +140,6 @@ JOWW(jint, JMClientApp_SyncSeqn)(JNIEnv *jni, jobject j_app, jlong seqn, jint ro
 }
 
 
-JOWW(jint, JMClientApp_SyncData)(JNIEnv *jni, jobject j_app, jlong seqn)
-{
-	JMClientApp* jApp = GetJApp(jni, j_app);
-	return jApp->SyncData(seqn);
-}
-
-
 JOWW(jint, JMClientApp_FetchGroupSeqn)(JNIEnv *jni, jobject j_app, jstring strGroupId)
 {
 	JMClientApp* jApp = GetJApp(jni, j_app);
@@ -160,14 +153,6 @@ JOWW(jint, JMClientApp_SyncGroupSeqn)(JNIEnv *jni, jobject j_app, jstring strGro
 	JMClientApp* jApp = GetJApp(jni, j_app);
 	JavaString jstrGroupId(strGroupId);
 	return jApp->SyncGroupSeqn(jstrGroupId.ToString8().c_str(), seqn, role);
-}
-
-
-JOWW(jint, JMClientApp_SyncGroupData)(JNIEnv *jni, jobject j_app, jstring strGroupId, jlong seqn)
-{
-	JMClientApp* jApp = GetJApp(jni, j_app);
-	JavaString jstrGroupId(strGroupId);
-	return jApp->SyncGroupData(jstrGroupId.ToString8().c_str(), seqn);
 }
 
 
