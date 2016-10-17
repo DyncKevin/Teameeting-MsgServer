@@ -414,6 +414,3 @@ int SRTConnManager::DispTimerCallback(const char*pData, int nLen)
     }
     return 0;
 }
-
-
-

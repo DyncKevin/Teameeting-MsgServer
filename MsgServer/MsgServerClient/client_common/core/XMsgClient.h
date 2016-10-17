@@ -309,7 +309,6 @@ private:
                 // if no data processing
                 // call syncseqn to get max seqn
 
-                //LOG(INFO) << "XMsgClient::UUpdateUserSeqn =======>>>Call NotifySyncSeqn, itCurSeqn:" << itCurSeqn->second << ", m_syncDataMaxSeqn:" << m_syncDataMaxSeqn;
                 if (itCurSeqn->second == m_syncDataMaxSeqn)
                 {
                     if (m_pClientImpl)
@@ -434,7 +433,6 @@ private:
             {
                 // if no data processing
                 // call syncseqn to get max seqn
-                //LOG(INFO) << "XMsgClient::GUpdateUserSeqn =======>>>Call NotifySyncGroupSeqn, itCurSeqn:" << itCurSeqn->second << ", m_syncGroupDataMaxSeqn:" << m_syncGroupDataMaxSeqn;
                 if (itCurSeqn->second == m_syncGroupDataMaxSeqn)
                 {
                     if (m_pClientImpl)
@@ -503,8 +501,6 @@ private:
                 continue;
             } else {
                 // just for test for a while
-
-                LOG(INFO) << "XMsgClient::GUpdateUserSeqn =======NOTFIND NOTFIND NOT FIND>>>Call NotifySyncGroupSeqn, itCurSeqn:" << itCurSeqn->second << ", m_syncGroupDataMaxSeqn:" << m_syncGroupDataMaxSeqn;
                 break;
 
 
@@ -522,7 +518,6 @@ private:
                     break;
                 } else { // find sk
 
-                    LOG(INFO) << "XMsgClient::GUpdateUserSeqn =======>>>SyncOneGroupData uid:" << m_uid << ", time:" << skit->second;
                     if (skit->second > SYNC_DATA_RETRY_TIMES) { // has try sync data 5 times
                         // if curseqn < maxseqn, drop current seqn sync, itCurSeqn->second += 1;
                         // sync the next one

@@ -189,7 +189,6 @@ void XTcpClientImpl::OnMessage(rtc::Message* msg)
         if (msg->pdata) {
             RelayedMsgData* pd = static_cast< RelayedMsgData* >(msg->pdata);
             if (pd) {
-                //LOG(INFO) << "XTcpClientImpl::OnMessage OnClientSyncGroupSeqn msg->pdata " << pd->data();
                 m_rCallback.OnClientSyncGroupSeqn(pd->data());
             }
             delete pd;

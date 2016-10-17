@@ -38,6 +38,7 @@ SRTTransferSession::~SRTTransferSession()
          m_RecvMsgBuf.pop();
     }
     DelObserver(this);
+    LI("SRTTransferSession::~SRTTransferSession ......\n");
     Unit();
 }
 

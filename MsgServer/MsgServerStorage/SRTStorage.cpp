@@ -13,6 +13,7 @@
 #include "RTUtils.hpp"
 #include "SRTStorageManager.h"
 #include "SRTStorageRedis.h"
+#include "SRTConnManager.h"
 
 
 static bool		g_inited = false;
@@ -192,4 +193,6 @@ void SRTStorage::Stop()
     SRTStorageManager::Instance().SignalKill();
     SRTStorageManager::Instance().ClearAll();
     SRTStorageManager::Instance().UninManager();
+    SRTConnManager::Instance().SignalKill();
+    SRTConnManager::Instance().ClearAll();
 }

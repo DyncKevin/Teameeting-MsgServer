@@ -389,7 +389,7 @@ void DRTTransferSession::OnTypeQueue(const std::string& str)
     struct timeval tv;
     gettimeofday(&tv, NULL);
 
-    LI("DRTTransferSession::OnTypeQueue ----auser:%s,---time:%lld\n", auser.users(0).c_str(), (long long)tv.tv_sec);
+    //LI("DRTTransferSession::OnTypeQueue ----auser:%s,---time:%lld\n", auser.users(0).c_str(), (long long)tv.tv_sec);
     std::string sd = rmsg.SerializeAsString();
     m_msgDispatch.SendData(sd.c_str(), (int)sd.length());
 #endif

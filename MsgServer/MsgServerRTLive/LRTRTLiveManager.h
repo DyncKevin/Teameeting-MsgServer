@@ -68,7 +68,6 @@ protected:
     }
 private:
     std::vector<std::string>            m_RedisHosts;
-    std::list<LRTTransferSession*>      m_TransferSessions;
 };
 
 #endif /* defined(__MsgServerRTLive__LRTRTLiveManager__) */

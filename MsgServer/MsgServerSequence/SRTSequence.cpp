@@ -13,6 +13,7 @@
 #include "RTUtils.hpp"
 #include "SRTSequenceManager.h"
 #include "SRTSequenceRedis.h"
+#include "SRTConnManager.h"
 
 
 static bool		g_inited = false;
@@ -201,4 +202,6 @@ void SRTSequence::Stop()
     SRTSequenceManager::Instance().ClearAll();
     SRTSequenceManager::Instance().UninManager();
     //SRTSequenceManager::Instance().ClearRedisServer();
+    SRTConnManager::Instance().SignalKill();
+    SRTConnManager::Instance().ClearAll();
 }

@@ -73,6 +73,7 @@ void SRTStorageRedis::Unin()
          delete m_RedisDBIdx;
          m_RedisDBIdx = nullptr;
     }
+    m_xRedisClient.Release();
 }
 
 // from RTEventLooper
@@ -90,7 +91,7 @@ void SRTStorageRedis::OnWakeupEvent(const void*pData, int nSize)
     {
         pms::StorageMsg store = m_QueuePostMsg.front();
 
-        LI("SRTStorageRedis::OnWakeupEvent was enter called, ruserid:%s, storeid:%s, sequence:%lld, sdmaxseqn:%lld\n"\
+        //LI("SRTStorageRedis::OnWakeupEvent was enter called, ruserid:%s, storeid:%s, sequence:%lld, sdmaxseqn:%lld\n"\
                 , store.ruserid().c_str()\
                 , store.storeid().c_str()\
                 , store.sequence(), store.sdmaxseqn());
@@ -198,6 +199,12 @@ void SRTStorageRedis::PushToQueue(pms::StorageMsg request)
 {
     {
         OSMutexLocker locker(&m_MutexRecvPost);
+        if (request.msgid().c_str())
+        {
+            LI("SRTStorageRedis::PushToQueue m_QueuePushMsg.push msgid.len:%d, msgid:%s\n", request.msgid().length(), request.msgid().c_str());
+        } else {
+            LE("SRTStorageRedis::PushToQueue m_QueuePushMsg.push not msgid userid:%s, svrcmd:%d\n", request.ruserid().c_str(), request.rsvrcmd());
+        }
         m_QueuePushMsg.push(request);
     }
     this->Signal(Task::kIdleEvent);
@@ -208,6 +215,12 @@ void SRTStorageRedis::PostToQueue(pms::StorageMsg request)
 {
     {
         OSMutexLocker locker(&m_MutexRecvPush);
+        if (request.msgid().c_str())
+        {
+            LI("SRTStorageRedis::PostToQueue m_QueuePostMsg.push msgid.len:%d, msgid:%s\n", request.msgid().length(), request.msgid().c_str());
+        } else {
+            LE("SRTStorageRedis::PostToQueue m_QueuePostMsg.push not msgid userid:%s, svrcmd:%d\n", request.ruserid().c_str(), request.rsvrcmd());
+        }
         m_QueuePostMsg.push(request);
     }
     this->Signal(Task::kWakeupEvent);

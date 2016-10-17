@@ -57,12 +57,12 @@ int main(int argc, const char * argv[]) {
 
     SRTStorage::Initialize(1024);
     SRTStorage* pStorage = SRTStorage::Inst();
+    //int test = 0;
     int res = pStorage->Start(conf);
     if (res != 0) {
         //////LI("SRTStorage start failed and goto exit, res:%d\n", res);
         goto EXIT;
     }
-    //int test = 0;
     //while (test++ < 60) {
     while (1) {
         pStorage->DoTick();

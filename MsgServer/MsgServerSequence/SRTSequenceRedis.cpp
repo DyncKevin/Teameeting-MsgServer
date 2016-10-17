@@ -70,6 +70,7 @@ void SRTSequenceRedis::Unin()
          delete m_RedisDBIdx;
          m_RedisDBIdx = nullptr;
     }
+    m_xRedisClient.Release();
 }
 
 // from RTEventLooper

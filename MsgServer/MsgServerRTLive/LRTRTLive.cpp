@@ -253,8 +253,26 @@ void LRTRTLive::DoTick()
 
 void LRTRTLive::Stop()
 {
-    LRTConnManager::Instance().UninManager();
+    if (m_pRTLiveListener)
+    {
+         delete m_pRTLiveListener;
+         m_pRTLiveListener = nullptr;
+    }
+    if (m_pGroupListener)
+    {
+         delete m_pGroupListener;
+         m_pGroupListener = nullptr;
+    }
+    if (m_pPushListener)
+    {
+         delete m_pPushListener;
+         m_pPushListener = nullptr;
+    }
+
     LRTRTLiveManager::Instance().SignalKill();
     LRTRTLiveManager::Instance().ClearAll();
     LRTRTLiveManager::Instance().UninManager();
+    LRTConnManager::Instance().SignalKill();
+    LRTConnManager::Instance().ClearAll();
+    LRTConnManager::Instance().UninManager();
 }

@@ -23,9 +23,6 @@
 
 #include "ProtoCommon.h"
 
-#define HR_USERID       "hr_userid"
-#define HR_CONNECTORID  "hr_connectorid"
-
 class SRTTransferSession;
 
 class SRTStorageManager : public RTSingleton< SRTStorageManager >{
@@ -36,11 +33,6 @@ public:
     bool RecvRequestCounter();
     bool SendResponseCounter();
 
-    void AddRedisServer(SRTStorageRedis* redis)
-    {
-        m_RedisGroups.push_back(redis);
-    }
-
     bool InitManager()
     {
     }
@@ -48,32 +40,6 @@ public:
     bool UninManager()
     {
         m_RedisHosts.clear();
-    }
-
-    void DelRedisServer(const std::string& host, int port)
-    {
-        std::vector<SRTStorageRedis*>::iterator it = m_RedisGroups.begin();
-        while(it != m_RedisGroups.end())
-        {
-            if((*it)->IsTheSameRedis(host, port))
-            {
-                delete *it;
-                m_RedisGroups.erase(it);
-                break;
-            }
-            it++;
-        }
-    }
-
-    void ClearRedisServer()
-    {
-        std::vector<SRTStorageRedis*>::iterator it = m_RedisGroups.begin();
-        while(it != m_RedisGroups.end())
-        {
-            delete *it;
-            m_RedisGroups.erase(it);
-            it++;
-        }
     }
 
     void PushRedisHosts(std::string host)
@@ -103,8 +69,6 @@ protected:
     }
 private:
     std::vector<std::string>            m_RedisHosts;
-    std::vector<SRTStorageRedis*>       m_RedisGroups;
-    std::list<SRTTransferSession*>      m_TransferSessions;
 };
 
 #endif /* defined(__MsgServerStorage__SRTStorageManager__) */
