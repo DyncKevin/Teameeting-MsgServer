@@ -173,7 +173,6 @@ int	SRTSequence::Start(const MsConfigParser& conf)
     SRTSequenceManager::Instance().PushRedisHosts(addr);
 
     std::string ssid;
-    LI("SRTSequence ip:%s, port:%u\n", strLocalIp.c_str(), nSequencePort);
     if (nSequencePort > 0) {
         m_pSequenceListener = new SRTSequenceListener();
         OS_Error err = m_pSequenceListener->Initialize(INADDR_ANY, nSequencePort);

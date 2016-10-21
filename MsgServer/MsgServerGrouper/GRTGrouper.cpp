@@ -128,19 +128,22 @@ int	GRTGrouper::Start(const MsConfigParser& conf)
     int debug = conf.GetIntVal("global", "debug", 1);
 
     std::string strLocalIp("");
+    std::string strRtliveIp("");
     std::string strHttpIp("");
     std::string strRedisIp1("");
     if (debug==1)
     {
         strLocalIp = conf.GetValue("global", "grouper_int_ip", "127.0.0.1");
+        strRtliveIp = conf.GetValue("global", "rtlive_int_ip", "127.0.0.1");
         strHttpIp = conf.GetValue("resetful", "http_int_ip", "127.0.0.1");
         strRedisIp1 = conf.GetValue("redis", "redis_int_ip1", "127.0.0.1");
     } else {
         strLocalIp = conf.GetValue("global", "grouper_ext_ip", "127.0.0.1");
+        strRtliveIp = conf.GetValue("global", "rtlive_ext_ip", "127.0.0.1");
         strHttpIp = conf.GetValue("resetful", "http_ext_ip", "127.0.0.1");
         strRedisIp1 = conf.GetValue("redis", "redis_ext_ip1", "127.0.0.1");
     }
-    if (strLocalIp.length()==0 || strHttpIp.length()==0 || strRedisIp1.length()==0) {
+    if (strLocalIp.length()==0 || strRtliveIp.length()==0 || strHttpIp.length()==0 || strRedisIp1.length()==0) {
         std::cout << "Error: Ip length is 0!" << std::endl;
         std::cout << "Please enter any key to exit ..." << std::endl;
         getchar();
@@ -202,7 +205,7 @@ int	GRTGrouper::Start(const MsConfigParser& conf)
     if(nGroupmgrPort > 0)
 	{
         char addr[24] = {0};
-        sprintf(addr, "%s %u", strLocalIp.c_str(), nGroupmgrPort);
+        sprintf(addr, "%s %u", strRtliveIp.c_str(), nGroupmgrPort);
         GRTConnManager::Instance().GetGroupMgrAddrList()->push_front(addr);
 
         LI("ConnectGroupMgr was called...\n");

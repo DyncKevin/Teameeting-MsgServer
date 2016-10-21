@@ -125,16 +125,22 @@ int	LRTLogical::Start(const MsConfigParser& conf)
     int debug = conf.GetIntVal("global", "debug", 1);
 
     std::string strLocalIp("");
+    std::string strSequenceIp("");
+    std::string strStorageIp("");
     std::string strHttpIp("");
     if (debug==1)
     {
         strLocalIp = conf.GetValue("global", "logical_int_ip", "127.0.0.1");
+        strSequenceIp = conf.GetValue("global", "sequence_int_ip", "127.0.0.1");
+        strStorageIp = conf.GetValue("global", "storage_int_ip", "127.0.0.1");
         strHttpIp = conf.GetValue("resetful", "http_int_ip", "127.0.0.1");
     } else {
         strLocalIp = conf.GetValue("global", "logical_ext_ip", "127.0.0.1");
+        strSequenceIp = conf.GetValue("global", "sequence_ext_ip", "127.0.0.1");
+        strStorageIp = conf.GetValue("global", "storage_ext_ip", "127.0.0.1");
         strHttpIp = conf.GetValue("resetful", "http_ext_ip", "127.0.0.1");
     }
-    if (strLocalIp.length()==0 || strHttpIp.length()==0) {
+    if (strLocalIp.length()==0 || strSequenceIp.length()==0 || strStorageIp.length()==0 || strHttpIp.length()==0) {
         std::cout << "Error: Ip length is 0!" << std::endl;
         std::cout << "Please enter any key to exit ..." << std::endl;
         getchar();
@@ -160,7 +166,7 @@ int	LRTLogical::Start(const MsConfigParser& conf)
 	if(nSequencePort > 0)
 	{
         char addr[24] = {0};
-        sprintf(addr, "%s %d", strLocalIp.c_str(), nSequencePort);
+        sprintf(addr, "%s %d", strSequenceIp.c_str(), nSequencePort);
         LRTConnManager::Instance().GetSequenceAddrList()->push_front(addr);
 
         if (!(LRTConnManager::Instance().ConnectSequence())) {
@@ -173,7 +179,7 @@ int	LRTLogical::Start(const MsConfigParser& conf)
     if(nStoragePort > 0)
 	{
         char addr[24] = {0};
-        sprintf(addr, "%s %u", strLocalIp.c_str(), nStoragePort);
+        sprintf(addr, "%s %u", strStorageIp.c_str(), nStoragePort);
         LRTConnManager::Instance().GetStorageAddrList()->push_front(addr);
 
         if (!(LRTConnManager::Instance().ConnectStorage())) {

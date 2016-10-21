@@ -130,16 +130,19 @@ int	DRTMsgQueue::Start(const MsConfigParser& conf)
     int debug = conf.GetIntVal("global", "debug", 1);
 
     std::string strLocalIp("");
+    std::string strConnectorIp("");
     std::string strHttpIp("");
     if (debug==1)
     {
         strLocalIp = conf.GetValue("global", "dispatcher_int_ip", "127.0.0.1");
+        strConnectorIp = conf.GetValue("global", "connector_int_ip", "127.0.0.1");
         strHttpIp = conf.GetValue("resetful", "http_int_ip", "127.0.0.1");
     } else {
         strLocalIp = conf.GetValue("global", "dispatcher_ext_ip", "127.0.0.1");
+        strConnectorIp = conf.GetValue("global", "connector_ext_ip", "127.0.0.1");
         strHttpIp = conf.GetValue("resetful", "http_ext_ip", "127.0.0.1");
     }
-    if (strLocalIp.length()==0 || strHttpIp.length()==0) {
+    if (strLocalIp.length()==0 || strConnectorIp.length()==0 || strHttpIp.length()==0) {
         std::cout << "Error: Ip length is 0!" << std::endl;
         std::cout << "Please enter any key to exit ..." << std::endl;
         getchar();
@@ -175,7 +178,7 @@ int	DRTMsgQueue::Start(const MsConfigParser& conf)
 	if(nConnPort > 0)
 	{
         char addr[24] = {0};
-        sprintf(addr, "%s %u", strLocalIp.c_str(), nConnPort);
+        sprintf(addr, "%s %u", strConnectorIp.c_str(), nConnPort);
         DRTConnManager::Instance().GetAddrsList()->push_front(addr);
 
         if (!(DRTConnManager::Instance().ConnectConnector())) {

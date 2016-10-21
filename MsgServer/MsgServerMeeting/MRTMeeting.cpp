@@ -120,16 +120,22 @@ int	MRTMeeting::Start(const MsConfigParser& conf)
     int debug = conf.GetIntVal("global", "debug", 1);
 
     std::string strLocalIp("");
+    std::string strConnectorIp("");
+    std::string strDispatcherIp("");
     std::string strHttpIp("");
     if (debug==1)
     {
         strLocalIp = conf.GetValue("global", "meeting_int_ip", "127.0.0.1");
+        strConnectorIp = conf.GetValue("global", "connector_int_ip", "127.0.0.1");
+        strDispatcherIp = conf.GetValue("global", "dispatcher_int_ip", "127.0.0.1");
         strHttpIp = conf.GetValue("resetful", "http_int_ip", "127.0.0.1");
     } else {
         strLocalIp = conf.GetValue("global", "meeting_ext_ip", "127.0.0.1");
+        strConnectorIp = conf.GetValue("global", "connector_ext_ip", "127.0.0.1");
+        strDispatcherIp = conf.GetValue("global", "dispatcher_ext_ip", "127.0.0.1");
         strHttpIp = conf.GetValue("resetful", "http_ext_ip", "127.0.0.1");
     }
-    if (strLocalIp.length()==0 || strHttpIp.length()==0) {
+    if (strLocalIp.length()==0 || strConnectorIp.length()==0 || strDispatcherIp.length()==0 || strHttpIp.length()==0) {
         std::cout << "Error: Ip length is 0!" << std::endl;
         std::cout << "Please enter any key to exit ..." << std::endl;
         getchar();
@@ -159,7 +165,7 @@ int	MRTMeeting::Start(const MsConfigParser& conf)
     LI("[][]MeetingId:%s\n", mid.c_str());
 
     char addr[24] = {0};
-    sprintf(addr, "%s %u", strLocalIp.c_str(), nConnPort);
+    sprintf(addr, "%s %u", strConnectorIp.c_str(), nConnPort);
     MRTConnManager::Instance().GetAddrsList()->push_front(addr);
 
     if (!(MRTConnManager::Instance().ConnectConnector())) {
@@ -167,7 +173,7 @@ int	MRTMeeting::Start(const MsConfigParser& conf)
         return -1;
     }
 
-    if (!(MRTRoomManager::Instance().Init(strLocalIp.c_str(), nDispPort, strHttpIp.c_str(), nHttpPort, hh))) {
+    if (!(MRTRoomManager::Instance().Init(strDispatcherIp.c_str(), nDispPort, strHttpIp.c_str(), nHttpPort, hh))) {
         LE("Start to RoomManager Init failed\n");
         return -1;
     }
