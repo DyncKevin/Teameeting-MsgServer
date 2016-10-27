@@ -13,7 +13,7 @@
 #include <google/protobuf/message.h>
 
 #ifndef _TEST_
-#define _TEST_ 1
+#define _TEST_ 0
 #endif
 
 int main(int argc, const char * argv[]) {
@@ -26,7 +26,8 @@ int main(int argc, const char * argv[]) {
         getchar();
         exit(0);
     }
-#if 0
+
+#if 1
 #if _TEST_
     if (RTZKClient::Instance().InitOnly(argv[1])!=0) {
 #else
@@ -37,22 +38,20 @@ int main(int argc, const char * argv[]) {
         getchar();
         exit(0);
     }
+#endif
 
-    int level = RTZKClient::Instance().GetServerConfig().Level;
-    std::string logpath = RTZKClient::Instance().GetServerConfig().LogPath;
-    if (logpath.empty())
-        L_Init(level, NULL);
-    else
-        L_Init(level, logpath.c_str());
+#if 0
+    L_Init(0, NULL);
+#else
+    L_Init(0, "./logsequence.log");
 #endif
 
     MsConfigParser conf;
     conf.LoadFromFile(argv[2]);
 
-    //int test = 0;
-    L_Init(0, NULL);
     SRTSequence::Initialize(1024);
     SRTSequence* pSequence = SRTSequence::Inst();
+    //int test = 0;
     int res = pSequence->Start(conf);
     if (res != 0) {
         //////LI("SRTSequence start failed and goto exit, res:%d\n", res);
@@ -69,7 +68,7 @@ EXIT:
     pSequence->Stop();
     SRTSequence::DeInitialize();
     L_Deinit();
-    //RTZKClient::Instance().Unin();
+    RTZKClient::Instance().Unin();
     google::protobuf::ShutdownProtobufLibrary();
     return 0;
 }

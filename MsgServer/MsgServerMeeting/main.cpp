@@ -13,7 +13,7 @@
 #include <google/protobuf/message.h>
 
 #ifndef _TEST_
-#define _TEST_ 1
+#define _TEST_ 0
 #endif
 
 int main(int argc, const char * argv[]) {
@@ -36,13 +36,11 @@ int main(int argc, const char * argv[]) {
         getchar();
         exit(0);
     }
-
-    int level = RTZKClient::Instance().GetServerConfig().Level;
-    std::string logpath = RTZKClient::Instance().GetServerConfig().LogPath;
-    if (logpath.empty())
-        L_Init(level, NULL);
-    else
-        L_Init(level, logpath.c_str());
+#if 0
+    L_Init(0, NULL);
+#else
+    L_Init(0, "./logmeeting.log");
+#endif
 
     MsConfigParser conf;
     conf.LoadFromFile(argv[2]);

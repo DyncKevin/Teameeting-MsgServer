@@ -2,8 +2,6 @@
 #define __SERVER_CONFIG_H__
 
 #include <vector>
-//#include <json/json.h>
-#include "common.h"
 
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
@@ -24,13 +22,6 @@ public:
 	std::string ModulePath;
 	std::string ProjectPath;
 
-	std::string HttpIp;
-	std::string LogPath;
-	int Debug;
-	int Level;
-
-	PortConfig portConfig;
-
 	ServerConfig();
     ~ServerConfig();
 
@@ -41,7 +32,6 @@ public:
 	std::string toStyledString() const;
 
 private:
-	int loadPortsConfigs(const rapidjson::Value& v);
 
 };
 

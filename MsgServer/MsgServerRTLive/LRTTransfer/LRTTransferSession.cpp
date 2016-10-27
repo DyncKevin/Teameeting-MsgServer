@@ -1045,6 +1045,7 @@ void LRTTransferSession::OnResponse(const char*pData, int nLen)
 
 void LRTTransferSession::ConnectionDisconnected()
 {
+    LI("LRTTransferSession::ConnectionDisconnected was called, m_transferSessId:%s\n", m_transferSessId.c_str());
     if (m_transferSessId.length()>0) {
         m_connectingStatus = 0;
         m_IsValid = false;

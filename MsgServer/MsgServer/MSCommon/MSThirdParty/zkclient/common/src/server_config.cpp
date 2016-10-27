@@ -18,10 +18,7 @@ ServerConfig::ServerConfig()
      ,NodePath("")
      ,ModulePath("")
      ,ProjectPath("")
-     ,HttpIp("")
-     ,LogPath("")
-     ,Debug(0)
-     ,Level(0){
+     {
      }
 
 ServerConfig::~ServerConfig(){
@@ -87,101 +84,10 @@ int ServerConfig::parseFromJson(const rapidjson::Document& root){
     }
     ProjectPath = root["ProjectPath"].GetString();
 
-    if(!(root.HasMember("HttpIp") && root["HttpIp"].IsString()))
-    {
-        return -1;
-    }
-    HttpIp = root["HttpIp"].GetString();
+    printf("Ip:%s, type:%s, zkurl:%s, nodepath:%s, module:%s, project:%s\n", IP.c_str(), Type.c_str(), ZkUrl.c_str(), NodePath.c_str()
+            , ModulePath.c_str(), ProjectPath.c_str());
 
-    if(!(root.HasMember("LogPath") && root["LogPath"].IsString()))
-    {
-        return -1;
-    }
-    LogPath = root["LogPath"].GetString();
-
-    if(!(root.HasMember("Debug") && root["Debug"].IsInt()))
-    {
-        return -1;
-    }
-    Debug = root["Debug"].GetInt();
-
-    if(!(root.HasMember("Level") && root["Level"].IsInt()))
-    {
-        return -1;
-    }
-    Level = root["Level"].GetInt();
-
-	ret = loadPortsConfigs(root["PortConfigs"]);
-    printf("Ip:%s, type:%s, zkurl:%s, nodepath:%s, module:%s, projeect:%s, httpip:%s, logpath:%s, debug:%d, level:%d\n", IP.c_str(), Type.c_str(), ZkUrl.c_str(), NodePath.c_str()
-            , ModulePath.c_str(), ProjectPath.c_str()
-            , HttpIp.c_str(), LogPath.c_str()
-            , Debug, Level);
-
-	return ret;
-}
-
-int ServerConfig::loadPortsConfigs(const rapidjson::Value& v){
-
-    const rapidjson::Value& cf = v;
-
-    const rapidjson::Value& Type = cf["Type"];
-    const rapidjson::Value& Port = cf["Port"];
-
-    if(!Type.IsInt() || !Port.IsObject()){
-        fprintf(stderr, "loadPortsConfigs error");
-        return -1;
-    }
-    printf("loadPortsConfigs Type:%d\n", Type.GetInt());
-    if (Type.GetInt()==1) {
-        const rapidjson::Value& ListenWebcon = Port["ListenWebcon"];
-        const rapidjson::Value& ListenModule = Port["ListenModule"];
-        const rapidjson::Value& ListenClicon = Port["ListenClicon"];
-        if(!ListenWebcon.IsInt() || !ListenModule.IsInt() || !ListenClicon.IsInt()){
-            return -1;
-        }
-
-        portConfig.MTYPE = Type.GetInt();
-        portConfig.connector.ListenWebcon = ListenWebcon.GetInt();
-        portConfig.connector.ListenModule = ListenModule.GetInt();
-        portConfig.connector.ListenClicon = ListenClicon.GetInt();
-        //printf("connector type:%d, webcon:%d, module:%d, clicon:%d\n\n", portConfig.MTYPE, portConfig.connector.ListenWebcon
-        //        , portConfig.connector.ListenModule, portConfig.connector.ListenClicon);
-    } else if (Type.GetInt()==2) {
-        const rapidjson::Value& AcceptConn = Port["AcceptConn"];
-        const rapidjson::Value& ListenDisp = Port["ListenDisp"];
-        const rapidjson::Value& ListenHttp = Port["ListenHttp"];
-        if(!AcceptConn.IsInt() || !ListenDisp.IsInt() || !ListenHttp.IsInt()){
-            return -1;
-        }
-        portConfig.MTYPE = Type.GetInt();
-        portConfig.dispatcher.AcceptConn = AcceptConn.GetInt();
-        portConfig.dispatcher.ListenDisp = ListenDisp.GetInt();
-        portConfig.dispatcher.ListenHttp = ListenHttp.GetInt();
-        //printf("dispatcher type:%d, webcon:%d, module:%d, clicon:%d\n\n", portConfig.MTYPE, portConfig.dispatcher.AcceptConn
-        //        , portConfig.dispatcher.ListenDisp, portConfig.dispatcher.ListenHttp);
-    } else if (Type.GetInt()==3) {
-        const rapidjson::Value& AcceptConn = Port["AcceptConn"];
-        const rapidjson::Value& AcceptDisp = Port["AcceptDisp"];
-        const rapidjson::Value& AcceptHttp = Port["AcceptHttp"];
-        if(!AcceptConn.IsInt() || !AcceptDisp.IsInt() || !AcceptHttp.IsInt()){
-            return -1;
-        }
-        portConfig.MTYPE = Type.GetInt();
-        portConfig.meeting.AcceptConn = AcceptConn.GetInt();
-        portConfig.meeting.AcceptDisp = AcceptDisp.GetInt();
-        portConfig.meeting.AcceptHttp = AcceptHttp.GetInt();
-        //printf("meeting type:%d, webcon:%d, module:%d, clicon:%d\n\n", portConfig.MTYPE, portConfig.meeting.AcceptConn
-        //        , portConfig.meeting.AcceptDisp, portConfig.meeting.AcceptHttp);
-    } else if (Type.GetInt()==4) {
-        const rapidjson::Value& ListenClicon = Port["ListenClicon"];
-        if(!ListenClicon.IsInt()){
-            return -1;
-        }
-        portConfig.MTYPE = Type.GetInt();
-        portConfig.sequence.ListenClicon = ListenClicon.GetInt();
-    }
-
-    return 0;
+	return 0;
 }
 
 string ServerConfig::toStyledString() const{
@@ -196,38 +102,6 @@ string ServerConfig::toStyledString() const{
     jDoc.AddMember("NodePath", NodePath.c_str(), jDoc.GetAllocator());
     jDoc.AddMember("ModulePath", ModulePath.c_str(), jDoc.GetAllocator());
     jDoc.AddMember("ProjectPath", ProjectPath.c_str(), jDoc.GetAllocator());
-    jDoc.AddMember("LogPath", LogPath.c_str(), jDoc.GetAllocator());
-
-    PortConfig x = portConfig;
-    rapidjson::Value vv;
-    if (x.MTYPE==1) {
-        vv["Type"] = x.MTYPE;
-        rapidjson::Value vvv;
-        vvv["ListenWebcon"] = x.connector.ListenWebcon;
-        vvv["ListenModule"] = x.connector.ListenModule;
-        vvv["ListenClicon"] = x.connector.ListenClicon;
-        vv["Port"] = vvv;
-    } else if (x.MTYPE==2) {
-        vv["Type"] = x.MTYPE;
-        rapidjson::Value vvv;
-        vvv["AcceptConn"] = x.dispatcher.AcceptConn;
-        vvv["ListenDisp"] = x.dispatcher.ListenDisp;
-        vvv["ListenHttp"] = x.dispatcher.ListenHttp;
-        vv["Port"] = vvv;
-    } else if (x.MTYPE==3) {
-        vv["Type"] = x.MTYPE;
-        rapidjson::Value vvv;
-        vvv["AcceptConn"] = x.meeting.AcceptConn;
-        vvv["AcceptDisp"] = x.meeting.AcceptDisp;
-        vvv["AcceptHttp"] = x.meeting.AcceptHttp;
-        vv["Port"] = vvv;
-    } else if (x.MTYPE==4) {
-        vv["Type"] = x.MTYPE;
-        rapidjson::Value vvv;
-        vvv["ListenClicon"] = x.sequence.ListenClicon;
-        vv["Port"] = vvv;
-    }
-    jDoc.AddMember("PortConfigs", vv, jDoc.GetAllocator());
 
     jDoc.Accept(writer);
     std::string s = sb.GetString();

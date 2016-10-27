@@ -13,7 +13,7 @@
 #include <google/protobuf/message.h>
 
 #ifndef _TEST_
-#define _TEST_ 1
+#define _TEST_ 0
 #endif
 
 int main(int argc, const char * argv[]) {
@@ -26,7 +26,8 @@ int main(int argc, const char * argv[]) {
         getchar();
         exit(0);
     }
-#if 0
+
+#if 1
 #if _TEST_
     if (RTZKClient::Instance().InitOnly(argv[1])!=0) {
 #else
@@ -37,13 +38,6 @@ int main(int argc, const char * argv[]) {
         getchar();
         exit(0);
     }
-
-    int level = RTZKClient::Instance().GetServerConfig().Level;
-    std::string logpath = RTZKClient::Instance().GetServerConfig().LogPath;
-    if (logpath.empty())
-        L_Init(level, NULL);
-    else
-        L_Init(level, logpath.c_str());
 #endif
 
 #if 0
@@ -74,7 +68,7 @@ EXIT:
     pLogical->Stop();
     LRTLogical::DeInitialize();
     L_Deinit();
-    //RTZKClient::Instance().Unin();
+    RTZKClient::Instance().Unin();
     google::protobuf::ShutdownProtobufLibrary();
     return 0;
 }

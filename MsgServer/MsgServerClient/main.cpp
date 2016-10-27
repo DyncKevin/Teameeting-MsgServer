@@ -74,7 +74,7 @@ int main(int argc, const char * argv[]) {
     MsgServerClient::Initialize(1024);
     MsgServerClient* pSClient = MsgServerClient::Inst();
     int res = pSClient->Start(argv[1], "192.168.7.207", 6630);
-    //int test = 0;
+    int test = 0;
     if (res != 0) {
         LI("MsgServerClient start failed and goto exit, res:%d\n", res);
         goto EXIT;
@@ -82,7 +82,8 @@ int main(int argc, const char * argv[]) {
     //while (test++ < 30*1000) {
     //while (test++ < 3000) {
     //while (test++ < 700) {
-    while (1) {
+    while (test++ < 20) {
+    //while (1) {
         pSClient->DoTick();
         //usleep(1000);
         sleep(1);
