@@ -2,7 +2,7 @@
 #define __MsgServerModule_MRTLOGICAL_H__
 #include "TCPListenerSocket.h"
 #include "MRTModuleListener.h"
-#include "MsConfigParser.h"
+#include "RTConfigParser.h"
 
 #include <iostream>
 #include <map>
@@ -35,7 +35,7 @@ public:
 	static MRTModule* Inst();
 
 public:
-	int		Start(const MsConfigParser& conf);
+	int		Start(const RTConfigParser& conf);
 	void	DoTick();
 	void	Stop();
 

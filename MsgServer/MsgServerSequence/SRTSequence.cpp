@@ -120,7 +120,7 @@ SRTSequence::~SRTSequence(void)
     }
 }
 
-int	SRTSequence::Start(const MsConfigParser& conf)
+int	SRTSequence::Start(const RTConfigParser& conf)
 {
 	Assert(g_inited);
     int debug = conf.GetIntVal("global", "debug", 1);

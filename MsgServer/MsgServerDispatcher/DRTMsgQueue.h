@@ -3,7 +3,7 @@
 #include "TCPListenerSocket.h"
 #include "DRTModuleListener.h"
 #include "DRTTransferSession.h"
-#include "MsConfigParser.h"
+#include "RTConfigParser.h"
 
 #include <iostream>
 
@@ -34,7 +34,7 @@ public:
 
 
 public:
-	int		Start(const MsConfigParser& conf);
+	int		Start(const RTConfigParser& conf);
 	void	DoTick();
 	void	Stop();
 

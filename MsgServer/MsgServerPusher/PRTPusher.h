@@ -2,7 +2,7 @@
 #define __MsgServerPusher_PRTPUSHER_H__
 #include "TCPListenerSocket.h"
 #include "PRTPusherListener.h"
-#include "MsConfigParser.h"
+#include "RTConfigParser.h"
 #include "PRTApnsPusher.h"
 
 #include <iostream>
@@ -36,7 +36,7 @@ public:
 	static PRTPusher* Inst();
 
 public:
-	int		Start(const MsConfigParser& conf);
+	int		Start(const RTConfigParser& conf);
 	void	DoTick();
 	void	Stop();
 

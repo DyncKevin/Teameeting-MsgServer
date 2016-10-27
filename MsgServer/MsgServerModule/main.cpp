@@ -52,7 +52,7 @@ int main(int argc, const char * argv[]) {
     L_Init(0, "./logmodule.log");
 #endif
 
-    MsConfigParser conf;
+    RTConfigParser conf;
     conf.LoadFromFile(argv[2]);
     MRTModule::Initialize(1024);
     MRTModule* pModule = MRTModule::Inst();

@@ -57,3 +57,4 @@ MsgServer/client_test/parser/msgclient_parser
 MsgServer/client_test/parser/log_parser
 MsgServer/client_test/parser/parser
 MsgServer/xredis_command/xredis-client
+MsgServer/MsgServerDaemon/print_time

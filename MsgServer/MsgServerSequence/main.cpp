@@ -46,7 +46,7 @@ int main(int argc, const char * argv[]) {
     L_Init(0, "./logsequence.log");
 #endif
 
-    MsConfigParser conf;
+    RTConfigParser conf;
     conf.LoadFromFile(argv[2]);
 
     SRTSequence::Initialize(1024);

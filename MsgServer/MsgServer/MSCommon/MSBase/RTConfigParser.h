@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////
 //  Copyright (c) 2014
 //
-//    FileName:   MsConfigParser.h
+//    FileName:   RTConfigParser.h
 //
 //    Description:
 //
@@ -22,15 +22,15 @@
 #define INVALID_DOUBLE	0.0
 #define NULL_STRING		""
 
-class MsConfigParser
+class RTConfigParser
 {
 private:
-	MsConfigParser( const MsConfigParser & c );
-	MsConfigParser & operator = ( const MsConfigParser & c );
+	RTConfigParser( const RTConfigParser & c );
+	RTConfigParser & operator = ( const RTConfigParser & c );
 
 public:
-	MsConfigParser();
-	~MsConfigParser();
+	RTConfigParser();
+	~RTConfigParser();
 
 	void Clear();
 

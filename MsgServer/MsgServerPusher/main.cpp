@@ -49,7 +49,7 @@ int main(int argc, const char * argv[]) {
     L_Init(0, "./logpusher.log");
 #endif
 
-    MsConfigParser conf;
+    RTConfigParser conf;
     conf.LoadFromFile(argv[2]);
 
     int debug = conf.GetIntVal("global", "debug", 1);

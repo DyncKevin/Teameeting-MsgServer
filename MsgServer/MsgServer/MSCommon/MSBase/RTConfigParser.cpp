@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////
 //  Copyright (c) 2014
 //
-//    FileName:   MsConfigParser.cpp
+//    FileName:   RTConfigParser.cpp
 //
 //    Description:
 //
@@ -11,7 +11,7 @@
 //
 ///////////////////////////////////////////////////////////
 
-#include "MsConfigParser.h"
+#include "RTConfigParser.h"
 #include <stdlib.h> // strtol
 #include <limits.h>	// LLONG_MIN LLONG_MAX
 #include <math.h>
@@ -22,17 +22,17 @@
 using std::map;
 using std::string;
 
-MsConfigParser::MsConfigParser()
+RTConfigParser::RTConfigParser()
 {
 
 }
 
-MsConfigParser::~MsConfigParser()
+RTConfigParser::~RTConfigParser()
 {
 	Clear();
 }
 
-void MsConfigParser::Clear()
+void RTConfigParser::Clear()
 {
 	m_cfg.clear();
 
@@ -46,7 +46,7 @@ void MsConfigParser::Clear()
 	return;
 }
 
-int MsConfigParser::LoadFromFile( const char * filename, int * errline )
+int RTConfigParser::LoadFromFile( const char * filename, int * errline )
 {
 	//ASSERT_RET( ( filename != NULL ), -1 );
 
@@ -177,7 +177,7 @@ int MsConfigParser::LoadFromFile( const char * filename, int * errline )
 	return 0;
 }
 
-char * MsConfigParser::skip_blank( char * str )
+char * RTConfigParser::skip_blank( char * str )
 {
 	//ASSERT_RET( ( str != NULL ), NULL );
 	char * p = str;
@@ -187,7 +187,7 @@ char * MsConfigParser::skip_blank( char * str )
 	return p;
 }
 
-char * MsConfigParser::skip_to_blank( char * str )
+char * RTConfigParser::skip_to_blank( char * str )
 {
 	//ASSERT_RET( ( str != NULL ), NULL );
 	char * p = str;
@@ -197,7 +197,7 @@ char * MsConfigParser::skip_to_blank( char * str )
 	return p;
 }
 
-int MsConfigParser::StoreToFile( const char * filename )
+int RTConfigParser::StoreToFile( const char * filename )
 {
 	//ASSERT_RET( ( filename != NULL ), -1 );
 
@@ -221,13 +221,13 @@ int MsConfigParser::StoreToFile( const char * filename )
 	return 0;
 }
 
-int MsConfigParser::Dump( void )
+int RTConfigParser::Dump( void )
 {
 	return StoreToFile( m_fname.c_str() );
 }
 
 // get value, return NULL when not found.
-const char * MsConfigParser::GetValue( const char * sectname, const char * key, const char * default_val ) const
+const char * RTConfigParser::GetValue( const char * sectname, const char * key, const char * default_val ) const
 {
 	//ASSERT_RET( ( sectname != NULL && key != NULL ), NULL );
 
@@ -242,7 +242,7 @@ const char * MsConfigParser::GetValue( const char * sectname, const char * key, 
 }
 
 // set value, return 0 when success;  < 0 when error,
-int MsConfigParser::SetValue( const char * sectname, const char * key, const char * value )
+int RTConfigParser::SetValue( const char * sectname, const char * key, const char * value )
 {
 	//ASSERT_RET( ( sectname != NULL && key != NULL && value != NULL ), -1 );
 
@@ -252,7 +252,7 @@ int MsConfigParser::SetValue( const char * sectname, const char * key, const cha
 }
 
 // get int (double), ATTENTION!! we return 0 (0.0) when error.
-int MsConfigParser::GetIntVal( const char * sectname, const char * key, int default_val ) const
+int RTConfigParser::GetIntVal( const char * sectname, const char * key, int default_val ) const
 {
 	//ASSERT_RET( ( sectname != NULL && key != NULL ), -1 );
 
@@ -276,7 +276,7 @@ int MsConfigParser::GetIntVal( const char * sectname, const char * key, int defa
 	return val;
 }
 
-int MsConfigParser::SetIntVal( const char * sectname, const char * key, int value )
+int RTConfigParser::SetIntVal( const char * sectname, const char * key, int value )
 {
 	//ASSERT_RET( ( sectname != NULL && key != NULL ), -1 );
 
@@ -289,7 +289,7 @@ int MsConfigParser::SetIntVal( const char * sectname, const char * key, int valu
 	return SetValue( sectname, key, buf );
 }
 
-double MsConfigParser::GetDblVal( const char * sectname, const char * key, double default_val ) const
+double RTConfigParser::GetDblVal( const char * sectname, const char * key, double default_val ) const
 {
 	//ASSERT_RET( ( sectname != NULL && key != NULL ), 0.0 );
 
@@ -313,7 +313,7 @@ double MsConfigParser::GetDblVal( const char * sectname, const char * key, doubl
 	return val;
 }
 
-int MsConfigParser::SetDblVal( const char * sectname, const char * key, double value )
+int RTConfigParser::SetDblVal( const char * sectname, const char * key, double value )
 {
 	//ASSERT_RET( ( sectname != NULL && key != NULL ), -1 );
 
@@ -326,7 +326,7 @@ int MsConfigParser::SetDblVal( const char * sectname, const char * key, double v
 	return SetValue( sectname, key, buf );
 }
 
-double MsConfigParser::GetInt64Val( const char * sectname, const char * key, double default_val ) const
+double RTConfigParser::GetInt64Val( const char * sectname, const char * key, double default_val ) const
 {
 	//ASSERT_RET( ( sectname != NULL && key != NULL ), -1 );
 
@@ -350,7 +350,7 @@ double MsConfigParser::GetInt64Val( const char * sectname, const char * key, dou
 	return val;
 }
 
-int MsConfigParser::SetInt64Val( const char * sectname, const char * key, double value )
+int RTConfigParser::SetInt64Val( const char * sectname, const char * key, double value )
 {
 	//ASSERT_RET( ( sectname != NULL && key != NULL ), -1 );
 
@@ -363,7 +363,7 @@ int MsConfigParser::SetInt64Val( const char * sectname, const char * key, double
 	return SetValue( sectname, key, buf );
 }
 
-int MsConfigParser::DelKey( const char * sectname, const char * key )
+int RTConfigParser::DelKey( const char * sectname, const char * key )
 {
 	//ASSERT_RET( ( sectname != NULL && key != NULL ), -1 );
 
@@ -379,7 +379,7 @@ int MsConfigParser::DelKey( const char * sectname, const char * key )
 	return -1; // not found
 }
 
-int MsConfigParser::DelSection( const char * sectname )
+int RTConfigParser::DelSection( const char * sectname )
 {
 	//ASSERT_RET( ( sectname != NULL ), -1 );
 
@@ -392,12 +392,12 @@ int MsConfigParser::DelSection( const char * sectname )
 	return -1;
 }
 
-int MsConfigParser::GetSectionNum() const
+int RTConfigParser::GetSectionNum() const
 {
 	return (int)m_cfg.size();
 }
 
-const char * MsConfigParser::GetSectionName( int index ) const
+const char * RTConfigParser::GetSectionName( int index ) const
 {
 	//ASSERT_RET( ( index >= 0 ), NULL );
 
@@ -412,7 +412,7 @@ const char * MsConfigParser::GetSectionName( int index ) const
 	return NULL;
 }
 
-int MsConfigParser::GetSectionKeyNum( const char * sectname ) const
+int RTConfigParser::GetSectionKeyNum( const char * sectname ) const
 {
 	//ASSERT_RET( (sectname != NULL), -1 );
 
@@ -423,7 +423,7 @@ int MsConfigParser::GetSectionKeyNum( const char * sectname ) const
 	return 0;
 }
 
-const char * MsConfigParser::GetSectionKeyName( const char * sectname, int index ) const
+const char * RTConfigParser::GetSectionKeyName( const char * sectname, int index ) const
 {
 	//ASSERT_RET( (sectname != NULL && index >= 0), NULL );
 

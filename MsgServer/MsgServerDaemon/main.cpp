@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include <iostream>
 #include "rtklog.h"
-#include "MsConfigParser.h"
+#include "RTConfigParser.h"
 #include "RTZKClient.hpp"
 #include <google/protobuf/message.h>
 
@@ -47,7 +47,7 @@ int main(int argc, const char * argv[]) {
     FILE* fp;
     time_t t;
 
-    MsConfigParser conf;
+    RTConfigParser conf;
     conf.LoadFromFile(argv[2]);
     int res = daemon(2, 4);
     if (res != 0) {

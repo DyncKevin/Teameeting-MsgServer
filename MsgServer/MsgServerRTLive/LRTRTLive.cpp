@@ -119,7 +119,7 @@ LRTRTLive::~LRTRTLive(void)
     }
 }
 
-int	LRTRTLive::Start(const MsConfigParser& conf)
+int	LRTRTLive::Start(const RTConfigParser& conf)
 {
 	Assert(g_inited);
     int debug = conf.GetIntVal("global", "debug", 1);

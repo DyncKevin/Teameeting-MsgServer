@@ -2,7 +2,7 @@
 #define __MsgServerMeeting_MRT_MEETING_H__
 #include "TCPListenerSocket.h"
 #include "MRTTransferSession.h"
-#include "MsConfigParser.h"
+#include "RTConfigParser.h"
 
 #include <iostream>
 
@@ -23,7 +23,7 @@ public:
 	static MRTMeeting* Inst();
 
 public:
-	int		Start(const MsConfigParser& conf);
+	int		Start(const RTConfigParser& conf);
 	void	DoTick();
 	void	Stop();
 

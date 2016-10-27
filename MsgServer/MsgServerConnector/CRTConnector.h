@@ -5,7 +5,7 @@
 #include "CRTModuleListener.h"
 #include "CRTConnTcpListener.h"
 #include "CRTWebServerListener.h"
-#include "MsConfigParser.h"
+#include "RTConfigParser.h"
 
 #include <iostream>
 #include <map>
@@ -37,7 +37,7 @@ public:
 	static CRTConnector* Inst();
 
 public:
-	int		Start(const MsConfigParser& conf);
+	int		Start(const RTConfigParser& conf);
 	void	DoTick();
 	void	Stop();
 

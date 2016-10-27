@@ -114,7 +114,7 @@ MRTMeeting::~MRTMeeting(void)
 
 }
 
-int	MRTMeeting::Start(const MsConfigParser& conf)
+int	MRTMeeting::Start(const RTConfigParser& conf)
 {
 	Assert(g_inited);
     int debug = conf.GetIntVal("global", "debug", 1);

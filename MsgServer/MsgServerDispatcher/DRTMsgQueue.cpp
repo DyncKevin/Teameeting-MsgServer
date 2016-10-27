@@ -124,7 +124,7 @@ DRTMsgQueue::~DRTMsgQueue(void)
     }
 }
 
-int	DRTMsgQueue::Start(const MsConfigParser& conf)
+int	DRTMsgQueue::Start(const RTConfigParser& conf)
 {
 	Assert(g_inited);
     int debug = conf.GetIntVal("global", "debug", 1);

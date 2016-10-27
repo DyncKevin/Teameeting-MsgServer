@@ -121,7 +121,7 @@ PRTPusher::~PRTPusher(void)
     }
 }
 
-int	PRTPusher::Start(const MsConfigParser& conf)
+int	PRTPusher::Start(const RTConfigParser& conf)
 {
 	Assert(g_inited);
     int debug = conf.GetIntVal("global", "debug", 1);

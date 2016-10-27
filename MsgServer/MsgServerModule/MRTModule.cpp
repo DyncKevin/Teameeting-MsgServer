@@ -119,7 +119,7 @@ MRTModule::~MRTModule(void)
     }
 }
 
-int	MRTModule::Start(const MsConfigParser& conf)
+int	MRTModule::Start(const RTConfigParser& conf)
 {
 	Assert(g_inited);
     int debug = conf.GetIntVal("global", "debug", 1);

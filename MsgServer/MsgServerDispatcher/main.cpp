@@ -43,7 +43,7 @@ int main(int argc, const char * argv[]) {
     L_Init(0, "./logdispatcher.log");
 #endif
 
-    MsConfigParser conf;
+    RTConfigParser conf;
     conf.LoadFromFile(argv[2]);
 
     DRTMsgQueue::Initialize(1024);

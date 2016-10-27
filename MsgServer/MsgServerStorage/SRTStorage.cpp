@@ -120,7 +120,7 @@ SRTStorage::~SRTStorage(void)
     }
 }
 
-int	SRTStorage::Start(const MsConfigParser& conf)
+int	SRTStorage::Start(const RTConfigParser& conf)
 {
 	Assert(g_inited);
     int debug = conf.GetIntVal("global", "debug", 1);

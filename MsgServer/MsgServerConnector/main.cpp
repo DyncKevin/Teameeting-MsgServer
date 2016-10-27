@@ -44,7 +44,7 @@ int main(int argc, const char * argv[]) {
 #endif
 
 
-    MsConfigParser conf;
+    RTConfigParser conf;
     conf.LoadFromFile(argv[2]);
 
     CRTConnector::Initialize(1024);

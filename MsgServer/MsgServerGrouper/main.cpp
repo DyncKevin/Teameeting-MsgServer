@@ -46,7 +46,7 @@ int main(int argc, const char * argv[]) {
     L_Init(0, "./loggrouper.log");
 #endif
 
-    MsConfigParser conf;
+    RTConfigParser conf;
     conf.LoadFromFile(argv[2]);
 
     GRTGrouper::Initialize(1024);

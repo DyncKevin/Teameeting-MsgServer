@@ -45,7 +45,7 @@ int main(int argc, const char * argv[]) {
     L_Init(0, "./logstorage.log");
 #endif
 
-    MsConfigParser conf;
+    RTConfigParser conf;
     conf.LoadFromFile(argv[2]);
 
     SRTStorage::Initialize(1024);

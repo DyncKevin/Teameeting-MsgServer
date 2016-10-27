@@ -138,7 +138,7 @@ CRTConnector::~CRTConnector(void)
 	}
 }
 
-int	CRTConnector::Start(const MsConfigParser& conf)
+int	CRTConnector::Start(const RTConfigParser& conf)
 {
 	Assert(g_inited);
 
