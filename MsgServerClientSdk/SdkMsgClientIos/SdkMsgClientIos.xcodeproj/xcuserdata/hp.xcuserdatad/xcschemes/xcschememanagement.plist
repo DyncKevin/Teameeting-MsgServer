@@ -7,17 +7,27 @@
 		<key>SdkMsgClientIos.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>2</integer>
+			<integer>0</integer>
 		</dict>
 		<key>msgclient.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>3</integer>
+			<integer>1</integer>
 		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
 		<key>2D38013B1C5DA07200138CF0</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>E60366E01DBF3CBE002C785D</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>E60366E91DBF3CBF002C785D</key>
 		<dict>
 			<key>primary</key>
 			<true/>
