@@ -267,8 +267,6 @@ void MRTRoomManager::LeaveRoom(pms::RelayMsg& rmsg, pms::Entity& mmsg)
 
 bool MRTRoomManager::Init(const std::string& msgQueueIp, unsigned short msgQueuePort, const std::string& httpIp, unsigned short httpPort, const std::string& httpHost)
 {
-    if (m_pRoomDispatcher==NULL)
-        m_pRoomDispatcher = new MRTRoomDispatcher();
     return ConnectMsgQueue(msgQueueIp, msgQueuePort) && ConnectHttpSvrConn(httpIp, httpPort, httpHost);
 }
 
@@ -284,33 +282,6 @@ bool MRTRoomManager::ConnectMsgQueue(const std::string& msgQueueIp, unsigned sho
     LI("%s port:%u, socketFD:%d\n", __FUNCTION__, msgQueuePort,  m_pMsgQueueSession->GetSocket()->GetSocketFD());
     m_pMsgQueueSession->EstablishConnection();
     return true;
-}
-
-bool MRTRoomManager::TryConnectMsgQueue(const std::string& msgQueueIp, unsigned short msgQueuePort)
-{
-    Assert(m_pMsgQueueSession==nullptr);
-
-    m_pMsgQueueSession = new MRTTransferSession(pms::ETransferModule::MMSGQUEUE);
-    m_pMsgQueueSession->Init();
-
-    bool ok = false;
-    int times;
-    // conn to msgqueue
-    do{
-        ok = m_pMsgQueueSession->Connect(msgQueueIp, msgQueuePort);
-        usleep(1000*1000);
-        LI("try %d times to connect to msgqueue server %s:%u waiting...\n", times, msgQueueIp.c_str(), msgQueuePort);
-    }while(!ok && times++ < 5);
-
-    if (ok) {
-        LI("%s port:%u, socketFD:%d\n", __FUNCTION__, msgQueuePort,  m_pMsgQueueSession->GetSocket()->GetSocketFD());
-        m_pMsgQueueSession->EstablishConnection();
-        return true;
-    } else {
-        if (m_pRoomDispatcher)
-            m_pRoomDispatcher->Signal(Task::kIdleEvent);
-        return false;
-    }
 }
 
 bool MRTRoomManager::ConnectHttpSvrConn(const std::string& httpIp, unsigned short httpPort, const std::string& httpHost)
@@ -404,29 +375,8 @@ void MRTRoomManager::ClearMsgQueueSession(const std::string& sid)
 
 bool MRTRoomManager::ClearAll()
 {
-    if (m_pRoomDispatcher)
-        m_pRoomDispatcher->Signal(Task::kKillEvent);
     return true;
 }
-
-void MRTRoomManager::ProcessTickEvent(const char*pData, int nLen)
-{
-    Assert(m_pMsgQueueSession);
-    if (m_pMsgQueueSession->GetConnectingStatus()==0) {
-        bool ok = false;
-        int times = 0;
-        do{
-            ok = m_pMsgQueueSession->Connect();
-            usleep(2000*1000);
-        }while(!ok && ++times < 5);
-        if (m_pRoomDispatcher)
-            m_pRoomDispatcher->Signal(Task::kIdleEvent);
-    } else if (m_pMsgQueueSession->GetConnectingStatus() == 1) {
-        m_pMsgQueueSession->EstablishConnection();
-    }
-}
-
-
 
 ////////////////////////////////////////////////////
 /////////////////private////////////////////////////

@@ -80,9 +80,7 @@ public:
     void TransferSessionLostNotify(const std::string& sid);
 
     bool    ConnectConnector();
-    bool TryConnectConnector(const std::string ip, unsigned short port);
     bool    ConnectRtlivePusher();
-    bool TryConnectRtlivePusher(const std::string ip, unsigned short port);
 
     std::list<std::string>* GetConnectorAddrList() { return &m_connectorAddrList; }
     std::list<std::string>* GetRtlivePusherAddrList() { return &m_rtlivepusherAddrList; }
@@ -108,7 +106,6 @@ private:
     std::list<std::string>    m_rtlivepusherAddrList;
     std::string               m_logicalId;
     UserConnectorMaps         m_userConnectors;
-    ConnectingSessList        m_connectingSessList;
 };
 
 #endif /* defined(__MsgServerPusher__PRTConnManager__) */

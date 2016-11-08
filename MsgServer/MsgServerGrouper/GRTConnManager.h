@@ -80,7 +80,6 @@ public:
     void TransferSessionLostNotify(const std::string& sid);
 
     bool    ConnectGroupMgr();
-    bool TryConnectGroupMgr(const std::string ip, unsigned short port);
 
     std::list<std::string>* GetGroupMgrAddrList() { return &m_groupMgrAddrList; }
 
@@ -106,9 +105,7 @@ private:
     std::string               m_grouperId;
     OSMutex                   m_mutexMembers;
     UserConnectorMaps         m_userConnectors;
-    ConnectingSessList        m_connectingSessList;
     GRTTransferSession*       m_pGroupMgrSession;
-
 };
 
 #endif /* defined(__MsgServerGrouper__GRTConnManager__) */

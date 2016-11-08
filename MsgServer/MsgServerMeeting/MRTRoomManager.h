@@ -18,7 +18,6 @@
 #include "MRTTransferSession.h"
 #include "MRTMeetingRoom.h"
 #include "MRTHttpSvrConn.h"
-#include "MRTRoomDispatcher.h"
 #include "RTEventTimer.h"
 #include "RTSingleton.h"
 
@@ -37,7 +36,6 @@ public:
 
     bool Init(const std::string& msgQueueIp, unsigned short msgQueuePort, const std::string& httpIp, unsigned short httpPort, const std::string& httpHost);
     bool ConnectMsgQueue(const std::string& msgQueueIp, unsigned short msgQueuePort);
-    bool TryConnectMsgQueue(const std::string& msgQueueIp, unsigned short msgQueuePort);
     bool ConnectHttpSvrConn(const std::string& httpIp, unsigned short httpPort, const std::string& httpHost);
     void SendTransferData(const std::string strData, int nLen);
 
@@ -47,19 +45,16 @@ public:
     void ClearMsgQueueSession(const std::string& sid);
     bool ClearAll();
 
-    void ProcessTickEvent(const char*pData, int nLen);
 protected:
     MRTRoomManager()
                 : m_pMsgQueueSession(NULL)
-                , m_pHttpSvrConn(NULL)
-                , m_pRoomDispatcher(NULL){}
+                , m_pHttpSvrConn(NULL){}
     ~MRTRoomManager(){
         if (m_pHttpSvrConn) {
             delete m_pHttpSvrConn;
             m_pHttpSvrConn = NULL;
         }
     }
-
 
 private:
     // <roomid, MeetingRoom> all the rooms map
@@ -105,10 +100,8 @@ private:
     OSMutex                     m_mutexUser;
     MRTHttpSvrConn*             m_pHttpSvrConn;
     MRTTransferSession*         m_pMsgQueueSession;
-    MRTRoomDispatcher*          m_pRoomDispatcher;
     MeetingRoomMap              m_meetingRoomMap;
     UserMeetingRoomIdMap        m_userMeetingRoomIdMap;
-
 };
 
 #endif /* defined(__MsgServerMeeting__MRTRoomManager__) */

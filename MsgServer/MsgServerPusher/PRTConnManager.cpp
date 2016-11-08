@@ -125,32 +125,6 @@ bool PRTConnManager::DoConnectConnector(const std::string ip, unsigned short por
     return true;
 }
 
-
-
-bool PRTConnManager::TryConnectConnector(const std::string ip, unsigned short port)
-{
-    LI("PRTConnManager::TryConneectConnector ip:%s, port:%u\n", ip.c_str(), port);
-    PRTTransferSession* connectorSession = new PRTTransferSession();
-    connectorSession->Init();
-    // conn to connector
-
-    bool ok = false;
-    int times = 0;
-    do{
-        ok = connectorSession->Connect(ip, port);
-        LI("try %d times to connect connector server %s:%u, waiting...\n", times, ip.c_str(), port);
-        usleep(1000*1000);
-    }while(!ok && ++times < 5);
-
-    if (ok) {
-        connectorSession->EstablishConnection();
-        return true;
-    } else {
-        m_connectingSessList.push_back(connectorSession);
-        return false;
-    }
-}
-
 bool PRTConnManager::ConnectRtlivePusher()
 {
     if (m_rtlivepusherAddrList.size() == 0) {
@@ -170,8 +144,6 @@ bool PRTConnManager::ConnectRtlivePusher()
     return true;
 }
 
-
-
 bool PRTConnManager::DoConnectRtlivePusher(const std::string ip, unsigned short port)
 {
     PRTTransferSession* rtlivepusherSession = new PRTTransferSession();
@@ -186,31 +158,6 @@ bool PRTConnManager::DoConnectRtlivePusher(const std::string ip, unsigned short 
     return true;
 }
 
-
-
-bool PRTConnManager::TryConnectRtlivePusher(const std::string ip, unsigned short port)
-{
-    LI("PRTConnManager::TryConneectRtlivePusher ip:%s, port:%u\n", ip.c_str(), port);
-    PRTTransferSession* rtlivepusherSession = new PRTTransferSession();
-    rtlivepusherSession->Init();
-    // conn to rtlive pusher
-
-    bool ok = false;
-    int times = 0;
-    do{
-        ok = rtlivepusherSession->Connect(ip, port);
-        LI("try %d times to connect rtlive pushesr server %s:%u, waiting...\n", times, ip.c_str(), port);
-        usleep(1000*1000);
-    }while(!ok && ++times < 5);
-
-    if (ok) {
-        rtlivepusherSession->EstablishConnection();
-        return true;
-    } else {
-        m_connectingSessList.push_back(rtlivepusherSession);
-        return false;
-    }
-}
 void PRTConnManager::RefreshConnection()
 {
     ModuleInfo* pmi = NULL;

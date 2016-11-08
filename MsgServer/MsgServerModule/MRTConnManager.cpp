@@ -156,54 +156,6 @@ bool MRTConnManager::DoConnectStorage(const std::string ip, unsigned short port)
     return true;
 }
 
-bool MRTConnManager::TryConnectSequence(const std::string ip, unsigned short port)
-{
-    LI("MRTConnManager::TryConneectSequence ip:%s, port:%u\n", ip.c_str(), port);
-    MRTTransferSession* sequenceSession = new MRTTransferSession();
-    sequenceSession->Init();
-    // conn to connector
-
-    bool ok = false;
-    int times = 0;
-    do{
-        ok = sequenceSession->Connect(ip, port);
-        LI("try %d times to connect sequence server %s:%u, waiting...\n", times, ip.c_str(), port);
-        usleep(1000*1000);
-    }while(!ok && ++times < 5);
-
-    if (ok) {
-        sequenceSession->EstablishConnection();
-        return true;
-    } else {
-        m_connectingSessList.push_back(sequenceSession);
-        return false;
-    }
-}
-
-bool MRTConnManager::TryConnectStorage(const std::string ip, unsigned short port)
-{
-    LI("MRTConnManager::TryConneectStorage ip:%s, port:%u\n", ip.c_str(), port);
-    MRTTransferSession* storageSession = new MRTTransferSession();
-    storageSession->Init();
-    // conn to connector
-
-    bool ok = false;
-    int times = 0;
-    do{
-        ok = storageSession->Connect(ip, port);
-        LI("try %d times to connect storage server %s:%u, waiting...\n", times, ip.c_str(), port);
-        usleep(1000*1000);
-    }while(!ok && ++times < 5);
-
-    if (ok) {
-        storageSession->EstablishConnection();
-        return true;
-    } else {
-        m_connectingSessList.push_back(storageSession);
-        return false;
-    }
-}
-
 void MRTConnManager::RefreshConnection()
 {
     ModuleInfo* pmi = NULL;

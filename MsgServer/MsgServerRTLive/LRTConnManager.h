@@ -121,13 +121,10 @@ public:
     void UninManager();
 
     bool    ConnectLogical();
-    bool TryConnectLogical(const std::string ip, unsigned short port);
 
     bool    ConnectConnector();
-    bool TryConnectConnector(const std::string ip, unsigned short port);
 
     bool    ConnectDispatcher();
-    bool TryConnectDispatcher(const std::string ip, unsigned short port);
 
     std::list<std::string>* GetLogicalAddrList() { return &m_logicalAddrList; }
     std::list<std::string>* GetConnectorAddrList() { return &m_connectorAddrList; }
@@ -163,7 +160,6 @@ private:
     std::string               m_rtliveId;
     OSMutex                   m_mutexMembers;
     UserConnectorMaps         m_userConnectors;
-    ConnectingSessList        m_connectingSessList;
 
     LRTTransferSession*       m_logicalSession;
     LRTTransferSession*       m_dispatcherSession;

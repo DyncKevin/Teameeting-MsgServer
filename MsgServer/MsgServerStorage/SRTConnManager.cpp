@@ -123,30 +123,6 @@ bool SRTConnManager::DoConnectConnector(const std::string ip, unsigned short por
     return true;
 }
 
-bool SRTConnManager::TryConnectConnector(const std::string ip, unsigned short port)
-{
-    LI("MRTConnManager::TryConneectConnector ip:%s, port:%u\n", ip.c_str(), port);
-    SRTTransferSession* connectorSession = new SRTTransferSession();
-    connectorSession->Init();
-    // conn to connector
-
-    bool ok = false;
-    int times = 0;
-    do{
-        ok = connectorSession->Connect(ip, port);
-        LI("try %d times to connect connector server %s:%u, waiting...\n", times, ip.c_str(), port);
-        usleep(1000*1000);
-    }while(!ok && ++times < 5);
-
-    if (ok) {
-        connectorSession->EstablishConnection();
-        return true;
-    } else {
-        m_connectingSessList.push_back(connectorSession);
-        return false;
-    }
-}
-
 void SRTConnManager::RefreshConnection()
 {
     ModuleInfo* pmi = NULL;

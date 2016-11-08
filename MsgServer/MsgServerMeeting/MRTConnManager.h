@@ -112,11 +112,8 @@ protected:
 
 private:
     bool DoConnectConnector(const std::string ip, unsigned short port);
-    bool TryConnectConnector(const std::string ip, unsigned short port);
     std::list<std::string>    m_ipList;
     std::string               m_meetingId;
-    ConnectingSessList        m_connectingSessList;
-
 };
 
 #endif /* defined(__MsgServerMeeting__MRTConnManager__) */

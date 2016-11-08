@@ -124,32 +124,6 @@ bool GRTConnManager::DoConnectGroupMgr(const std::string ip, unsigned short port
     return true;
 }
 
-bool GRTConnManager::TryConnectGroupMgr(const std::string ip, unsigned short port)
-{
-    LI("GRTConnManager::TryConneectGroupMgr ip:%s, port:%u\n", ip.c_str(), port);
-    // TODO:
-    // bug here, fix later, groupMgrSession should be m_pGroupMgrSession
-    GRTTransferSession* groupMgrSession = new GRTTransferSession();
-    groupMgrSession->Init();
-    // conn to connector
-
-    bool ok = false;
-    int times = 0;
-    do{
-        ok = groupMgrSession->Connect(ip, port);
-        LI("try %d times to connect groupMgr server %s:%u, waiting...\n", times, ip.c_str(), port);
-        usleep(1000*1000);
-    }while(!ok && ++times < 5);
-
-    if (ok) {
-        groupMgrSession->EstablishConnection();
-        return true;
-    } else {
-        m_connectingSessList.push_back(groupMgrSession);
-        return false;
-    }
-}
-
 void GRTConnManager::RefreshConnection()
 {
     ModuleInfo* pmi = NULL;

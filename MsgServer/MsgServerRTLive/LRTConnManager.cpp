@@ -177,30 +177,6 @@ bool LRTConnManager::ConnectLogical()
     return true;
 }
 
-bool LRTConnManager::TryConnectLogical(const std::string ip, unsigned short port)
-{
-    LI("LRTConnManager::TryConneectLogical ip:%s, port:%u\n", ip.c_str(), port);
-    LRTTransferSession* logicalSession = new LRTTransferSession();
-    logicalSession->Init();
-    // conn to logical
-
-    bool ok = false;
-    int times = 0;
-    do{
-        ok = logicalSession->Connect(ip, port);
-        LI("try %d times to connect logical server %s:%u, waiting...\n", times, ip.c_str(), port);
-        usleep(1000*1000);
-    }while(!ok && ++times < 5);
-
-    if (ok) {
-        logicalSession->EstablishConnection();
-        return true;
-    } else {
-        m_connectingSessList.push_back(logicalSession);
-        return false;
-    }
-}
-
 bool LRTConnManager::ConnectConnector()
 {
     if (m_connectorAddrList.size() == 0) {
@@ -219,30 +195,6 @@ bool LRTConnManager::ConnectConnector()
         }
     }
     return true;
-}
-
-bool LRTConnManager::TryConnectConnector(const std::string ip, unsigned short port)
-{
-    LI("LRTConnManager::TryConneectConnector ip:%s, port:%u\n", ip.c_str(), port);
-    LRTTransferSession* connectorSession = new LRTTransferSession();
-    connectorSession->Init();
-    // conn to connector
-
-    bool ok = false;
-    int times = 0;
-    do{
-        ok = connectorSession->Connect(ip, port);
-        LI("try %d times to connect connector server %s:%u, waiting...\n", times, ip.c_str(), port);
-        usleep(1000*1000);
-    }while(!ok && ++times < 5);
-
-    if (ok) {
-        connectorSession->EstablishConnection();
-        return true;
-    } else {
-        m_connectingSessList.push_back(connectorSession);
-        return false;
-    }
 }
 
 bool LRTConnManager::ConnectDispatcher()
@@ -264,31 +216,6 @@ bool LRTConnManager::ConnectDispatcher()
     }
     return true;
 }
-
-bool LRTConnManager::TryConnectDispatcher(const std::string ip, unsigned short port)
-{
-    LI("LRTConnManager::TryConneectLogical ip:%s, port:%u\n", ip.c_str(), port);
-    LRTTransferSession* dispatcherSession = new LRTTransferSession();
-    dispatcherSession->Init();
-    // conn to dispatcher
-
-    bool ok = false;
-    int times = 0;
-    do{
-        ok = dispatcherSession->Connect(ip, port);
-        LI("try %d times to connect dispatcher server %s:%u, waiting...\n", times, ip.c_str(), port);
-        usleep(1000*1000);
-    }while(!ok && ++times < 5);
-
-    if (ok) {
-        dispatcherSession->EstablishConnection();
-        return true;
-    } else {
-        m_connectingSessList.push_back(dispatcherSession);
-        return false;
-    }
-}
-
 
 void LRTConnManager::RefreshConnection()
 {

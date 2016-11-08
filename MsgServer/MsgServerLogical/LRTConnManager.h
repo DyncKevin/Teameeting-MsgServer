@@ -80,10 +80,8 @@ public:
     void TransferSessionLostNotify(const std::string& sid);
 
     bool    ConnectSequence();
-    bool TryConnectSequence(const std::string ip, unsigned short port);
 
     bool    ConnectStorage();
-    bool TryConnectStorage(const std::string ip, unsigned short port);
 
     void PushSeqnReadMsg(const std::string& smsg);
     void PushSeqnWriteMsg(const std::string& smsg);
@@ -115,7 +113,6 @@ private:
     std::string               m_logicalId;
     OSMutex                   m_mutexMembers;
     UserConnectorMaps         m_userConnectors;
-    ConnectingSessList        m_connectingSessList;
 
     LRTTransferSession*       m_sequenceWriteSession;
     LRTTransferSession*       m_sequenceReadSession;

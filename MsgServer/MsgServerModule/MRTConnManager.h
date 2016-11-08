@@ -82,10 +82,8 @@ public:
     void TransferSessionLostNotify(const std::string& sid);
 
     bool    ConnectSequence();
-    bool TryConnectSequence(const std::string ip, unsigned short port);
 
     bool    ConnectStorage();
-    bool TryConnectStorage(const std::string ip, unsigned short port);
 
     std::list<std::string>* GetSequenceAddrList() { return &m_sequenceAddrList; }
     std::list<std::string>* GetStorageAddrList() { return &m_storageAddrList; }
@@ -112,7 +110,6 @@ private:
     std::string               m_logicalId;
     OSMutex                   m_mutexMembers;
     UserConnectorMaps         m_userConnectors;
-    ConnectingSessList        m_connectingSessList;
 };
 
 #endif /* defined(__MsgServerModule__MRTConnManager__) */

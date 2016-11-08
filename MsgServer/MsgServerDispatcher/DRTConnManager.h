@@ -111,7 +111,6 @@ public:
     void TransferSessionLostNotify(const std::string& sid);
 
     bool    ConnectConnector();
-    bool TryConnectConnector(const std::string ip, unsigned short port);
     std::list<std::string>* GetAddrsList() { return &m_ipList; }
     void    RefreshConnection();
     void    SendTransferData(const std::string mid, const std::string uid, const std::string msg);
@@ -157,7 +156,6 @@ private:
     OSMutex                   m_mutexMembers;
     DRTHttpSvrConn*           m_pHttpSvrConn;
     UserConnectorMaps         m_userConnectors;
-    ConnectingSessList        m_connectingSessList;
 };
 
 #endif /* defined(__MsgServerDispatcher__DRTConnManager__) */
