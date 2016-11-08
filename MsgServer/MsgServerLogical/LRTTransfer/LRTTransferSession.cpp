@@ -20,7 +20,7 @@
 
 #define TIMEOUT_TS (60*1000)
 
-LRTTransferSession::LRTTransferSession()
+LRTTransferSession::LRTTransferSession(SessionType type)
 : RTJSBuffer()
 , RTLstorage()
 , m_lastUpdateTime(0)
@@ -39,6 +39,7 @@ LRTTransferSession::LRTTransferSession()
 , m_tmpOData2Id(0)
 , m_tmpOGData2Id(0)
 , m_IsValid(true)
+, m_sessionType(type)
 {
     AddObserver(this);
     GenericSessionId(m_transferSessId);
@@ -394,6 +395,24 @@ void LRTTransferSession::OnTypeConn(const std::string& str)
                     pmi->othModuleType = c_msg.tr_module();
                     pmi->othModuleId = m_transferSessId;
                     pmi->pModule = this;
+                    switch(m_sessionType) {
+                        case ESequenceRead:
+                            LRTConnManager::Instance().SetSequenceReadSessId(m_transferSessId);
+                            break;
+                        case ESequenceWrite:
+                            LRTConnManager::Instance().SetSequenceWriteSessId(m_transferSessId);
+                            break;
+                        case EStorageRead:
+                            LRTConnManager::Instance().SetStorageReadSessId(m_transferSessId);
+                            break;
+                        case EStorageWrite:
+                            LRTConnManager::Instance().SetStorageWriteSessId(m_transferSessId);
+                            break;
+                        case EOther:
+                            break;
+                        default:
+                            break;
+                    }
                     //bind session and transfer id
                     LRTConnManager::Instance().AddModuleInfo(pmi, m_transferSessId);
                     //store which moudle connect to this connector

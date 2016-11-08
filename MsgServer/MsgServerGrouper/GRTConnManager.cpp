@@ -112,15 +112,15 @@ bool GRTConnManager::ConnectGroupMgr()
 
 bool GRTConnManager::DoConnectGroupMgr(const std::string ip, unsigned short port)
 {
-    GRTTransferSession* m_pGroupMgrSession = new GRTTransferSession();
-    m_pGroupMgrSession->Init();
+    GRTTransferSession* groupMgrSession = new GRTTransferSession();
+    groupMgrSession->Init();
     // conn to connector
-    while (!m_pGroupMgrSession->Connect(ip, port)) {
+    while (!groupMgrSession->Connect(ip, port)) {
         LI("connecting to RTLive groupMgr server %s:%u waiting...\n", ip.c_str(), port);
         usleep(100*1000);
     }
-    LI("%s port:%u, socketFD:%d\n", __FUNCTION__, port, m_pGroupMgrSession->GetSocket()->GetSocketFD());
-    m_pGroupMgrSession->EstablishConnection();
+    LI("%s port:%u, socketFD:%d\n", __FUNCTION__, port, groupMgrSession->GetSocket()->GetSocketFD());
+    groupMgrSession->EstablishConnection();
     return true;
 }
 
@@ -161,9 +161,6 @@ bool GRTConnManager::SignalKill()
 
 bool GRTConnManager::ClearAll()
 {
-    //if (m_pGroupMgrSession)
-        //m_pGroupMgrSession->Signal(Task::kKillEvent);
-    //m_pGroupMgrSession = nullptr;
     {
         OSMutexLocker mlocker(&s_mutexModule);
         for (auto & x : s_ModuleInfoMap) {

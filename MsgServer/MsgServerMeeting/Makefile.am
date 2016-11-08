@@ -30,7 +30,6 @@ MsgServerMeeting_SOURCES=$(top_srcdir)/MRTHttp/MRTHttpSvrConn.cpp \
 						   $(top_srcdir)/MRTMeeting.cpp \
 						   $(top_srcdir)/MRTMeetingRoom.cpp \
 						   $(top_srcdir)/MRTRoomManager.cpp \
-						   $(top_srcdir)/MRTRoomDispatcher.cpp \
 						   $(top_srcdir)/main.cpp
 
 MsgServerMeeting_LDADD=-L$(top_srcdir)/../MsgServer/MSCommonLib/ -lMSCommon -lRtComm -lxredis -lhiredis -lhttp -lrtklog -lzkclient

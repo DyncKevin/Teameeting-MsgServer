@@ -94,6 +94,11 @@ public:
     bool IsSvrSequence() { return m_isSvrSequenceOk; }
     bool IsSvrStorage() { return m_isSvrStorageOk; }
 
+    void SetSequenceReadSessId(const std::string& sid) { m_sequenceReadSessId = sid; }
+    void SetSequenceWriteSessId(const std::string& sid) { m_sequenceWriteSessId = sid; }
+    void SetStorageReadSessId(const std::string& sid) { m_storageReadSessId = sid; }
+    void SetStorageWriteSessId(const std::string& sid) { m_storageWriteSessId = sid; }
+
     void    RefreshConnection();
     void    SendTransferData(const std::string mid, const std::string uid, const std::string msg);
 
@@ -119,10 +124,10 @@ private:
     OSMutex                   m_mutexMembers;
     UserConnectorMaps         m_userConnectors;
 
-    LRTTransferSession*       m_sequenceWriteSession;
-    LRTTransferSession*       m_sequenceReadSession;
-    LRTTransferSession*       m_storageWriteSession;
-    LRTTransferSession*       m_storageReadSession;
+    std::string                 m_sequenceWriteSessId;
+    std::string                 m_sequenceReadSessId;
+    std::string                 m_storageWriteSessId;
+    std::string                 m_storageReadSessId;
 };
 
 #endif /* defined(__MsgServerLogical__LRTConnManager__) */

@@ -135,8 +135,11 @@ public:
     bool IsSvrConnector() { return m_isSvrConnectorOk; }
     bool IsSvrDispatcher() { return m_isSvrDispatcherOk; }
 
+    void SetDispatcherSessId(const std::string& sid) { m_dispatcherSessId = sid; }
+    void SetLogicalSessId(const std::string& sid) {m_logicalSessId = sid; }
+
     void    RefreshConnection();
-    void    SendTransferData(const std::string mid, const std::string uid, const std::string msg);
+    void    Transfer2Dispatcher(const std::string mid, const std::string uid, const std::string msg);
 
     void PushNewMsg2Queue(const std::string& str);
     void PushSeqnReq2Queue(const std::string& str);
@@ -170,8 +173,8 @@ private:
     OSMutex                   m_mutexMembers;
     UserConnectorMaps         m_userConnectors;
 
-    LRTTransferSession*       m_logicalSession;
-    LRTTransferSession*       m_dispatcherSession;
+    std::string               m_dispatcherSessId;
+    std::string               m_logicalSessId;
 
 };
 

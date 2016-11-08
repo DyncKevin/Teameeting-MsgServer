@@ -29,7 +29,9 @@ class LRTTransferSession
     , public RTTransfer
     , public RTObserverConnection{
 public:
-    LRTTransferSession();
+    typedef enum{EDispatcher, ELogical, EOther}SessionType;
+
+    LRTTransferSession(SessionType type);
     virtual ~LRTTransferSession();
     void Init();
     void InitConf();
@@ -139,6 +141,7 @@ private:
     unsigned int                m_wNewMsgId;
     std::queue<std::string>             m_RecvMsgBuf;
     bool                                m_IsValid;
+    SessionType                 m_sessionType;
 };
 
 #endif /* defined(__MsgServerRTLive__LRTTransferSession__) */

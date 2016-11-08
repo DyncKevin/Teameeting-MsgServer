@@ -25,14 +25,23 @@
 
 #include "ProtoCommon.h"
 
+#define SESSION_TYPE_SEQUENCE_READ (1)
+#define SESSION_TYPE_SEQUENCE_WRITE (2)
+#define SESSION_TYPE_STORAGE_READ (3)
+#define SESSION_TYPE_STORAGE_WRITE (4)
+
 class LRTTransferSession
     : public RTTcpNoTimeout
     , public RTJSBuffer
     , public RTLstorage
     , public RTObserverConnection{
 public:
-    LRTTransferSession();
+    typedef enum {ESequenceRead, ESequenceWrite, EStorageRead, EStorageWrite, EOther}SessionType;
+
+    LRTTransferSession(SessionType type);
     virtual ~LRTTransferSession();
+
+
     void Init();
     void InitConf();
     void Unit();
@@ -105,7 +114,6 @@ private:
     OSMutex                         m_mutexQWrite;
 
     int                             m_isRun;
-
     unsigned int                    m_tmpWMsgId;
     unsigned int                    m_tmpRSeqnId;
     unsigned int                    m_tmpRDataId;
@@ -117,6 +125,8 @@ private:
     unsigned int                    m_tmpOGData2Id; // one group data
     std::queue<std::string>             m_RecvMsgBuf;
     bool                                m_IsValid;
+
+    SessionType                     m_sessionType;
 };
 
 #endif /* defined(__MsgServerLogical__LRTTransferSession__) */

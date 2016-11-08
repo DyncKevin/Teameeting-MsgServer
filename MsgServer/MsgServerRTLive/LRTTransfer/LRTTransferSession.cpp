@@ -24,9 +24,7 @@
 
 #define TIMEOUT_TS (60*1000)
 
-static int g_on_ticket_time = 0;
-
-LRTTransferSession::LRTTransferSession()
+LRTTransferSession::LRTTransferSession(SessionType type)
 : RTJSBuffer()
 , RTTransfer()
 , m_lastUpdateTime(0)
@@ -37,6 +35,7 @@ LRTTransferSession::LRTTransferSession()
 , m_connectingStatus(0)
 , m_wNewMsgId(0)
 , m_IsValid(true)
+, m_sessionType(type)
 {
     AddObserver(this);
     GenericSessionId(m_transferSessId);
@@ -166,7 +165,7 @@ void LRTTransferSession::KeepAlive()
     t_msg.set_content(c_msg.SerializeAsString());
 
     std::string s = t_msg.SerializeAsString();
-    SendTransferData(s.c_str(), (int)s.length());
+    this->SendTransferData(s.c_str(), (int)s.length());
 }
 
 void LRTTransferSession::TestConnection()
@@ -188,7 +187,7 @@ void LRTTransferSession::EstablishConnection()
     t_msg.set_content(c_msg.SerializeAsString());
 
     std::string s = t_msg.SerializeAsString();
-    SendTransferData(s.c_str(), (int)s.length());
+    this->SendTransferData(s.c_str(), (int)s.length());
 }
 
 void LRTTransferSession::SendTransferData(const char* pData, int nLen)
@@ -200,7 +199,7 @@ void LRTTransferSession::SendTransferData(const char* pData, int nLen)
 
 void LRTTransferSession::SendTransferData(const std::string& data)
 {
-    SendTransferData(data.c_str(), data.length());
+    this->SendTransferData(data.c_str(), data.length());
 }
 
 // from RTTcpNoTimeout
@@ -417,7 +416,7 @@ void LRTTransferSession::OnTypeConn(const std::string& str)
         t_msg.set_content(c_msg.SerializeAsString());
 
         std::string s = t_msg.SerializeAsString();
-        SendTransferData(s.c_str(), (int)s.length());
+        this->SendTransferData(s.c_str(), (int)s.length());
     } else if ((c_msg.conn_tag() == pms::EConnTag::THELLO)) {
         // when ME connector to other:
         // store other's transfersessionid and other's moduleId
@@ -430,6 +429,18 @@ void LRTTransferSession::OnTypeConn(const std::string& str)
                     pmi->othModuleType = c_msg.tr_module();
                     pmi->othModuleId = m_transferSessId;
                     pmi->pModule = this;
+                    switch(m_sessionType) {
+                        case EDispatcher:
+                            LRTConnManager::Instance().SetDispatcherSessId(m_transferSessId);
+                            break;
+                        case ELogical:
+                            LRTConnManager::Instance().SetLogicalSessId(m_transferSessId);
+                            break;
+                        case EOther:
+                            break;
+                        default:
+                            break;
+                    }
                     //bind session and transfer id
                     LRTConnManager::Instance().AddModuleInfo(pmi, m_transferSessId);
                     //store which moudle connect to this connector
@@ -457,7 +468,7 @@ void LRTTransferSession::OnTypeConn(const std::string& str)
 
             this->SetTestName(m_transferSessId);
             std::string s = t_msg.SerializeAsString();
-            SendTransferData(s.c_str(), (int)s.length());
+            this->SendTransferData(s.c_str(), (int)s.length());
         } else {
             LE("Connection id:%s error!!!\n", c_msg.transferid().c_str());
         }
@@ -762,7 +773,7 @@ void LRTTransferSession::OnTypeQueue(const std::string& str)
             t_msg.set_type(pms::ETransferType::TQUEUE);
             t_msg.set_content(r_msg.SerializeAsString());
             std::string response = t_msg.SerializeAsString();
-            LRTConnManager::Instance().SendTransferData("", "", response);
+            LRTConnManager::Instance().Transfer2Dispatcher("", "", response);
         } else if (store.msgs(i).rsvrcmd()==pms::EServerCmd::CCREATESEQN)
         {
             resp.set_svr_cmds(store.msgs(i).rsvrcmd());
@@ -856,7 +867,7 @@ void LRTTransferSession::OnTypeDispatch(const std::string& str)
                     t_msg.set_type(pms::ETransferType::TQUEUE);
                     t_msg.set_content(r_msg.SerializeAsString());
                     std::string response = t_msg.SerializeAsString();
-                    LRTConnManager::Instance().SendTransferData("", "", response);
+                    LRTConnManager::Instance().Transfer2Dispatcher("", "", response);
 
                 }
                 break;
@@ -889,7 +900,7 @@ void LRTTransferSession::OnTypeDispatch(const std::string& str)
                     t_msg.set_type(pms::ETransferType::TQUEUE);
                     t_msg.set_content(r_msg.SerializeAsString());
                     std::string response = t_msg.SerializeAsString();
-                    LRTConnManager::Instance().SendTransferData("", "", response);
+                    LRTConnManager::Instance().Transfer2Dispatcher("", "", response);
                 }
                 break;
             case pms::EServerCmd::CPGETDATA:
@@ -1000,7 +1011,7 @@ void LRTTransferSession::OnGroupNotify(pms::EServerCmd cmd, pms::EModuleType mod
         t_msg.set_type(pms::ETransferType::TQUEUE);
         t_msg.set_content(r_msg.SerializeAsString());
         std::string response = t_msg.SerializeAsString();
-        LRTConnManager::Instance().SendTransferData("", "", response);
+        LRTConnManager::Instance().Transfer2Dispatcher("", "", response);
     }
 }
 

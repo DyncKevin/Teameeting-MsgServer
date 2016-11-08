@@ -19,7 +19,7 @@ Task* LRTLogicalListener::GetSessionTask(int osSocket, struct sockaddr_in* addr)
     // when the server is behing a round robin DNS, the client needs to knwo the IP address ot the server
     // so that it can direct the "POST" half of the connection to the same machine when tunnelling RTSP thru HTTP
 
-    LRTTransferSession* theTask = new LRTTransferSession();
+    LRTTransferSession* theTask = new LRTTransferSession(LRTTransferSession::EOther);
     if(NULL == theTask)
         return NULL;
     theSocket = theTask->GetSocket();  // out socket is not attached to a unix socket yet.

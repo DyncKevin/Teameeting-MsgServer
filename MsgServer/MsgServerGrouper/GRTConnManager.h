@@ -109,7 +109,6 @@ private:
     std::string               m_grouperId;
     OSMutex                   m_mutexMembers;
     UserConnectorMaps         m_userConnectors;
-    GRTTransferSession*       m_pGroupMgrSession;
 };
 
 #endif /* defined(__MsgServerGrouper__GRTConnManager__) */

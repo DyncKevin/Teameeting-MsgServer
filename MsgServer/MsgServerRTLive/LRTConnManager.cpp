@@ -15,8 +15,6 @@
 #include "RTZKClient.hpp"
 #include "ProtoCommon.h"
 
-static int ticket_time = 0;
-
 static OSMutex       s_mutex;
 static OSMutex       s_mutexModule;
 static OSMutex       s_mutexTypeModule;
@@ -225,47 +223,47 @@ void LRTConnManager::RefreshConnection()
         ModuleInfoMapsIt it = s_ModuleInfoMap.begin();
         for (; it!=s_ModuleInfoMap.end(); it++) {
             pmi = it->second;
-            //if (pmi && pmi->othModuleType == pms::ETransferModule::MCONNECTOR) {
-                if (pmi && pmi->pModule && pmi->pModule->RefreshTime()) {
-                    pmi->pModule->KeepAlive();
-                }
-            //}
+            if (pmi && pmi->pModule && pmi->pModule->RefreshTime()) {
+                pmi->pModule->KeepAlive();
+            }
         }
     }
 }
 
-void LRTConnManager::SendTransferData(const std::string mid, const std::string uid, const std::string msg)
+void LRTConnManager::Transfer2Dispatcher(const std::string mid, const std::string uid, const std::string msg)
 {
-     if (m_dispatcherSession && m_dispatcherSession->IsLiveSession())
-     {
-        m_dispatcherSession->SendTransferData(msg);
-     } else {
-         LE("LRTConnManager::SendTransferData m_dispatcherSession can not use, has error\n");
-     }
+    LRTConnManager::ModuleInfo* pInfo = findModuleInfoBySid(m_dispatcherSessId);
+    if (pInfo && pInfo->pModule && pInfo->pModule->IsLiveSession())
+    {
+        pInfo->pModule->SendTransferData(msg);
+    }
 }
 
 void LRTConnManager::PushNewMsg2Queue(const std::string& str)
 {
-     if (m_logicalSession && m_logicalSession->IsLiveSession())
-     {
-         m_logicalSession->PushNewMsg2Queue(str);
-     }
+    LRTConnManager::ModuleInfo* pInfo = findModuleInfoBySid(m_logicalSessId);
+    if (pInfo && pInfo->pModule && pInfo->pModule->IsLiveSession())
+    {
+        pInfo->pModule->PushNewMsg2Queue(str);
+    }
 }
 
 void LRTConnManager::PushSeqnReq2Queue(const std::string& str)
 {
-     if (m_logicalSession && m_logicalSession->IsLiveSession())
-     {
-         m_logicalSession->PushSeqnReq2Queue(str);
-     }
+    LRTConnManager::ModuleInfo* pInfo = findModuleInfoBySid(m_logicalSessId);
+    if (pInfo && pInfo->pModule && pInfo->pModule->IsLiveSession())
+    {
+        pInfo->pModule->PushSeqnReq2Queue(str);
+    }
 }
 
 void LRTConnManager::PushDataReq2Queue(const std::string& str)
 {
-     if (m_logicalSession && m_logicalSession->IsLiveSession())
-     {
-         m_logicalSession->PushDataReq2Queue(str);
-     }
+    LRTConnManager::ModuleInfo* pInfo = findModuleInfoBySid(m_logicalSessId);
+    if (pInfo && pInfo->pModule && pInfo->pModule->IsLiveSession())
+    {
+        pInfo->pModule->PushDataReq2Queue(str);
+    }
 }
 
 bool LRTConnManager::SignalKill()
@@ -456,22 +454,21 @@ void LRTConnManager::OnTLogout(const std::string& uid, const std::string& token,
 
 bool LRTConnManager::DoConnectLogical(const std::string ip, unsigned short port)
 {
-    //LRTTransferSession* logicalSession = new LRTTransferSession();
-    m_logicalSession = new LRTTransferSession();
-    m_logicalSession->Init();
+    LRTTransferSession* logicalSession = new LRTTransferSession(LRTTransferSession::ELogical);
+    logicalSession->Init();
     // conn to logical
-    while (!m_logicalSession->Connect(ip, port)) {
+    while (!logicalSession->Connect(ip, port)) {
         LI("connecting to logical server %s:%u waiting...\n", ip.c_str(), port);
         usleep(100*1000);
     }
-    LI("%s port:%u, socketFD:%d\n", __FUNCTION__, port, m_logicalSession->GetSocket()->GetSocketFD());
-    m_logicalSession->EstablishConnection();
+    LI("%s port:%u, socketFD:%d\n", __FUNCTION__, port, logicalSession->GetSocket()->GetSocketFD());
+    logicalSession->EstablishConnection();
     return true;
 }
 
 bool LRTConnManager::DoConnectConnector(const std::string ip, unsigned short port)
 {
-    LRTTransferSession* connectorSession = new LRTTransferSession();
+    LRTTransferSession* connectorSession = new LRTTransferSession(LRTTransferSession::EOther);
     connectorSession->Init();
     // conn to logical
     while (!connectorSession->Connect(ip, port)) {
@@ -485,14 +482,14 @@ bool LRTConnManager::DoConnectConnector(const std::string ip, unsigned short por
 
 bool LRTConnManager::DoConnectDispatcher(const std::string ip, unsigned short port)
 {
-    m_dispatcherSession = new LRTTransferSession();
-    m_dispatcherSession->Init();
+    LRTTransferSession* dispatcherSession = new LRTTransferSession(LRTTransferSession::EDispatcher);
+    dispatcherSession->Init();
     // conn to logical
-    while (!m_dispatcherSession->Connect(ip, port)) {
+    while (!dispatcherSession->Connect(ip, port)) {
         LI("connecting to dispatcher server %s:%u waiting...\n", ip.c_str(), port);
         usleep(100*1000);
     }
-    LI("%s port:%u, socketFD:%d\n", __FUNCTION__, port, m_dispatcherSession->GetSocket()->GetSocketFD());
-    m_dispatcherSession->EstablishConnection();
+    LI("%s port:%u, socketFD:%d\n", __FUNCTION__, port, dispatcherSession->GetSocket()->GetSocketFD());
+    dispatcherSession->EstablishConnection();
     return true;
 }
