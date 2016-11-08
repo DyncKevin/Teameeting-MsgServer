@@ -83,6 +83,9 @@ public:
 
     std::list<std::string>* GetGroupMgrAddrList() { return &m_groupMgrAddrList; }
 
+    void SetSvrRTLive(bool ok) { m_isSvrRTLiveOk = ok; }
+    bool IsSvrRTLive() { return m_isSvrRTLiveOk; }
+
     void    RefreshConnection();
     void    SendTransferData(const std::string mid, const std::string uid, const std::string msg);
 
@@ -101,6 +104,7 @@ protected:
     ~GRTConnManager() { }
 private:
     bool DoConnectGroupMgr(const std::string ip, unsigned short port);
+    bool                      m_isSvrRTLiveOk;
     std::list<std::string>    m_groupMgrAddrList;
     std::string               m_grouperId;
     OSMutex                   m_mutexMembers;

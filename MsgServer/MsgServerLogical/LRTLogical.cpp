@@ -164,6 +164,7 @@ int	LRTLogical::Start(const RTConfigParser& conf)
             LE("Start to ConnectSequence failed\n");
             return -1;
         }
+        LRTConnManager::Instance().SetSvrSequence(true);
 	}
     LI("SequenceServer should already be connected!!!\n\n");
 
@@ -177,6 +178,7 @@ int	LRTLogical::Start(const RTConfigParser& conf)
             LE("Start to ConnectStorage failed\n");
             return -1;
         }
+        LRTConnManager::Instance().SetSvrStorage(true);
 	}
     LI("StorageServer should already be connected!!!\n\n");
 
@@ -200,6 +202,21 @@ void LRTLogical::DoTick()
 {
 #if 1
     //LRTLogicalManager::Instance().GenerateLogical();
+    LI("LRTLogical::DoTick IsSvrSequence ok:%d, IsSvrStorage ok:%d\n", LRTConnManager::Instance().IsSvrSequence(), LRTConnManager::Instance().IsSvrStorage());
+    if (!LRTConnManager::Instance().IsSvrSequence())
+    {
+        // svr sequence is not ok
+        if ((LRTConnManager::Instance().ConnectSequence())) {
+            LRTConnManager::Instance().SetSvrSequence(true);
+        }
+    }
+    if (!LRTConnManager::Instance().IsSvrStorage())
+    {
+        // svr storage is not ok
+        if ((LRTConnManager::Instance().ConnectStorage())) {
+            LRTConnManager::Instance().SetSvrStorage(true);
+        }
+    }
 #endif
 }
 

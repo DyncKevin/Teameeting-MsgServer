@@ -171,6 +171,7 @@ int	DRTDispatcher::Start(const RTConfigParser& conf)
             LE("Start to ConnectConnector failed\n");
             return -1;
         }
+        DRTConnManager::Instance().SetSvrConnector(true);
 	}
 
 	if(nDispPort > 0)
@@ -195,6 +196,15 @@ void DRTDispatcher::DoTick()
 {
 #if 1
     DRTConnManager::Instance().RefreshConnection();
+    LI("DRTDispatcher::DoTick IsSvrConnector ok:%d\n"\
+            , DRTConnManager::Instance().IsSvrConnector());
+    if (!DRTConnManager::Instance().IsSvrConnector())
+    {
+        // svr connector is not ok
+        if ((DRTConnManager::Instance().ConnectConnector())) {
+            DRTConnManager::Instance().SetSvrConnector(true);
+        }
+    }
 #endif
 }
 

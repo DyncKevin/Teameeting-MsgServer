@@ -112,6 +112,10 @@ public:
 
     bool    ConnectConnector();
     std::list<std::string>* GetAddrsList() { return &m_ipList; }
+
+    void SetSvrConnector(bool ok) { m_isSvrConnectorOk = ok; }
+    bool IsSvrConnector() { return m_isSvrConnectorOk; }
+
     void    RefreshConnection();
     void    SendTransferData(const std::string mid, const std::string uid, const std::string msg);
     void SetDispatcherId(const std::string& did) { m_dispatcherId = did; }
@@ -149,6 +153,7 @@ protected:
     }
 private:
     bool DoConnectConnector(const std::string ip, unsigned short port);
+    bool                      m_isSvrConnectorOk;
     std::list<std::string>    m_ipList;
     std::string               m_dispatcherId;
     OnlineMembers             m_onlineMembers;

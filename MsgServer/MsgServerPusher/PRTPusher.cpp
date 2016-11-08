@@ -187,6 +187,7 @@ int	PRTPusher::Start(const RTConfigParser& conf)
             LE("Start to ConnectConnector failed\n");
             return -1;
         }
+        PRTConnManager::Instance().SetSvrConnector(true);
 	}
 
     if(nRtlivePusherPort > 0)
@@ -199,6 +200,7 @@ int	PRTPusher::Start(const RTConfigParser& conf)
             LE("Start to ConnectRtlivePusher failed\n");
             return -1;
         }
+        PRTConnManager::Instance().SetSvrRTLivePusher(true);
 	}
 
 	return 0;
@@ -208,6 +210,23 @@ void PRTPusher::DoTick()
 {
 #if 1
     PRTConnManager::Instance().RefreshConnection();
+    LI("PRTPusher::DoTick IsSvrConnector ok:%d, IsSvrRTLivePusher:%d\n"\
+            , PRTConnManager::Instance().IsSvrConnector()\
+            , PRTConnManager::Instance().IsSvrRTLivePusher());
+    if (!PRTConnManager::Instance().IsSvrConnector())
+    {
+        // svr connector is not ok
+        if ((PRTConnManager::Instance().ConnectConnector())) {
+            PRTConnManager::Instance().SetSvrConnector(true);
+        }
+    }
+    if (!PRTConnManager::Instance().IsSvrRTLivePusher())
+    {
+        // svr rtlivepusher is not ok
+        if ((PRTConnManager::Instance().ConnectRtlivePusher())) {
+            PRTConnManager::Instance().SetSvrRTLivePusher(true);
+        }
+    }
 #endif
 }
 

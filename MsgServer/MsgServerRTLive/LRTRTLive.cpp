@@ -172,6 +172,8 @@ int	LRTRTLive::Start(const RTConfigParser& conf)
             LE("Start to ConnectLogical failed\n");
             return -1;
         }
+        LRTConnManager::Instance().SetSvrLogical(true);
+
 	}
 
     if(nConnectorPort > 0)
@@ -185,6 +187,7 @@ int	LRTRTLive::Start(const RTConfigParser& conf)
             LE("Start to ConnectConnector failed\n");
             return -1;
         }
+        LRTConnManager::Instance().SetSvrConnector(true);
 	}
 
     if(nDispatcherPort > 0)
@@ -198,6 +201,7 @@ int	LRTRTLive::Start(const RTConfigParser& conf)
             LE("Start to ConnectDispatcher failed\n");
             return -1;
         }
+        LRTConnManager::Instance().SetSvrDispatcher(true);
 	}
 
     if (nRtlivePort > 0) {
@@ -245,6 +249,31 @@ void LRTRTLive::DoTick()
 {
 #if 1
     LRTConnManager::Instance().RefreshConnection();
+    LI("LRTRTLive::DoTick IsSvrLogical ok:%d, IsSvrConnector ok:%d, IsSvrDispatcher ok:%d\n"\
+            , LRTConnManager::Instance().IsSvrLogical()\
+            , LRTConnManager::Instance().IsSvrConnector()\
+            , LRTConnManager::Instance().IsSvrDispatcher());
+    if (!LRTConnManager::Instance().IsSvrLogical())
+    {
+        // svr logical is not ok
+        if ((LRTConnManager::Instance().ConnectLogical())) {
+            LRTConnManager::Instance().SetSvrLogical(true);
+        }
+    }
+    if (!LRTConnManager::Instance().IsSvrConnector())
+    {
+        // svr connector is not ok
+        if ((LRTConnManager::Instance().ConnectConnector())) {
+            LRTConnManager::Instance().SetSvrConnector(true);
+        }
+    }
+    if (!LRTConnManager::Instance().IsSvrDispatcher())
+    {
+        // svr dispatcher is not ok
+        if ((LRTConnManager::Instance().ConnectDispatcher())) {
+            LRTConnManager::Instance().SetSvrDispatcher(true);
+        }
+    }
 #endif
 }
 

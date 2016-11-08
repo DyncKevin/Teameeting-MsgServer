@@ -427,6 +427,17 @@ void LRTConnManager::TransferSessionLostNotify(const std::string& sid)
     data.mtype = SESSEVENT::_sess_lost;
     DelModuleInfo(sid, data);
     DelTypeModuleSession(sid);
+     LI("LRTConnManager::TransferSessionLostNotify data.connect.module:%d\n", data.connect.module);
+     if (data.connect.module==pms::ETransferModule::MLOGICAL)
+     {
+         m_isSvrLogicalOk = false;
+     } else if (data.connect.module==pms::ETransferModule::MCONNECTOR)
+     {
+         m_isSvrConnectorOk = false;
+     } else if (data.connect.module==pms::ETransferModule::MMSGQUEUE)
+     {
+         m_isSvrDispatcherOk = false;
+     }
 }
 
 void LRTConnManager::OnTLogin(const std::string& uid, const std::string& token, const std::string& connector)

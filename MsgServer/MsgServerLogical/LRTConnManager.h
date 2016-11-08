@@ -80,7 +80,6 @@ public:
     void TransferSessionLostNotify(const std::string& sid);
 
     bool    ConnectSequence();
-
     bool    ConnectStorage();
 
     void PushSeqnReadMsg(const std::string& smsg);
@@ -90,6 +89,10 @@ public:
 
     std::list<std::string>* GetSequenceAddrList() { return &m_sequenceAddrList; }
     std::list<std::string>* GetStorageAddrList() { return &m_storageAddrList; }
+    void SetSvrSequence(bool ok) { m_isSvrSequenceOk = ok; }
+    void SetSvrStorage(bool ok) { m_isSvrStorageOk = ok; }
+    bool IsSvrSequence() { return m_isSvrSequenceOk; }
+    bool IsSvrStorage() { return m_isSvrStorageOk; }
 
     void    RefreshConnection();
     void    SendTransferData(const std::string mid, const std::string uid, const std::string msg);
@@ -108,6 +111,8 @@ protected:
 private:
     bool DoConnectSequence(const std::string ip, unsigned short port);
     bool DoConnectStorage(const std::string ip, unsigned short port);
+    bool                      m_isSvrSequenceOk;
+    bool                      m_isSvrStorageOk;
     std::list<std::string>    m_sequenceAddrList;
     std::list<std::string>    m_storageAddrList;
     std::string               m_logicalId;

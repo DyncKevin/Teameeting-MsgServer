@@ -296,6 +296,16 @@ void PRTConnManager::TransferSessionLostNotify(const std::string& sid)
     data.mtype = SESSEVENT::_sess_lost;
     DelModuleInfo(sid, data);
     DelTypeModuleSession(sid);
+
+    LI("DRTConnManager::TransferSessionLostNotify data.connect.module:%d\n", data.connect.module);
+
+    if (data.connect.module==pms::ETransferModule::MCONNECTOR)
+    {
+        m_isSvrConnectorOk = false;
+    } else if (data.connect.module==pms::ETransferModule::MLIVE)
+    {
+        m_isSvrRTLivePusherOk = false;
+    }
 }
 
 void PRTConnManager::OnTLogin(const std::string& uid, const std::string& token, const std::string& connector)

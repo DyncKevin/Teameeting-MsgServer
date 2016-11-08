@@ -26,6 +26,7 @@ int main(int argc, const char * argv[]) {
         getchar();
         exit(0);
     }
+
 #if _TEST_
     if (RTZKClient::Instance().InitOnly(argv[1])!=0) {
 #else

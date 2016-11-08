@@ -266,11 +266,17 @@ bool GRTConnManager::DelTypeModuleSession(const std::string& sid)
 
 void GRTConnManager::TransferSessionLostNotify(const std::string& sid)
 {
-    LI("GRTConnManager::TransferSessionLostNotify was called...sid:%s\n", sid.c_str());
     EventData data;
     data.mtype = SESSEVENT::_sess_lost;
     DelModuleInfo(sid, data);
     DelTypeModuleSession(sid);
+
+    LI("GRTConnManager::TransferSessionLostNotify data.connect.module:%d\n", data.connect.module);
+
+    if (data.connect.module==pms::ETransferModule::MLIVE)
+    {
+        m_isSvrRTLiveOk = false;
+    }
 }
 
 void GRTConnManager::OnTLogin(const std::string& uid, const std::string& token, const std::string& connector)

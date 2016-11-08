@@ -121,14 +121,19 @@ public:
     void UninManager();
 
     bool    ConnectLogical();
-
     bool    ConnectConnector();
-
     bool    ConnectDispatcher();
 
     std::list<std::string>* GetLogicalAddrList() { return &m_logicalAddrList; }
     std::list<std::string>* GetConnectorAddrList() { return &m_connectorAddrList; }
     std::list<std::string>* GetDispatcherAddrList() { return &m_dispatcherAddrList; }
+
+    void SetSvrLogical(bool ok) { m_isSvrLogicalOk = ok; }
+    void SetSvrConnector(bool ok) { m_isSvrConnectorOk = ok; }
+    void SetSvrDispatcher(bool ok) { m_isSvrDispatcherOk = ok; }
+    bool IsSvrLogical() { return m_isSvrLogicalOk; }
+    bool IsSvrConnector() { return m_isSvrConnectorOk; }
+    bool IsSvrDispatcher() { return m_isSvrDispatcherOk; }
 
     void    RefreshConnection();
     void    SendTransferData(const std::string mid, const std::string uid, const std::string msg);
@@ -152,6 +157,10 @@ private:
     bool DoConnectLogical(const std::string ip, unsigned short port);
     bool DoConnectConnector(const std::string ip, unsigned short port);
     bool DoConnectDispatcher(const std::string ip, unsigned short port);
+
+    bool                      m_isSvrLogicalOk;
+    bool                      m_isSvrConnectorOk;
+    bool                      m_isSvrDispatcherOk;
 
     std::list<std::string>    m_logicalAddrList;
     std::list<std::string>    m_connectorAddrList;

@@ -20,9 +20,6 @@
 
 #define TIMEOUT_TS (60*1000)
 
-static int g_read_event_counter = 0;
-static int g_write_event_counter = 0;
-
 LRTTransferSession::LRTTransferSession()
 : RTJSBuffer()
 , RTLstorage()

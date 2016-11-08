@@ -203,6 +203,7 @@ int	GRTGrouper::Start(const RTConfigParser& conf)
             LE("Start to ConnectGroupMgr failed\n");
             return -1;
         }
+        GRTConnManager::Instance().SetSvrRTLive(true);
 	}
 
     LI("Start Grouper Service success...\n");
@@ -211,8 +212,16 @@ int	GRTGrouper::Start(const RTConfigParser& conf)
 
 void GRTGrouper::DoTick()
 {
-#if 0
-
+#if 1
+    LI("GRTGrouper::DoTick IsSvrRTLive ok:%d\n"\
+            , GRTConnManager::Instance().IsSvrRTLive());
+    if (!GRTConnManager::Instance().IsSvrRTLive())
+    {
+        // svr rtlive is not ok
+        if ((GRTConnManager::Instance().ConnectGroupMgr())) {
+            GRTConnManager::Instance().SetSvrRTLive(true);
+        }
+    }
 #endif
 }
 

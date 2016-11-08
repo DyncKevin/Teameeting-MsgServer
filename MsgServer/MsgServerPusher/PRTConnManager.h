@@ -85,6 +85,11 @@ public:
     std::list<std::string>* GetConnectorAddrList() { return &m_connectorAddrList; }
     std::list<std::string>* GetRtlivePusherAddrList() { return &m_rtlivepusherAddrList; }
 
+    void SetSvrConnector(bool ok) { m_isSvrConnectorOk = ok; }
+    void SetSvrRTLivePusher(bool ok) { m_isSvrRTLivePusherOk = ok; }
+    bool IsSvrConnector() { return m_isSvrConnectorOk; }
+    bool IsSvrRTLivePusher() { return m_isSvrRTLivePusherOk; }
+
     void    RefreshConnection();
     void    SendTransferData(const std::string mid, const std::string uid, const std::string msg);
 
@@ -102,6 +107,8 @@ protected:
 private:
     bool DoConnectConnector(const std::string ip, unsigned short port);
     bool DoConnectRtlivePusher(const std::string ip, unsigned short port);
+    bool                      m_isSvrConnectorOk;
+    bool                      m_isSvrRTLivePusherOk;
     std::list<std::string>    m_connectorAddrList;
     std::list<std::string>    m_rtlivepusherAddrList;
     std::string               m_logicalId;
