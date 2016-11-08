@@ -38,15 +38,19 @@ int main(int argc, const char * argv[]) {
         exit(0);
     }
 #endif
-
-#if 0
-    L_Init(0, NULL);
-#else
-    L_Init(0, "./logstorage.log");
-#endif
-
     RTConfigParser conf;
     conf.LoadFromFile(argv[2]);
+
+    int nLogLevel = conf.GetIntVal("log", "level", 0);
+    std::string strLogPath = conf.GetValue("log", "path", "./logstorage.log");
+    if (nLogLevel < 0 || nLogLevel > 5)
+    {
+        std::cout << "Error: Log level=" << nLogLevel << " extend range(0 - 5)!" << std::endl;
+        std::cout << "Please enter any key to exit ..." << std::endl;
+        getchar();
+        exit(0);
+    }
+    L_Init(nLogLevel, strLogPath.c_str());
 
     SRTStorage::Initialize(1024);
     SRTStorage* pStorage = SRTStorage::Inst();

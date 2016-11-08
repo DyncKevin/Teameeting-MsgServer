@@ -11,9 +11,13 @@
 
 #include <stdio.h>
 #include <iostream>
+#include <string>
+#include <vector>
 
 void GenericSessionId(std::string& strId);
 
 unsigned int GenericTransSeq();
+
+int Split(const std::string& delim, const std::string& srcStr, std::vector<std::string>& dstVec);
 
 #endif /* RTUtils_hpp */

@@ -41,6 +41,8 @@ public:
 	void	DoTick();
 	void	Stop();
 
+    void UpdateProcessStatus(std::string& status);
+
 private:
 
 	CRTConnListener		*m_pConnListener;

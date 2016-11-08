@@ -5,9 +5,10 @@ CLEAN_FLAG=1
 fi
 
 TARGET_PREFIX=/usr/local/dync/msgserver/pusher
+TARGET_LOG_PREFIX=/opt/dync/msgserver/pusher
 TARGET_CONF_PATH=$TARGET_PREFIX/conf
 TARGET_BIN_PATH=$TARGET_PREFIX/bin
-TARGET_LOG_PATH=$TARGET_PREFIX/log
+TARGET_LOG_PATH=$TARGET_LOG_PREFIX/log
 TARGET_LIB_PATH=$TARGET_PREFIX/lib
 SYS_BIN_PATH=/usr/bin
 SYS_INIT_PATH=/etc/init.d
@@ -36,5 +37,6 @@ rm -f $TARGET_CONF_PATH/pusher.conf
 rm -f $TARGET_CONF_PATH/params.conf
 rm -f $TARGET_BIN_PATH/MsgServerPusher
 rm -rf $TARGET_PREFIX
+rm -rf $TARGET_LOG_PREFIX
 printf "UnInstall program ok!\r\n"
 fi

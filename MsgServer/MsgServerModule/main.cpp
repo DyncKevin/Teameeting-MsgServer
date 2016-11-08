@@ -45,15 +45,20 @@ int main(int argc, const char * argv[]) {
     else
         L_Init(level, logpath.c_str());
 #endif
-
-#if 0
-    L_Init(0, NULL);
-#else
-    L_Init(0, "./logmodule.log");
-#endif
-
     RTConfigParser conf;
     conf.LoadFromFile(argv[2]);
+
+    int nLogLevel = conf.GetIntVal("log", "level", 0);
+    std::string strLogPath = conf.GetValue("log", "path", "./logmodule.log");
+    if (nLogLevel < 0 || nLogLevel > 5)
+    {
+        std::cout << "Error: Log level=" << nLogLevel << " extend range(0 - 5)!" << std::endl;
+        std::cout << "Please enter any key to exit ..." << std::endl;
+        getchar();
+        exit(0);
+    }
+    L_Init(nLogLevel, strLogPath.c_str());
+
     MRTModule::Initialize(1024);
     MRTModule* pModule = MRTModule::Inst();
     int res = pModule->Start(conf);

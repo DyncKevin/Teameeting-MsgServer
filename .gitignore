@@ -44,6 +44,8 @@ MsgServer/MsgServerPusher/MsgServerPusher
 MsgServer/MsgServerPusher/pusher/bin
 MsgServer/MsgServerModule/MsgServerModule
 MsgServer/MsgServerModule/module/bin
+MsgServer/MsgServerDaemon/MsgServerDaemon
+MsgServer/MsgServerDaemon/daemon/bin
 MsgServer/MsgServer/MSCommon/MSThirdParty/xredis/examples/demo
 MsgServer/MsgServer/MSCommon/MSThirdParty/xredis/examples/xredis-example
 MsgServer/MsgServerClient/MsgServerClient

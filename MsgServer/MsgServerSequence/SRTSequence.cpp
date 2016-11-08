@@ -153,16 +153,6 @@ int	SRTSequence::Start(const RTConfigParser& conf)
     int nRedisPort1 = conf.GetIntVal("redis", "redis_port1", 6379);
     int nRedisPort2 = conf.GetIntVal("redis", "redis_port2", 6379);
 
-    int log_level = conf.GetIntVal("log", "level", 5);
-    std::string strLogPath = conf.GetValue("log", "path");
-    if (log_level < 0 || log_level > 5)
-    {
-        std::cout << "Error: Log level=" << log_level << " extend range(0 - 5)!" << std::endl;
-        std::cout << "Please enter any key to exit ..." << std::endl;
-        getchar();
-        exit(0);
-    }
-
     SRTSequenceManager::Instance().InitManager();
 
     char addr[24] = {0};

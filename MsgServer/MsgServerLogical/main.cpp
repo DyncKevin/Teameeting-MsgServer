@@ -40,14 +40,19 @@ int main(int argc, const char * argv[]) {
     }
 #endif
 
-#if 0
-    L_Init(0, NULL);
-#else
-    L_Init(0, "./loglogical.log");
-#endif
-
     RTConfigParser conf;
     conf.LoadFromFile(argv[2]);
+
+    int nLogLevel = conf.GetIntVal("log", "level", 0);
+    std::string strLogPath = conf.GetValue("log", "path", "./loglogical.log");
+    if (nLogLevel < 0 || nLogLevel > 5)
+    {
+        std::cout << "Error: Log level=" << nLogLevel << " extend range(0 - 5)!" << std::endl;
+        std::cout << "Please enter any key to exit ..." << std::endl;
+        getchar();
+        exit(0);
+    }
+    L_Init(nLogLevel, strLogPath.c_str());
 
     LRTLogical::Initialize(1024);
     LRTLogical* pLogical = LRTLogical::Inst();

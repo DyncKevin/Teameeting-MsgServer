@@ -38,4 +38,8 @@ echo "untar pusher.tar.gz..."
 sleep 1
 tar -zxvf pusher.tar.gz
 
+echo "untar daemon.tar.gz..."
+sleep 1
+tar -zxvf daemon.tar.gz
+
 echo "untar end *_*..."

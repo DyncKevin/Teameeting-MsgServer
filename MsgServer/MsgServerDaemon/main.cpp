@@ -13,9 +13,71 @@
 #include "RTZKClient.hpp"
 #include <google/protobuf/message.h>
 
+#include <stdio.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <signal.h>
+
+#include "DRTDaemon.h"
+#include "DRTServerManager.h"
+
 #ifndef _TEST_
 #define _TEST_ 0
 #endif
+
+void CreateDaemon(void)
+{
+    int i;
+    int fd0;
+    pid_t pid;
+    struct sigaction sa;
+    umask(0);
+    if (pid=fork()<0)
+    {
+
+    } else if (pid!=0) {
+        exit(0);
+    }
+    setsid();
+    sa.sa_handler=SIG_IGN;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags=0;
+
+    if (sigaction(SIGCHLD, &sa, NULL)<0)
+    {
+         return;
+    }
+    if (pid=fork()<0)
+    {
+        return;
+    } else if (pid!=0) {
+         exit(0);
+    }
+    if (chdir("/")<0)
+    {
+        printf("child dir error\n");
+        return;
+    }
+    close(0);
+    fd0=open("/dev/null", O_RDWR);
+    dup2(fd0, 1);
+    dup2(fd0, 2);
+}
+
+void handler(int num)
+{
+     int status;
+     int pid = waitpid(-1, &status, WNOHANG);
+     if (WIFEXITED(status))
+     {
+         printf("-----------the child %d exit with code :%d\n", pid, WEXITSTATUS(status));
+     } else {
+         printf("-----------111111 the child %d not exit with code :%d\n", pid, WEXITSTATUS(status));
+     }
+}
 
 int main(int argc, const char * argv[]) {
     printf("Hello, MsgServerDaemon!!!\n");
@@ -26,7 +88,11 @@ int main(int argc, const char * argv[]) {
         getchar();
         exit(0);
     }
-#if 1
+
+    printf("hahahaha 1\n");
+    //signal(SIGCHLD, handler);
+    //daemon(0, 0);
+    printf("hahahaha 2\n");
 #if _TEST_
     if (RTZKClient::Instance().InitOnly(argv[1])!=0) {
 #else
@@ -37,36 +103,50 @@ int main(int argc, const char * argv[]) {
         getchar();
         exit(0);
     }
-#endif
-
-#if 0
-    L_Init(0, NULL);
-#else
-    L_Init(0, "./logdeamon.log");
-#endif
-    FILE* fp;
-    time_t t;
 
     RTConfigParser conf;
     conf.LoadFromFile(argv[2]);
-    int res = daemon(2, 4);
+
+    int nLogLevel = conf.GetIntVal("log", "level", 0);
+    std::string strLogPath = conf.GetValue("log", "path", "./logdaemon.log");
+    if (nLogLevel < 0 || nLogLevel > 5)
+    {
+        std::cout << "Error: Log level=" << nLogLevel << " extend range(0 - 5)!" << std::endl;
+        std::cout << "Please enter any key to exit ..." << std::endl;
+        getchar();
+        exit(0);
+    }
+    L_Init(nLogLevel, strLogPath.c_str());
+
+    int count = 0, res = 0;
+    DRTDaemon* pDaemon = nullptr;
+
+    LI("DRTDaemon start argv1:%s, argv2:%s\n", argv[1], argv[2]);
+
+    DRTDaemon::Initialize(1024);
+    pDaemon = DRTDaemon::Inst();
+    res = pDaemon->Start(conf);
     if (res != 0) {
-        LI("DRTDeamon start failed and goto exit, res:%d\n", res);
+        LI("DRTDaemon start failed and goto exit, res:%d\n", res);
         goto EXIT;
     }
+
     while (1) {
         sleep(1);
-        if((fp=fopen("print_time", "a"))>=0) {
-             t = time(0);
-             fprintf(fp, "The time right now is :%s\n", asctime(localtime(&t)));
-             fclose(fp);
-        }
-        //break;
+        pDaemon->DoTick();
+        //if (count++ >120)
+        //    break;
     }
         sleep(1);
 EXIT:
+    LI("DRTDaemon exit 1\n");
+    pDaemon->Stop();
+    LI("DRTDaemon exit 2\n");
     L_Deinit();
+    printf("DRTDaemon exit 3\n");
     RTZKClient::Instance().Unin();
+    printf("DRTDaemon exit 4\n");
     google::protobuf::ShutdownProtobufLibrary();
+    printf("DRTDaemon exit 5\n");
     return 0;
 }

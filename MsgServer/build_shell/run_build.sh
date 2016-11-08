@@ -584,6 +584,23 @@ else
     logerr "building msgserverpusher not running..."
 fi
 
+####################    building msgserverdaemon    ###########################
+if [ "yes"x = "yes"x ]
+then
+    SRC_PATH=$BASE_PATH/MsgServerDaemon
+    BUILD_NAME=MsgServerDaemon
+    PREFIX_PATH=$SRC_PATH/daemon
+    build_bin $SRC_PATH $PREFIX_PATH $BUILD_NAME
+    if [ $? -ne 0 ]
+    then
+        logerr "build_bin $BUILD_NAME error..."
+        exit 1
+    fi
+    cd $SRC_PATH
+    tar_tar_gz daemon
+else
+    logerr "building msgserverdaemon not running..."
+fi
 
 
 ####################    taring all.tar.gz to msgserver    ###########################

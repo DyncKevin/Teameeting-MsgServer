@@ -21,18 +21,26 @@
 #include "server_status.h"
 #include "RTSingleton.h"
 
+
 class RTZKClient : public RTSingleton< RTZKClient > {
     friend class RTSingleton< RTZKClient >;
 public:
+
+    typedef void (*NodeAddCallback)(const std::string& nodePath);
+    typedef void (*NodeDelCallback)(const std::string& nodePath);
+    typedef void (*DataWatchCallback)(const std::string& data, const std::string& extra);
 
     int InitOnly(const std::string& conf);
     int InitZKClient(const std::string& conf);
     int InitStatusNode(gim::ServerConfig& conf);
     int Unin();
 
+    void SetNodeCallback(NodeAddCallback addCb, NodeDelCallback delCb);
+    void SetDataWatchCallback(DataWatchCallback dataCb);
+
     bool CheckNodeExists(const std::string& nodePath);
 
-    static void RTZKLogCallBack(void* ctx, const std::string& l);
+    static void RTZKLogCallback(void* ctx, const std::string& l);
     static int RTZKDataCallback(void* ctx, int version, const std::string& data);
 
     //for list
@@ -40,9 +48,14 @@ public:
     int ChildrenMapCallback(const gim::ChildrenMap& cmap);
     int PathRemoveCallback(const std::string& path);
 
+    void SetNodeData(const std::string& path, const std::string& data);
+
     // <nodePath, node>
     typedef std::unordered_map< std::string, gim::ListWatcher<RTZKClient>* > ChildrenWatcherMap;
     typedef ChildrenWatcherMap::iterator ChildrenWatcherMapIt;
+
+    typedef std::unordered_map< std::string, gim::DataWatcher<RTZKClient>* > DataWatcherMap;
+    typedef DataWatcherMap::iterator DataWatcherMapIt;
 
     typedef std::vector< gim::ListWatcher<RTZKClient>* > ListWatcherVec;
     typedef std::vector< gim::DataWatcher<RTZKClient>* > DataWatcherVec;
@@ -60,7 +73,11 @@ private:
     ListWatcherVec          m_listWs;
     ChildrenWatcherMap      m_mapChildWs;
     DataWatcherVec          m_dataWs;
+    DataWatcherMap          m_mapDataWs;
 
+    NodeAddCallback         m_NodeAddCallback;
+    NodeDelCallback         m_NodeDelCallback;
+    DataWatchCallback       m_DataWatchCallback;
 };
 
 #endif /* RTZKClient_hpp */

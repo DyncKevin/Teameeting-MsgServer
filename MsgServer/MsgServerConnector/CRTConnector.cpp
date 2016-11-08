@@ -17,11 +17,14 @@
 #include "CRTConnManager.h"
 #include "CRTDispatchConnection.h"
 #include "RTUtils.hpp"
+#include "RTZKClient.hpp"
+#include "RTProcessInfo.h"
 
 
 static bool		g_inited = false;
 static char*	g_pVersion = (char*)"0.01.20150810";
 static CRTConnector*	g_pConnector = NULL;
+static int g_count = 0;
 
 void CRTConnector::PrintVersion()
 {
@@ -171,16 +174,6 @@ int	CRTConnector::Start(const RTConfigParser& conf)
     int nHttpPort = conf.GetIntVal("resetful", "listen_http_port", 8055);
     int nRedisPort1 = conf.GetIntVal("redis", "redis_port1", 6379);
 
-    int log_level = conf.GetIntVal("log", "level", 5);
-    std::string strLogPath = conf.GetValue("log", "path");
-    if (log_level < 0 || log_level > 5)
-    {
-        std::cout << "Error: Log level=" << log_level << " extend range(0 - 5)!" << std::endl;
-        std::cout << "Please enter any key to exit ..." << std::endl;
-        getchar();
-        exit(0);
-    }
-
     CRTConnManager::Instance().Init(strRedisIp1, nRedisPort1);
     std::string ssid;
     GenericSessionId(ssid);
@@ -252,8 +245,13 @@ int	CRTConnector::Start(const RTConfigParser& conf)
 
 void CRTConnector::DoTick()
 {
-#if 0
-
+#if 1
+    std::string st("");
+    UpdateProcessStatus(st);
+    if (RTZKClient::Instance().CheckNodeExists("/dync/msgserver/connector/127.0.0.1"))
+    {
+        RTZKClient::Instance().SetNodeData("/dync/msgserver/connector/127.0.0.1", st);
+    }
 #endif
 }
 
@@ -263,3 +261,48 @@ void CRTConnector::Stop()
     CRTConnManager::Instance().ClearAll();
     CRTConnManager::Instance().Unin();
 }
+
+void CRTConnector::UpdateProcessStatus(std::string& status)
+{
+    RTProcessInfo info;
+    pid_t pid = getpid();
+    float cpu = info.GetPcpu(pid);
+    float mem = info.GetPmem(pid);
+    int online = 1;
+    std::string node = RTZKClient::Instance().GetServerConfig().NodePath;
+
+    rapidjson::Document jDoc;
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+
+    rapidjson::Document jDocNode;
+    rapidjson::StringBuffer sbNode;
+    rapidjson::Writer<rapidjson::StringBuffer> writerNode(sbNode);
+    jDocNode.SetObject();
+    jDocNode.AddMember("node", node.c_str(), jDocNode.GetAllocator());
+    jDocNode.Accept(writerNode);
+
+    rapidjson::Document jDocSyst;
+    rapidjson::StringBuffer sbSyst;
+    rapidjson::Writer<rapidjson::StringBuffer> writerSyst(sbSyst);
+    jDocSyst.SetObject();
+    jDocSyst.AddMember("cpu", cpu, jDocSyst.GetAllocator());
+    jDocSyst.AddMember("mem", mem, jDocSyst.GetAllocator());
+    jDocSyst.Accept(writerSyst);
+
+    rapidjson::Document jDocProc;
+    rapidjson::StringBuffer sbProc;
+    rapidjson::Writer<rapidjson::StringBuffer> writerProc(sbProc);
+    jDocProc.SetObject();
+    jDocProc.AddMember("online", online, jDocProc.GetAllocator());
+    jDocProc.Accept(writerProc);
+
+    jDoc.SetObject();
+    jDoc.AddMember("node", sbNode.GetString(), jDoc.GetAllocator());
+    jDoc.AddMember("syst", sbSyst.GetString(), jDoc.GetAllocator());
+    jDoc.AddMember("proc", sbProc.GetString(), jDoc.GetAllocator());
+
+    jDoc.Accept(writer);
+    status = sb.GetString();
+}
+

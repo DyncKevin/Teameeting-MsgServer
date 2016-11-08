@@ -152,15 +152,6 @@ int	LRTLogical::Start(const RTConfigParser& conf)
     int nLogicalPort = conf.GetIntVal("global", "listen_logical_port", 6670);
     int nHttpPort = conf.GetIntVal("resetful", "listen_http_port", 8055);
 
-    int log_level = conf.GetIntVal("log", "level", 5);
-    std::string strLogPath = conf.GetValue("log", "path");
-    if (log_level < 0 || log_level > 5)
-    {
-        std::cout << "Error: Log level=" << log_level << " extend range(0 - 5)!" << std::endl;
-        std::cout << "Please enter any key to exit ..." << std::endl;
-        getchar();
-        exit(0);
-    }
     LRTLogicalManager::Instance().InitManager();
 
 	if(nSequencePort > 0)
