@@ -156,10 +156,6 @@ int	DRTDispatcher::Start(const RTConfigParser& conf)
     char hh[24] = {0};
     sprintf(hh, "%s:%d", strHttpIp.c_str(), nHttpPort);
 
-    DRTConnManager::s_cohttpHost = hh;
-    DRTConnManager::s_cohttpIp = strHttpIp.c_str();
-    DRTConnManager::s_cohttpPort = nHttpPort;
-
     std::string mid;
     GenericSessionId(mid);
     DRTConnManager::Instance().SetDispatcherId(mid);

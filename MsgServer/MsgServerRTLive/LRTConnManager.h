@@ -93,9 +93,7 @@ public:
     typedef std::unordered_map< std::string, ConnectionInfo* >  ConnectionInfoMaps;
     typedef ConnectionInfoMaps::iterator                        ConnectionInfoMapsIt;
 
-    static std::string      s_cohttpIp;
-    static unsigned short   s_cohttpPort;
-    static std::string      s_cohttpHost;
+    ///////////////////////////////////////////////////////////////////////////////////
 
     ModuleInfo*       findConnModuleInfo(const std::string& userid);
     ModuleInfo*       findModuleInfo(const std::string& userid, pms::ETransferModule module);

@@ -17,10 +17,6 @@
 
 static int ticket_time = 0;
 
-std::string     LRTConnManager::s_cohttpIp;
-unsigned short  LRTConnManager::s_cohttpPort;
-std::string     LRTConnManager::s_cohttpHost;
-
 static OSMutex       s_mutex;
 static OSMutex       s_mutexModule;
 static OSMutex       s_mutexTypeModule;

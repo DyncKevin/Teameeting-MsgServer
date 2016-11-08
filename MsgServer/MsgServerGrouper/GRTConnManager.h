@@ -65,6 +65,8 @@ public:
 
     typedef std::list< GRTTransferSession* > ConnectingSessList;
 
+    ///////////////////////////////////////////////////////////////////////////////////
+
     ModuleInfo*       findConnectorInfo(const std::string& userid);
     ModuleInfo*       findModuleInfo(const std::string& userid, pms::ETransferModule module);
     ModuleInfo*       findModuleInfoBySid(const std::string& sid);

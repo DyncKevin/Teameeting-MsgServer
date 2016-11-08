@@ -86,6 +86,7 @@ public:
 
     typedef std::list< MRTTransferSession* > ConnectingSessList;
 
+    ///////////////////////////////////////////////////////////////////////////////////
 
     ModuleInfo*  findModuleInfo(const std::string& userid, pms::ETransferModule module);
 

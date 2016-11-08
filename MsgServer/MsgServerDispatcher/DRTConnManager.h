@@ -96,9 +96,7 @@ public:
 
     typedef std::list< DRTTransferSession* > ConnectingSessList;
 
-    static std::string      s_cohttpIp;
-    static unsigned short   s_cohttpPort;
-    static std::string      s_cohttpHost;
+    ///////////////////////////////////////////////////////////////////////////////////
 
     ModuleInfo*       findConnectorInfo(const std::string& userid);
     ModuleInfo*       findModuleInfo(const std::string& userid, pms::ETransferModule module);
@@ -137,7 +135,7 @@ public:
 
     void GetUserConnectorId(const std::string& uid, std::string& connector);
 
-    bool ConnectHttpSvrConn();
+    bool ConnectHttpSvrConn(const std::string& addr, const unsigned short port, const std::string& host);
     void PushMeetingMsg(const std::string& meetingid, const std::string& msgFromId, const std::string& meetingOnlineMembers, const std::string& pushMsg, const std::string& notification, const std::string& extra);
     void PushCommonMsg(const std::string& sign, const std::string& targetid, const std::string& pushMsg, const std::string& notification, const std::string& extra);
 

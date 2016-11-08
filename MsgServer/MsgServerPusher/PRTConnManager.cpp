@@ -15,10 +15,6 @@
 #include "RTZKClient.hpp"
 #include "ProtoCommon.h"
 
-std::string     PRTConnManager::s_cohttpIp;
-unsigned short  PRTConnManager::s_cohttpPort;
-std::string     PRTConnManager::s_cohttpHost;
-
 static OSMutex       s_mutex;
 static OSMutex       s_mutexModule;
 static OSMutex       s_mutexTypeModule;

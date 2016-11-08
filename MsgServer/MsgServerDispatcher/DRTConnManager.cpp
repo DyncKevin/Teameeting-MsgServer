@@ -15,10 +15,6 @@
 #include "RTZKClient.hpp"
 #include "ProtoCommon.h"
 
-std::string     DRTConnManager::s_cohttpIp;
-unsigned short  DRTConnManager::s_cohttpPort;
-std::string     DRTConnManager::s_cohttpHost;
-
 static OSMutex       s_mutex;
 static OSMutex       s_mutexModule;
 static OSMutex       s_mutexTypeModule;
@@ -361,12 +357,12 @@ void DRTConnManager::GetUserConnectorId(const std::string& uid, std::string& con
     connector = m_userConnectors.find(uid)->second;
 }
 
-bool DRTConnManager::ConnectHttpSvrConn()
+bool DRTConnManager::ConnectHttpSvrConn(const std::string& addr, const unsigned short port, const std::string& host)
 {
     if (!m_pHttpSvrConn) {
         LI("DRTConnManager::ConnectHttpSvrConn ok\n");
         m_pHttpSvrConn = new rtc::RefCountedObject<DRTHttpSvrConn>();
-        m_pHttpSvrConn->SetHttpHost(s_cohttpIp, s_cohttpPort, s_cohttpHost);
+        m_pHttpSvrConn->SetHttpHost(addr, port, host);
     } else {
         LI("DRTConnManager::ConnectHttpSvrConn error\n");
         return false;
