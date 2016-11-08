@@ -18,7 +18,6 @@
 #include "OSMutex.h"
 #include "RTSingleton.h"
 #include "RTType.h"
-#include "GRTConnDispatcher.h"
 #include "RTEventTimer.h"
 
 #include "ProtoCommon.h"
@@ -96,21 +95,14 @@ public:
     void OnTLogin(const std::string& uid, const std::string& token, const std::string& connector);
     void OnTLogout(const std::string& uid, const std::string& token, const std::string& connector);
 
-    void ProcessRecvEvent(const char*pData, int nLen);
-    void ProcessTickEvent(const char*pData, int nLen);
-    void PostDataStatic(const char* pData, int nLen);
-
-    // for RTEventTimer
-    static int DispTimerCallback(const char*pData, int nLen);
 protected:
-    GRTConnManager():m_pConnDispatcher(NULL) { }
+    GRTConnManager() { }
     ~GRTConnManager() { }
 private:
     bool DoConnectGroupMgr(const std::string ip, unsigned short port);
     std::list<std::string>    m_groupMgrAddrList;
     std::string               m_grouperId;
     OSMutex                   m_mutexMembers;
-    GRTConnDispatcher*        m_pConnDispatcher;
     UserConnectorMaps         m_userConnectors;
     ConnectingSessList        m_connectingSessList;
     GRTTransferSession*       m_pGroupMgrSession;

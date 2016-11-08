@@ -1,7 +1,6 @@
 bin_PROGRAMS=MsgServerGrouper
 
 AM_CFLAGS=-g -O0 -std=c++11 -Wall -fPIC -D__PTHREADS__ -D__PTHREADS_MUTEXES__
-###AM_CFLAGS+=-DAUTO_RECONNECT
 MsgServerGrouper_LDFLAGS=-static-libgcc
 
 AM_CPPFLAGS=$(AM_CFLAGS)
@@ -32,7 +31,6 @@ MsgServerGrouper_SOURCES=$(top_srcdir)/GRTListener/GRTGrouperListener.cpp \
 						   $(top_srcdir)/GRTXRedis/RCPthread.cpp \
 						   $(top_srcdir)/GRTChannelManager.cpp \
 						   $(top_srcdir)/GRTConnManager.cpp \
-						   $(top_srcdir)/GRTConnDispatcher.cpp \
 						   $(top_srcdir)/GRTGrouperManager.cpp \
 						   $(top_srcdir)/GRTGrouper.cpp \
 						   $(top_srcdir)/main.cpp

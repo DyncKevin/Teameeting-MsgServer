@@ -18,7 +18,6 @@
 #include "OSMutex.h"
 #include "RTSingleton.h"
 #include "RTType.h"
-#include "MRTConnDispatcher.h"
 #include "RTEventTimer.h"
 
 #include "ProtoCommon.h"
@@ -104,14 +103,8 @@ public:
     void OnTLogin(const std::string& uid, const std::string& token, const std::string& connector);
     void OnTLogout(const std::string& uid, const std::string& token, const std::string& connector);
 
-    void ProcessRecvEvent(const char*pData, int nLen);
-    void ProcessTickEvent(const char*pData, int nLen);
-    void PostDataStatic(const char* pData, int nLen);
-
-    // for RTEventTimer
-    static int DispTimerCallback(const char*pData, int nLen);
 protected:
-    MRTConnManager():m_pConnDispatcher(NULL) { }
+    MRTConnManager() { }
     ~MRTConnManager() { }
 private:
     bool DoConnectSequence(const std::string ip, unsigned short port);
@@ -120,7 +113,6 @@ private:
     std::list<std::string>    m_storageAddrList;
     std::string               m_logicalId;
     OSMutex                   m_mutexMembers;
-    MRTConnDispatcher*        m_pConnDispatcher;
     UserConnectorMaps         m_userConnectors;
     ConnectingSessList        m_connectingSessList;
 };

@@ -1,7 +1,6 @@
 bin_PROGRAMS=MsgServerSequence
 
 AM_CFLAGS=-g -O0 -std=c++11 -Wall -fPIC -D__PTHREADS__ -D__PTHREADS_MUTEXES__
-###AM_CFLAGS+=-DAUTO_RECONNECT
 MsgServerSequence_LDFLAGS=-static-libgcc
 
 AM_CPPFLAGS=$(AM_CFLAGS)
@@ -29,7 +28,6 @@ MsgServerSequence_SOURCES=$(top_srcdir)/SRTListener/SRTSequenceListener.cpp \
 						   $(top_srcdir)/SRTSequenceRedis.cpp \
 						   $(top_srcdir)/SRTResponseCollection.cpp \
 						   $(top_srcdir)/SRTConnManager.cpp \
-						   $(top_srcdir)/SRTConnDispatcher.cpp \
 						   $(top_srcdir)/SRTRedisManager.cpp \
 						   $(top_srcdir)/SRTSequenceGenerator.cpp \
 						   $(top_srcdir)/SRTSequenceManager.cpp \

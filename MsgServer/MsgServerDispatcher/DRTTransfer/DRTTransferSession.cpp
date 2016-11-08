@@ -1,6 +1,6 @@
 //
 //  DRTTransferSession.cpp
-//  dyncRTMsgQueue
+//  dyncRTDispatcher
 //
 //  Created by hp on 11/26/15.
 //  Copyright (c) 2015 hp. All rights reserved.
@@ -234,14 +234,14 @@ void DRTTransferSession::OnTypeConn(const std::string& str)
 
     if ((c_msg.conn_tag() == pms::EConnTag::THI)) {
         // when other connect to ME:
-        // send the transfersessionid and MsgQueueId to other
+        // send the transfersessionid and DispatcherId to other
         pms::TransferMsg t_msg;
 
         c_msg.set_tr_module(pms::ETransferModule::MMSGQUEUE);
         c_msg.set_conn_tag(pms::EConnTag::THELLO);
         c_msg.set_transferid(m_transferSessId);
-        //send self MsgQueue id to other
-        c_msg.set_moduleid(DRTConnManager::Instance().MsgQueueId());
+        //send self Dispatcher id to other
+        c_msg.set_moduleid(DRTConnManager::Instance().DispatcherId());
 
         t_msg.set_type(pms::ETransferType::TCONN);
         //this is for transfer
@@ -279,8 +279,8 @@ void DRTTransferSession::OnTypeConn(const std::string& str)
             c_msg.set_tr_module(pms::ETransferModule::MMSGQUEUE);
             c_msg.set_conn_tag(pms::EConnTag::THELLOHI);
             c_msg.set_transferid(m_transferSessId);
-            //send self MsgQueue id to other
-            c_msg.set_moduleid(DRTConnManager::Instance().MsgQueueId());
+            //send self Dispatcher id to other
+            c_msg.set_moduleid(DRTConnManager::Instance().DispatcherId());
 
             t_msg.set_type(pms::ETransferType::TCONN);
             //this is for transfer

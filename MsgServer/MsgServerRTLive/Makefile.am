@@ -1,7 +1,6 @@
 bin_PROGRAMS=MsgServerRTLive
 
 AM_CFLAGS=-g -O0 -std=c++11 -Wall -fPIC -D__PTHREADS__ -D__PTHREADS_MUTEXES__
-###AM_CFLAGS+=-DAUTO_RECONNECT
 MsgServerRTLive_LDFLAGS=-static-libgcc
 
 AM_CPPFLAGS=$(AM_CFLAGS)
@@ -30,7 +29,6 @@ MsgServerRTLive_SOURCES=$(top_srcdir)/LRTListener/LRTRTLiveListener.cpp \
 						   $(top_srcdir)/LRTTransfer/LRTTransferSession.cpp \
 						   $(top_srcdir)/LRTModuleConnTcp.cpp \
 						   $(top_srcdir)/LRTConnManager.cpp \
-						   $(top_srcdir)/LRTConnDispatcher.cpp \
 						   $(top_srcdir)/LRTRTLiveManager.cpp \
 						   $(top_srcdir)/LRTRTLive.cpp \
 						   $(top_srcdir)/main.cpp

@@ -17,7 +17,6 @@
 #include <set>
 #include "OSMutex.h"
 #include "DRTHttpSvrConn.h"
-#include "DRTConnDispatcher.h"
 #include "RTEventTimer.h"
 #include "RTSingleton.h"
 
@@ -118,8 +117,8 @@ public:
     std::list<std::string>* GetAddrsList() { return &m_ipList; }
     void    RefreshConnection();
     void    SendTransferData(const std::string mid, const std::string uid, const std::string msg);
-    void SetMsgQueueId(const std::string& mid) { m_msgQueueId = mid; }
-    std::string& MsgQueueId() { return m_msgQueueId; }
+    void SetDispatcherId(const std::string& did) { m_dispatcherId = did; }
+    std::string& DispatcherId() { return m_dispatcherId; }
     bool    SignalKill();
     bool    ClearAll();
 
@@ -142,15 +141,9 @@ public:
     void PushMeetingMsg(const std::string& meetingid, const std::string& msgFromId, const std::string& meetingOnlineMembers, const std::string& pushMsg, const std::string& notification, const std::string& extra);
     void PushCommonMsg(const std::string& sign, const std::string& targetid, const std::string& pushMsg, const std::string& notification, const std::string& extra);
 
-    void ProcessRecvEvent(const char*pData, int nLen);
-    void ProcessTickEvent(const char*pData, int nLen);
-    void PostDataStatic(const char* pData, int nLen);
-
-    // for RTEventTimer
-    static int DispTimerCallback(const char*pData, int nLen);
 protected:
     DRTConnManager()
-        : m_pHttpSvrConn(NULL), m_pConnDispatcher(NULL) { }
+        : m_pHttpSvrConn(NULL){ }
     ~DRTConnManager() {
         if(m_pHttpSvrConn) {
             delete m_pHttpSvrConn;
@@ -160,12 +153,11 @@ protected:
 private:
     bool DoConnectConnector(const std::string ip, unsigned short port);
     std::list<std::string>    m_ipList;
-    std::string               m_msgQueueId;
+    std::string               m_dispatcherId;
     OnlineMembers             m_onlineMembers;
     OfflineMembers            m_offlineMembers;
     OSMutex                   m_mutexMembers;
     DRTHttpSvrConn*           m_pHttpSvrConn;
-    DRTConnDispatcher*        m_pConnDispatcher;
     UserConnectorMaps         m_userConnectors;
     ConnectingSessList        m_connectingSessList;
 };

@@ -1,7 +1,6 @@
 bin_PROGRAMS=MsgServerLogical
 
 AM_CFLAGS=-g -O0 -std=c++11 -Wall -fPIC -D__PTHREADS__ -D__PTHREADS_MUTEXES__
-###AM_CFLAGS+=-DAUTO_RECONNECT
 MsgServerLogical_LDFLAGS=-static-libgcc
 
 AM_CPPFLAGS=$(AM_CFLAGS)
@@ -27,7 +26,6 @@ AM_CPPFLAGS+= -I$(top_srcdir)/../ \
 MsgServerLogical_SOURCES=$(top_srcdir)/LRTListener/LRTLogicalListener.cpp \
 						   $(top_srcdir)/LRTTransfer/LRTTransferSession.cpp \
 						   $(top_srcdir)/LRTConnManager.cpp \
-						   $(top_srcdir)/LRTConnDispatcher.cpp \
 						   $(top_srcdir)/LRTLogicalManager.cpp \
 						   $(top_srcdir)/LRTLogical.cpp \
 						   $(top_srcdir)/main.cpp

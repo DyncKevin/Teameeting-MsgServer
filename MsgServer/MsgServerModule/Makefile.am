@@ -1,7 +1,6 @@
 bin_PROGRAMS=MsgServerModule
 
 AM_CFLAGS=-g -O0 -std=c++11 -Wall -fPIC -D__PTHREADS__ -D__PTHREADS_MUTEXES__
-###AM_CFLAGS+=-DAUTO_RECONNECT
 MsgServerModule_LDFLAGS=-static-libgcc
 
 AM_CPPFLAGS=$(AM_CFLAGS)
@@ -27,7 +26,6 @@ AM_CPPFLAGS+= -I$(top_srcdir)/../ \
 MsgServerModule_SOURCES=$(top_srcdir)/MRTListener/MRTModuleListener.cpp \
 						   $(top_srcdir)/MRTTransfer/MRTTransferSession.cpp \
 						   $(top_srcdir)/MRTConnManager.cpp \
-						   $(top_srcdir)/MRTConnDispatcher.cpp \
 						   $(top_srcdir)/MRTModuleManager.cpp \
 						   $(top_srcdir)/MRTModule.cpp \
 						   $(top_srcdir)/main.cpp

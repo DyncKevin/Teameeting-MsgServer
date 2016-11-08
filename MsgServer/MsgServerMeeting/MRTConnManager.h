@@ -15,7 +15,6 @@
 #include <utility>
 #include <list>
 #include <set>
-#include "MRTConnDispatcher.h"
 #include "RTEventTimer.h"
 #include "RTSingleton.h"
 
@@ -106,14 +105,8 @@ public:
     std::string& MeetingId() { return m_meetingId; }
     std::list<std::string>* GetAddrsList() { return &m_ipList; }
 
-    void ProcessRecvEvent(const char*pData, int nLen);
-    void ProcessTickEvent(const char*pData, int nLen);
-    void PostDataStatic(const char* pData, int nLen);
-
-    // for RTEventTimer
-    static int ConnTimerCallback(const char*pData, int nLen);
 protected:
-    MRTConnManager():m_pConnDispatcher(NULL){}
+    MRTConnManager(){}
     ~MRTConnManager(){}
 
 private:
@@ -122,7 +115,6 @@ private:
     std::list<std::string>    m_ipList;
     std::string               m_meetingId;
     ConnectingSessList        m_connectingSessList;
-    MRTConnDispatcher*        m_pConnDispatcher;
 
 };
 

@@ -8,17 +8,17 @@
 
 #include <iostream>
 #include "rtklog.h"
-#include "DRTMsgQueue.h"
+#include "DRTDispatcher.h"
 #include "RTZKClient.hpp"
 #include <google/protobuf/message.h>
 
 #ifndef _TEST_
-#define _TEST_ 0
+#define _TEST_ 1
 #endif
 
 int main(int argc, const char * argv[]) {
     printf("Hello, Dispatcher!!!");
-    DRTMsgQueue::PrintVersion();
+    DRTDispatcher::PrintVersion();
 
     if (argc <= 2) {
         std::cout << "Error: Please usage:$0 {conf_path} " << std::endl;
@@ -50,24 +50,24 @@ int main(int argc, const char * argv[]) {
     }
     L_Init(nLogLevel, strLogPath.c_str());
 
-    DRTMsgQueue::Initialize(1024);
-    DRTMsgQueue* pMsgQueue = DRTMsgQueue::Inst();
+    DRTDispatcher::Initialize(1024);
+    DRTDispatcher* pDispatcher = DRTDispatcher::Inst();
     //int test = 0;
-    int res = pMsgQueue->Start(conf);
+    int res = pDispatcher->Start(conf);
     if (res != 0) {
-        LI("DRTMsgQueue start failed and goto exit, res:%d\n", res);
+        LI("DRTDispatcher start failed and goto exit, res:%d\n", res);
         goto EXIT;
     }
     //while (test++ < 30) {
     while (1) {
-        pMsgQueue->DoTick();
+        pDispatcher->DoTick();
         sleep(1);
         //break;
     }
         sleep(1);
 EXIT:
-    pMsgQueue->Stop();
-    DRTMsgQueue::DeInitialize();
+    pDispatcher->Stop();
+    DRTDispatcher::DeInitialize();
     L_Deinit();
     RTZKClient::Instance().Unin();
     google::protobuf::ShutdownProtobufLibrary();

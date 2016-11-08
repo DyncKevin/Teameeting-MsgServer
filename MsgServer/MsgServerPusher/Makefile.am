@@ -1,7 +1,6 @@
 bin_PROGRAMS=MsgServerPusher
 
 AM_CFLAGS=-g -O0 -std=c++11 -Wall -fPIC -D__PTHREADS__ -D__PTHREADS_MUTEXES__
-###AM_CFLAGS+=-DAUTO_RECONNECT
 MsgServerPusher_LDFLAGS=-static-libgcc
 
 AM_CPPFLAGS=$(AM_CFLAGS)
@@ -34,7 +33,6 @@ MsgServerPusher_SOURCES=$(top_srcdir)/PRTListener/PRTPusherListener.cpp \
 						   $(top_srcdir)/Ios/IosPusher.cpp \
 						   $(top_srcdir)/PRTXRedis.cpp \
 						   $(top_srcdir)/PRTConnManager.cpp \
-						   $(top_srcdir)/PRTConnDispatcher.cpp \
 						   $(top_srcdir)/PRTPusherManager.cpp \
 						   $(top_srcdir)/PRTPusher.cpp \
 						   $(top_srcdir)/main.cpp

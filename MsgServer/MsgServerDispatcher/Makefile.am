@@ -1,7 +1,6 @@
 bin_PROGRAMS=MsgServerDispatcher
 
 AM_CFLAGS=-g -O0 -std=c++11 -Wall -fPIC -D__PTHREADS__ -D__PTHREADS_MUTEXES__
-###AM_CFLAGS+=-DAUTO_RECONNECT
 MsgServerDispatcher_LDFLAGS=-static-libgcc
 
 AM_CPPFLAGS=$(AM_CFLAGS)
@@ -31,8 +30,7 @@ MsgServerDispatcher_SOURCES=$(top_srcdir)/DRTListener/DRTModuleListener.cpp \
 						   $(top_srcdir)/DRTHttp/DRTHttpSvrConn.cpp \
 						   $(top_srcdir)/DRTHttp/DRTMsgDispatch.cpp \
 						   $(top_srcdir)/DRTConnManager.cpp \
-						   $(top_srcdir)/DRTConnDispatcher.cpp \
-						   $(top_srcdir)/DRTMsgQueue.cpp \
+						   $(top_srcdir)/DRTDispatcher.cpp \
 						   $(top_srcdir)/main.cpp
 
 MsgServerDispatcher_LDADD=-L$(top_srcdir)/../MsgServer/MSCommonLib/ -lMSCommon -lRtComm -lxredis -lhiredis -lhttp -lrtklog -lzkclient

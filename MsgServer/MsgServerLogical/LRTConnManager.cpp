@@ -99,8 +99,6 @@ bool LRTConnManager::ConnectSequence()
     if (m_sequenceAddrList.size() == 0) {
         return false;
     }
-    if (m_pConnDispatcher==NULL)
-        m_pConnDispatcher = new LRTConnDispatcher();
     std::list<std::string>::iterator it;
     for (it=m_sequenceAddrList.begin(); it!=m_sequenceAddrList.end(); it++) {
         std::string s = *it;
@@ -120,8 +118,6 @@ bool LRTConnManager::ConnectStorage()
     if (m_storageAddrList.size() == 0) {
         return false;
     }
-    if (m_pConnDispatcher==NULL)
-        m_pConnDispatcher = new LRTConnDispatcher();
     std::list<std::string>::iterator it;
     for (it=m_storageAddrList.begin(); it!=m_storageAddrList.end(); it++) {
         std::string s = *it;
@@ -206,8 +202,6 @@ bool LRTConnManager::TryConnectSequence(const std::string ip, unsigned short por
         return true;
     } else {
         m_connectingSessList.push_back(m_sequenceWriteSession);
-        if (m_pConnDispatcher)
-            m_pConnDispatcher->Signal(Task::kIdleEvent);
         return false;
     }
 
@@ -227,8 +221,6 @@ bool LRTConnManager::TryConnectSequence(const std::string ip, unsigned short por
         return true;
     } else {
         m_connectingSessList.push_back(m_sequenceReadSession);
-        if (m_pConnDispatcher)
-            m_pConnDispatcher->Signal(Task::kIdleEvent);
         return false;
     }
 }
@@ -255,8 +247,6 @@ bool LRTConnManager::TryConnectStorage(const std::string ip, unsigned short port
         return true;
     } else {
         m_connectingSessList.push_back(m_storageWriteSession);
-        if (m_pConnDispatcher)
-            m_pConnDispatcher->Signal(Task::kIdleEvent);
         return false;
     }
 
@@ -275,8 +265,6 @@ bool LRTConnManager::TryConnectStorage(const std::string ip, unsigned short port
         return true;
     } else {
         m_connectingSessList.push_back(m_storageReadSession);
-        if (m_pConnDispatcher)
-            m_pConnDispatcher->Signal(Task::kIdleEvent);
         return false;
     }
 }
@@ -337,9 +325,6 @@ bool LRTConnManager::SignalKill()
 
 bool LRTConnManager::ClearAll()
 {
-    if (m_pConnDispatcher)
-        m_pConnDispatcher->Signal(Task::kKillEvent);
-    m_pConnDispatcher = nullptr;
     {
         OSMutexLocker mlocker(&s_mutexModule);
         for (auto & x : s_ModuleInfoMap) {
@@ -447,23 +432,6 @@ void LRTConnManager::TransferSessionLostNotify(const std::string& sid)
     data.mtype = SESSEVENT::_sess_lost;
     DelModuleInfo(sid, data);
     DelTypeModuleSession(sid);
-
-#ifdef AUTO_RECONNECT
-    //fire an event to restart
-    {
-        Json::Value request;
-        request["type"] = data.mtype;
-        request["module"] = data.connect.module;
-        request["ip"] = data.connect.ip;
-        request["port"] = data.connect.port;
-        std::string s = request.toStyledString();
-        LI("TransferSessionLostNotify EventData mtype:%d, module:%d, ip:%s, port:%d\n", data.mtype, data.connect.module, data.connect.ip, data.connect.port);
-        LI("TransferSessionLostNotify s:%s\n", s.c_str());
-        RTEventTimer* timer = new RTEventTimer(RETRY_MAX_TIME, &LRTConnManager::DispTimerCallback);
-        timer->DataDelay(s.c_str(), (int)s.length());
-        LI("Waiting for Session Reconnecting...");
-    }
-#endif
 }
 
 void LRTConnManager::OnTLogin(const std::string& uid, const std::string& token, const std::string& connector)
@@ -474,94 +442,4 @@ void LRTConnManager::OnTLogin(const std::string& uid, const std::string& token, 
 void LRTConnManager::OnTLogout(const std::string& uid, const std::string& token, const std::string& connector)
 {
 
-}
-
-void LRTConnManager::ProcessRecvEvent(const char*pData, int nLen)
-{
-    if (!pData || nLen<=0) {
-        return;
-    }
-
-    Json::Reader reader;
-    Json::Value root;
-    if (!reader.parse(pData, root, false)) {
-        LE("reader.parse error\n");
-        return ;
-    }
-    EventData data;
-    if (!root["type"].isInt()) {
-        return;
-    }
-    data.mtype = root["type"].asInt();
-    if (data.mtype == SESSEVENT::_sess_lost) {//offline and reconnect
-        if (!root["module"].isInt() || !root["ip"].isString() || !root["port"].isInt()) {
-            return;
-        }
-        data.connect.module = root["module"].asInt();
-        memset(data.connect.ip, 0x00, 17);
-        memcpy(data.connect.ip, root["ip"].asString().c_str(), (int)root["ip"].asString().length());
-        data.connect.port = root["port"].asInt();
-        LI("OnReadEvent EventData mtype:%d, module:%d, ip:%s, port:%d\n", data.mtype, data.connect.module, data.connect.ip, data.connect.port);
-        if (data.connect.module == pms::ETransferModule::MCONNECTOR) {// connect to connector
-            TryConnectSequence(data.connect.ip, data.connect.port);
-        }
-    }
-}
-
-void LRTConnManager::ProcessTickEvent(const char*pData, int nLen)
-{
-    for(auto & x : m_connectingSessList) {
-        if (x->GetConnectingStatus()==0) {
-            bool ok = false;
-            int times = 0;
-            do{
-                ok = x->Connect();
-                usleep(2000*1000);
-            }while(!ok && ++times < 5);
-            if (m_pConnDispatcher)
-                m_pConnDispatcher->Signal(Task::kIdleEvent);
-        } else if (x->GetConnectingStatus() == 1) {
-            x->EstablishConnection();
-            m_connectingSessList.remove(x);
-        }
-    }
-}
-
-void LRTConnManager::PostDataStatic(const char* pData, int nLen)
-{
-    if (m_pConnDispatcher)
-        m_pConnDispatcher->PostData(pData, nLen);
-}
-
-int LRTConnManager::DispTimerCallback(const char*pData, int nLen)
-{
-    if (pData && nLen>0) {
-
-        Json::Reader reader;
-        Json::Value root;
-        if (!reader.parse(pData, root, false)) {
-            LE("reader.parse error\n");
-            return -1;
-        }
-        if (!root["type"].isInt() || !root["module"].isInt() || !root["ip"].isString() || !root["port"].isInt()) {
-            return -1;
-        }
-        if (root["type"].asInt() == SESSEVENT::_sess_lost) {//offline and reconnect
-            std::string s("");
-            if (root["module"].asInt()== pms::ETransferModule::MCONNECTOR) {// connect to connector
-                s = "/dync/msgserver/connector/" + root["ip"].asString();
-            } else {
-                return 0;
-            }
-            if (s.length()>0) {
-                if (RTZKClient::Instance().CheckNodeExists(s)) {
-                    LRTConnManager::Instance().PostDataStatic(pData, nLen);
-                } else {
-                    RTEventTimer* timer = new RTEventTimer(RETRY_MAX_TIME, &LRTConnManager::DispTimerCallback);
-                    timer->DataDelay(pData, nLen);
-                }
-            }
-        }
-    }
-    return 0;
 }

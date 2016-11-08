@@ -19,7 +19,6 @@
 #include "RTSingleton.h"
 #include "RTTcp.h"
 #include "RTType.h"
-#include "LRTConnDispatcher.h"
 #include "RTEventTimer.h"
 
 #include "ProtoCommon.h"
@@ -151,14 +150,8 @@ public:
     void OnTLogin(const std::string& uid, const std::string& token, const std::string& connector);
     void OnTLogout(const std::string& uid, const std::string& token, const std::string& connector);
 
-    void ProcessRecvEvent(const char*pData, int nLen);
-    void ProcessTickEvent(const char*pData, int nLen);
-    void PostDataStatic(const char* pData, int nLen);
-
-    // for RTEventTimer
-    static int DispTimerCallback(const char*pData, int nLen);
 protected:
-    LRTConnManager():m_pConnDispatcher(NULL) { }
+    LRTConnManager() { }
     ~LRTConnManager() { }
 private:
     bool DoConnectLogical(const std::string ip, unsigned short port);
@@ -171,7 +164,6 @@ private:
 
     std::string               m_rtliveId;
     OSMutex                   m_mutexMembers;
-    LRTConnDispatcher*        m_pConnDispatcher;
     UserConnectorMaps         m_userConnectors;
     ConnectingSessList        m_connectingSessList;
 

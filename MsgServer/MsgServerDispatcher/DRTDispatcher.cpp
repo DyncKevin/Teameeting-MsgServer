@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <iostream>
-#include "DRTMsgQueue.h"
+#include "DRTDispatcher.h"
 #include "atomic.h"
 #include "OSThread.h"
 #include "IdleTask.h"
@@ -17,9 +17,9 @@
 
 static bool         g_inited = false;
 static const char*	g_pVersion = "0.01.20150810";
-static DRTMsgQueue*	g_pMsgQueue = NULL;
+static DRTDispatcher*	g_pDispatcher = NULL;
 
-void DRTMsgQueue::PrintVersion()
+void DRTDispatcher::PrintVersion()
 {
 	printf("<******** DYNC MSG Server ********>\r\n");
 	printf("* Version:\t %s \r\n", g_pVersion);
@@ -31,7 +31,7 @@ void DRTMsgQueue::PrintVersion()
 }
 
 
-void DRTMsgQueue::Initialize(int evTbSize)
+void DRTDispatcher::Initialize(int evTbSize)
 {
 	// Initialize utility classes
     LI("Hello server...");
@@ -71,14 +71,14 @@ void DRTMsgQueue::Initialize(int evTbSize)
 
 	Socket::StartThread();// start EventThread
 	OSThread::Sleep(100);
-	g_pMsgQueue = new DRTMsgQueue();
+	g_pDispatcher = new DRTDispatcher();
 	g_inited = true;
 }
 
-void DRTMsgQueue::DeInitialize()
+void DRTDispatcher::DeInitialize()
 {
-	delete g_pMsgQueue;
-	g_pMsgQueue = NULL;
+	delete g_pDispatcher;
+	g_pDispatcher = NULL;
 	g_inited = false;
 	TaskThreadPool::RemoveThreads();
 
@@ -98,20 +98,20 @@ void DRTMsgQueue::DeInitialize()
     LI("ByeBye server...");
 }
 
-DRTMsgQueue* DRTMsgQueue::Inst()
+DRTDispatcher* DRTDispatcher::Inst()
 {
-	Assert(g_pMsgQueue != NULL);
-	return g_pMsgQueue;
+	Assert(g_pDispatcher != NULL);
+	return g_pDispatcher;
 }
 
-DRTMsgQueue::DRTMsgQueue(void)
+DRTDispatcher::DRTDispatcher(void)
 : m_pModuleListener(NULL)
 , m_pTransferSession(NULL)
 {
 
 }
 
-DRTMsgQueue::~DRTMsgQueue(void)
+DRTDispatcher::~DRTDispatcher(void)
 {
     if (m_pTransferSession) {
         delete m_pTransferSession;
@@ -124,7 +124,7 @@ DRTMsgQueue::~DRTMsgQueue(void)
     }
 }
 
-int	DRTMsgQueue::Start(const RTConfigParser& conf)
+int	DRTDispatcher::Start(const RTConfigParser& conf)
 {
 	Assert(g_inited);
     int debug = conf.GetIntVal("global", "debug", 1);
@@ -162,8 +162,8 @@ int	DRTMsgQueue::Start(const RTConfigParser& conf)
 
     std::string mid;
     GenericSessionId(mid);
-    DRTConnManager::Instance().SetMsgQueueId(mid);
-    LI("[][]MsgQueueId:%s\n", mid.c_str());
+    DRTConnManager::Instance().SetDispatcherId(mid);
+    LI("[][]DispatcherId:%s\n", mid.c_str());
 
 	if(nConnPort > 0)
 	{
@@ -188,21 +188,21 @@ int	DRTMsgQueue::Start(const RTConfigParser& conf)
             m_pModuleListener=NULL;
             return -1;
         }
-        LI("Start MsgQueue service meet:(%d) ok...,socketFD:%d\n", nDispPort, m_pModuleListener->GetSocketFD());
+        LI("Start Dispatcher service meet:(%d) ok...,socketFD:%d\n", nDispPort, m_pModuleListener->GetSocketFD());
         m_pModuleListener->RequestEvent(EV_RE);
 	}
 
    return 0;
 }
 
-void DRTMsgQueue::DoTick()
+void DRTDispatcher::DoTick()
 {
 #if 1
     DRTConnManager::Instance().RefreshConnection();
 #endif
 }
 
-void DRTMsgQueue::Stop()
+void DRTDispatcher::Stop()
 {
     DRTConnManager::Instance().SignalKill();
     DRTConnManager::Instance().ClearAll();
