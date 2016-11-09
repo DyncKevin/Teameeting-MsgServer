@@ -34,9 +34,14 @@
 
 #define USE_QUEUE_TO_CACHE (1)
 
-#define ERR_CODE_SVR_NOT_EXISTS (1)
+#define ERR_CODE_SVR_OK (0)
+#define ERR_STR_SVR_OK "server_ok"
 
+#define ERR_CODE_SVR_NOT_EXISTS (1)
 #define ERR_STR_SVR_NOT_EXISTS "server_not_exists"
+
+#define ERR_CODE_SYS_SVR_ERROR (101)
+#define ERR_STR_SYS_SVR_ERROR "system_server_error"
 
 
 #endif /* StatusCode_h */

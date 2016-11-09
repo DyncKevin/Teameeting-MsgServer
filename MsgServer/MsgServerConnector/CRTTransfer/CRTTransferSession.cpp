@@ -325,6 +325,12 @@ void CRTTransferSession::OnTypeError(const std::string& str)
         return;
     }
     LI("CRTTransferSession::OnTypeError emodule:%d, userid:%s, reason:%s, errcode:%d\n", emsg.emodule(), emsg.userid().c_str(), emsg.reason().c_str(), emsg.errcode());
+    // send to user without push
+    if (emsg.userid().c_str()!=nullptr && emsg.userid().length()>0)
+    {
+        pms::RelayMsg dmsg;
+        m_dispatchConnection.DispatchMsg(emsg.userid(), dmsg);
+    }
 
 }
 

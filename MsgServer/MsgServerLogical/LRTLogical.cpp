@@ -13,6 +13,7 @@
 #include "RTUtils.hpp"
 #include "LRTLogicalManager.h"
 #include "LRTConnManager.h"
+#include "StatusCode.h"
 
 
 static bool		g_inited = false;
@@ -208,6 +209,8 @@ void LRTLogical::DoTick()
         // svr sequence is not ok
         if ((LRTConnManager::Instance().ConnectSequence())) {
             LRTConnManager::Instance().SetSvrSequence(true);
+            LRTConnManager::Instance().ReportError(pms::ETransferModule::MSEQUENCE, "", ERR_STR_SVR_OK, ERR_CODE_SVR_OK);
+
         }
     }
     if (!LRTConnManager::Instance().IsSvrStorage())
@@ -215,6 +218,7 @@ void LRTLogical::DoTick()
         // svr storage is not ok
         if ((LRTConnManager::Instance().ConnectStorage())) {
             LRTConnManager::Instance().SetSvrStorage(true);
+            LRTConnManager::Instance().ReportError(pms::ETransferModule::MSTORAGE, "", ERR_STR_SVR_OK, ERR_CODE_SVR_OK);
         }
     }
 #endif

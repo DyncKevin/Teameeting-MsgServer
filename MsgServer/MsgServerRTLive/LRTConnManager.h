@@ -134,6 +134,12 @@ public:
     bool IsSvrConnector() { return m_isSvrConnectorOk; }
     bool IsSvrDispatcher() { return m_isSvrDispatcherOk; }
 
+
+    void SetSvrSequence(bool ok) { m_isSvrSequenceOk = ok; }
+    void SetSvrStorage(bool ok) { m_isSvrStorageOk = ok; }
+    bool IsSvrSequence() { return m_isSvrSequenceOk; }
+    bool IsSvrStorage() { return m_isSvrStorageOk; }
+
     void SetDispatcherSessId(const std::string& sid) { m_dispatcherSessId = sid; }
     void SetLogicalSessId(const std::string& sid) {m_logicalSessId = sid; }
 
@@ -165,6 +171,10 @@ private:
     bool                      m_isSvrLogicalOk;
     bool                      m_isSvrConnectorOk;
     bool                      m_isSvrDispatcherOk;
+
+    // this two for system type error
+    bool                      m_isSvrSequenceOk;
+    bool                      m_isSvrStorageOk;
 
     std::list<std::string>    m_logicalAddrList;
     std::list<std::string>    m_connectorAddrList;

@@ -1042,7 +1042,24 @@ void LRTTransferSession::OnTypeError(const std::string& str)
         return;
     }
     LI("LRTTransferSession::OnTypeError emodule:%d, userid:%s, reason:%s, errcode:%d\n", emsg.emodule(), emsg.userid().c_str(), emsg.reason().c_str(), emsg.errcode());
-
+    if (emsg.emodule()==pms::ETransferModule::MSEQUENCE)
+    {
+         if (emsg.errcode()==0)
+         {
+            LRTConnManager::Instance().SetSvrSequence(true);
+         } else {
+            LRTConnManager::Instance().SetSvrSequence(false);
+         }
+    }
+    if (emsg.emodule()==pms::ETransferModule::MSTORAGE)
+    {
+         if (emsg.errcode()==0)
+         {
+            LRTConnManager::Instance().SetSvrStorage(true);
+         } else {
+            LRTConnManager::Instance().SetSvrStorage(false);
+         }
+    }
 }
 
 // from LRTModuleConnTcp
