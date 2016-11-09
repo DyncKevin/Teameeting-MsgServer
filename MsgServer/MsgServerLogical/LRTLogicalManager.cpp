@@ -90,6 +90,7 @@ bool LRTLogicalManager::DeleteDataWrite(pms::StorageMsg*  storeMsg)
             // after get from store, delete this msg in map
             if (it->second.sess && it->second.sess->IsLiveSession())
             {
+                // send back to server for data write, e.g. rtlive
                 it->second.sess->PushWriteMsg(*storeMsg);
             }
             m_dataWriteMap.erase(it);
@@ -136,6 +137,7 @@ bool LRTLogicalManager::DeleteSeqnRead(pms::StorageMsg*  storeMsg)
             // after get from store, delete this msg in map
             if (it->second.sess && it->second.sess->IsLiveSession())
             {
+                // send back to server for seqn read, e.g. rtlive
                 it->second.sess->PushReadMsg(*storeMsg);
             }
             m_seqnReadMap.erase(it);

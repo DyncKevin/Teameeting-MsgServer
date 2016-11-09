@@ -100,7 +100,6 @@ public:
     void SetStorageWriteSessId(const std::string& sid) { m_storageWriteSessId = sid; }
 
     void    RefreshConnection();
-    void    SendTransferData(const std::string mid, const std::string uid, const std::string msg);
 
     void SetLogicalId(const std::string& mid) { m_logicalId = mid; }
     std::string& LogicalId() { return m_logicalId; }

@@ -83,11 +83,6 @@ void CRTTransferSession::Disconn()
 
 }
 
-void CRTTransferSession::TestConnection()
-{
-
-}
-
 void CRTTransferSession::EstablishConnection()
 {
     pms::TransferMsg t_msg;

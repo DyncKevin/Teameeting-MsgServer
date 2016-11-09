@@ -55,7 +55,6 @@ public:
     void SendTransferData(const std::string& data);
 
     void SetModuleId(std::string& moduleId) { m_moduleId = moduleId; }
-    void TestConnection();
 
     std::string& GetTransferAddr() { return m_addr; }
     int GetTransferPort() { return m_port; }

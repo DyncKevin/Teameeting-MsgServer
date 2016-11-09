@@ -137,11 +137,6 @@ void SRTTransferSession::KeepAlive()
     SendTransferData(s.c_str(), (int)s.length());
 }
 
-void SRTTransferSession::TestConnection()
-{
-
-}
-
 void SRTTransferSession::EstablishConnection()
 {
     pms::TransferMsg t_msg;

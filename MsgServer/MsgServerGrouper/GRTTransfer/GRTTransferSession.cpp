@@ -147,11 +147,6 @@ void GRTTransferSession::KeepAlive()
     SendTransferData(s.c_str(), (int)s.length());
 }
 
-void GRTTransferSession::TestConnection()
-{
-
-}
-
 void GRTTransferSession::EstablishConnection()
 {
     pms::TransferMsg t_msg;

@@ -40,8 +40,6 @@ public:
     void ConnectionConnNotify(const std::string& uid, const std::string& token);
     void TransferMsg(pms::EServerCmd cmd, const std::string& msg);
 
-    void TestConnection();
-
 public:
     void EstablishConnection();
 

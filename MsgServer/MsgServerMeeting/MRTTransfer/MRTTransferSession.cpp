@@ -130,12 +130,6 @@ void MRTTransferSession::KeepAlive()
     SendTransferData(s.c_str(), (int)s.length());
 }
 
-
-void MRTTransferSession::TestConnection()
-{
-
-}
-
 void MRTTransferSession::EstablishConnection()
 {
     pms::TransferMsg t_msg;

@@ -168,11 +168,6 @@ void LRTTransferSession::KeepAlive()
     this->SendTransferData(s.c_str(), (int)s.length());
 }
 
-void LRTTransferSession::TestConnection()
-{
-
-}
-
 void LRTTransferSession::EstablishConnection()
 {
     pms::TransferMsg t_msg;

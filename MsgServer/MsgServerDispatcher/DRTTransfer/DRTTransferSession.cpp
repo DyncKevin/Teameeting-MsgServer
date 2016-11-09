@@ -137,11 +137,6 @@ void DRTTransferSession::KeepAlive()
     SendTransferData(s.c_str(), (int)s.length());
 }
 
-void DRTTransferSession::TestConnection()
-{
-
-}
-
 void DRTTransferSession::EstablishConnection()
 {
     pms::TransferMsg t_msg;

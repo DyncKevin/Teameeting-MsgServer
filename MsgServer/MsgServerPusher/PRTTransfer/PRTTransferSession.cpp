@@ -176,11 +176,6 @@ void PRTTransferSession::KeepAlive()
     SendTransferData(s.c_str(), (int)s.length());
 }
 
-void PRTTransferSession::TestConnection()
-{
-
-}
-
 void PRTTransferSession::EstablishConnection()
 {
     pms::TransferMsg t_msg;

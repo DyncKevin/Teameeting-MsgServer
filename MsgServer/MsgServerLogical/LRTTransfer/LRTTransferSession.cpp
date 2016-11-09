@@ -162,13 +162,7 @@ void LRTTransferSession::KeepAlive()
     t_msg.set_priority(pms::ETransferPriority::PNORMAL);
     t_msg.set_content(c_msg.SerializeAsString());
 
-    std::string s = t_msg.SerializeAsString();
-    SendTransferData(s.c_str(), (int)s.length());
-}
-
-void LRTTransferSession::TestConnection()
-{
-
+    this->SendTransferData(t_msg.SerializeAsString());
 }
 
 void LRTTransferSession::EstablishConnection()
@@ -184,13 +178,11 @@ void LRTTransferSession::EstablishConnection()
     t_msg.set_priority(pms::ETransferPriority::PHIGH);
     t_msg.set_content(c_msg.SerializeAsString());
 
-    std::string s = t_msg.SerializeAsString();
-    SendTransferData(s.c_str(), (int)s.length());
+    this->SendTransferData(t_msg.SerializeAsString());
 }
 
 void LRTTransferSession::SendTransferData(const char* pData, int nLen)
 {
-    LRTLogicalManager::Instance().SendResponseCounter();
     RTTcpNoTimeout::SendTransferData(pData, nLen);
     GetSocket()->RequestEvent(EV_RE);
 }
@@ -343,7 +335,7 @@ void LRTTransferSession::OnTickEvent(const char*pData, int nLen)
 
 void LRTTransferSession::OnTransfer(const std::string& str)
 {
-    RTTcpNoTimeout::SendTransferData(str.c_str(), (int)str.length());
+    this->SendTransferData(str);
 }
 
 void LRTTransferSession::OnMsgAck(pms::TransferMsg& tmsg)
@@ -381,8 +373,7 @@ void LRTTransferSession::OnTypeConn(const std::string& str)
         t_msg.set_priority(pms::ETransferPriority::PHIGH);
         t_msg.set_content(c_msg.SerializeAsString());
 
-        std::string s = t_msg.SerializeAsString();
-        SendTransferData(s.c_str(), (int)s.length());
+        this->SendTransferData(t_msg.SerializeAsString());
     } else if ((c_msg.conn_tag() == pms::EConnTag::THELLO)) {
         // when ME connector to other:
         // store other's transfersessionid and other's moduleId
@@ -439,8 +430,7 @@ void LRTTransferSession::OnTypeConn(const std::string& str)
             t_msg.set_content(c_msg.SerializeAsString());
 
             this->SetTestName(m_transferSessId);
-            std::string s = t_msg.SerializeAsString();
-            SendTransferData(s.c_str(), (int)s.length());
+            this->SendTransferData(t_msg.SerializeAsString());
         } else {
             LE("Connection id:%s error!!!\n", c_msg.transferid().c_str());
         }
@@ -502,7 +492,6 @@ void LRTTransferSession::OnTypeWriteRequest(const std::string& str)
         case pms::EServerCmd::CCREATESEQN:
         case pms::EServerCmd::CDELETESEQN:
             {
-                LRTLogicalManager::Instance().RecvRequestCounter();
                 pms::PackedStoreMsg store;
                 if (!store.ParseFromString(rmsg.content())) return;
                 for(int i=0;i<store.msgs_size();++i)
@@ -525,6 +514,7 @@ void LRTTransferSession::OnTypeWriteRequest(const std::string& str)
                 tmsg.set_flag(pms::ETransferFlag::FNOACK);
                 tmsg.set_priority(pms::ETransferPriority::PNORMAL);
                 tmsg.set_content(store.SerializeAsString());
+                // send to sequence
                 LRTConnManager::Instance().PushSeqnWriteMsg(tmsg.SerializeAsString());
             }
             break;
@@ -577,6 +567,7 @@ void LRTTransferSession::OnTypeWriteResponse(const std::string& str)
             tmsg.set_flag(pms::ETransferFlag::FNOACK);
             tmsg.set_priority(pms::ETransferPriority::PNORMAL);
             tmsg.set_content(newmsg_store.SerializeAsString());
+            // send to storage
             LRTConnManager::Instance().PushStoreWriteMsg(tmsg.SerializeAsString());
         }
     // this means data write
@@ -649,6 +640,7 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
             tmsg.set_flag(pms::ETransferFlag::FNOACK);
             tmsg.set_priority(pms::ETransferPriority::PNORMAL);
             tmsg.set_content(s_store.SerializeAsString());
+            // send to sequnce
             LRTConnManager::Instance().PushSeqnReadMsg(tmsg.SerializeAsString());
         }
     } else if (rmsg.svr_cmds()==pms::EServerCmd::CSYNCDATA) {
@@ -712,6 +704,7 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
             tmsg.set_flag(pms::ETransferFlag::FNOACK);
             tmsg.set_priority(pms::ETransferPriority::PNORMAL);
             tmsg.set_content(d_store.SerializeAsString());
+            // send to storage
             LRTConnManager::Instance().PushStoreReadMsg(tmsg.SerializeAsString());
         }
 
@@ -722,6 +715,7 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
             tmsg.set_flag(pms::ETransferFlag::FNOACK);
             tmsg.set_priority(pms::ETransferPriority::PNORMAL);
             tmsg.set_content(s_store.SerializeAsString());
+            // send to sequence
             LRTConnManager::Instance().PushSeqnReadMsg(tmsg.SerializeAsString());
         }
 
@@ -755,6 +749,7 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
             tmsg.set_flag(pms::ETransferFlag::FNOACK);
             tmsg.set_priority(pms::ETransferPriority::PNORMAL);
             tmsg.set_content(d_store.SerializeAsString());
+            // send to storage
             LRTConnManager::Instance().PushStoreReadMsg(tmsg.SerializeAsString());
         }
     } else {
@@ -809,6 +804,7 @@ void LRTTransferSession::OnTypeReadResponse(const std::string& str)
             tmsg.set_flag(pms::ETransferFlag::FNOACK);
             tmsg.set_priority(pms::ETransferPriority::PNORMAL);
             tmsg.set_content(d_store.SerializeAsString());
+            // send to storage
             LRTConnManager::Instance().PushStoreReadMsg(tmsg.SerializeAsString());
         }
     } else if (rmsg.svr_cmds()==pms::EServerCmd::CDATA)
@@ -834,6 +830,7 @@ void LRTTransferSession::OnTypeReadResponse(const std::string& str)
                     LI("LRTTransferSession::OnTypeReadResponse was called, CDATA ruserid:%s, time:%lld\n"\
                             , store.msgs(i).ruserid().c_str()\
                             , (long long)tv.tv_sec);
+                    //send back to server for data read, e.g. rtlive
                      pMd->pModule->PushReadMsg(store.msgs(i));
                 }
             } else {
