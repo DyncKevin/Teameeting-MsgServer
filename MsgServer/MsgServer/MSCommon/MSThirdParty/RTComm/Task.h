@@ -69,16 +69,16 @@ class Task
             kStartEvent =   0x1 << 0x2,
             kTimeoutEvent = 0x1 << 0x3,
 
-          //socket events
+            //socket events
             kReadEvent =        0x1 << 0x4, //All of type "EventFlags"
             kWriteEvent =       0x1 << 0x5,
 
-           //update event
-            kUpdateEvent =      0x1 << 0x6,
+            kUpdateEvent =      0x1 << 0x6, // for update event
 			//user defined event
-			kWakeupEvent =			0x1 << 0x7,
+			kWakeupEvent =		0x1 << 0x7,
 			kPushEvent =		0x1 << 0x8,
-			kRedisEvent =		0x1 << 0x9 // for redis write or read
+			kRedisEvent =		0x1 << 0x9, // for redis write or read
+			kErrorEvent =		0x1 << 0x10 // for error
         };
 
         //CONSTRUCTOR / DESTRUCTOR

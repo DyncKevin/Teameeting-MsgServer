@@ -31,6 +31,7 @@ public:
     virtual void OnTypeQueue(const std::string& str) = 0;
     virtual void OnTypeDispatch(const std::string& str) = 0;
     virtual void OnTypePush(const std::string& str) = 0;
+    virtual void OnTypeError(const std::string& str) = 0;
 
     virtual void OnTypeWriteRequest(const std::string& str) = 0;
     virtual void OnTypeWriteResponse(const std::string& str) = 0;

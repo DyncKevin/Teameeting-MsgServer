@@ -30,6 +30,7 @@ public:
     virtual void OnPushEvent(const char*pData, int nLen);
     virtual void OnTickEvent(const char*pData, int nLen) {}
     virtual void OnRedisEvent(const char*pData, int nLen) {}
+    virtual void OnErrorEvent(const char*pData, int nLen) {}
 
 // from RTObserverConnection
 public:

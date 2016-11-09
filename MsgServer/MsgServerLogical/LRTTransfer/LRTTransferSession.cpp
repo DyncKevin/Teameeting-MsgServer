@@ -481,6 +481,11 @@ void LRTTransferSession::OnTypePush(const std::string& str)
     LI("%s was called\n", __FUNCTION__);
 }
 
+void LRTTransferSession::OnTypeError(const std::string& str)
+{
+    LI("%s was called\n", __FUNCTION__);
+}
+
 void LRTTransferSession::OnTypeWriteRequest(const std::string& str)
 {
     pms::RelayMsg rmsg;

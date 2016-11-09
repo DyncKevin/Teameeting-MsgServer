@@ -160,6 +160,11 @@ SInt64 RTEventLooper::Run()
 			OnTickEvent(NULL, 0);
 			events -= Task::kIdleEvent;
 		}
+		else if(events&Task::kErrorEvent)
+		{
+			OnErrorEvent(NULL, 0);
+			events -= Task::kErrorEvent;
+		}
 		else
 		{
 			return fTickTime;

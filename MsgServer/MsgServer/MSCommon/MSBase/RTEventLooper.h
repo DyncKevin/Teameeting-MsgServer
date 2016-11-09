@@ -39,6 +39,7 @@ public:
 	virtual void OnPushEvent(const char*pData, int nSize) = 0;
 	virtual void OnTickEvent(const void*pData, int nSize) = 0;
     virtual void OnRedisEvent(const char*pData, int nLen) = 0;
+    virtual void OnErrorEvent(const char*pData, int nLen) = 0;
 
 protected:
 	//* For Task

@@ -339,6 +339,11 @@ void SRTTransferSession::OnTypePush(const std::string& str)
     LI("%s was called\n", __FUNCTION__);
 }
 
+void SRTTransferSession::OnTypeError(const std::string& str)
+{
+    LI("%s was called\n", __FUNCTION__);
+}
+
 void SRTTransferSession::OnTypeWriteRequest(const std::string& str)
 {
     SRTSequenceManager::Instance().RecvRequestCounter();

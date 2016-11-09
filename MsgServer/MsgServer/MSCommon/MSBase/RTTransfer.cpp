@@ -54,6 +54,8 @@ int RTTransfer::DoProcessData(const char *pData, int nLen)
             OnTypeTLogin(m_msg.content());
         } else if (m_msg.type() == pms::ETransferType::TLOGOUT) {
             OnTypeTLogout(m_msg.content());
+        } else if (m_msg.type() == pms::ETransferType::TERROR) {
+            OnTypeError(m_msg.content());
         } else {
             LE("invalid type::%d", m_msg.type());
         }

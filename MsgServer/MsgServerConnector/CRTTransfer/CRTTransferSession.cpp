@@ -316,6 +316,11 @@ void CRTTransferSession::OnTypeTLogout(const std::string& str)
     LI("%s was called\n", __FUNCTION__);
 }
 
+void CRTTransferSession::OnTypeError(const std::string& str)
+{
+    LI("%s was called\n", __FUNCTION__);
+}
+
 void CRTTransferSession::ConnectionDisconnected()
 {
     if (m_transferSessId.length()>0) {

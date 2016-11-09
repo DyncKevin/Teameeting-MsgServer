@@ -327,6 +327,11 @@ void MRTTransferSession::OnTypeTLogout(const std::string& str)
     return;
 }
 
+void MRTTransferSession::OnTypeError(const std::string& str)
+{
+    LI("%s was called\n", __FUNCTION__);
+}
+
 /**
  *  User connection lost, clear user in the meeting
  */

@@ -32,6 +32,7 @@ enum ETransferType{
     TWRITE_RESPONSE     = 8;
     TREAD_REQUEST       = 9;
     TREAD_RESPONSE      = 10;
+    TERROR      = 11;
 }
 
 // the priority of transfering msg

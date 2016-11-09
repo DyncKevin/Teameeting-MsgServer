@@ -65,6 +65,7 @@ public:
     virtual void OnPushEvent(const char*pData, int nLen) {}
     virtual void OnTickEvent(const char*pData, int nLen) {}
     virtual void OnRedisEvent(const char*pData, int nSize);
+    virtual void OnErrorEvent(const char*pData, int nSize) {}
 
 // from RTTransfer
 public:
@@ -77,6 +78,7 @@ public:
     virtual void OnTypePush(const std::string& str);
     virtual void OnTypeTLogin(const std::string& str);
     virtual void OnTypeTLogout(const std::string& str);
+    virtual void OnTypeError(const std::string& str);
 
 // from XGrpMsgClientHelper
 public:

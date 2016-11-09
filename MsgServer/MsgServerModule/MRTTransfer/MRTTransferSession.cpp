@@ -348,6 +348,10 @@ void MRTTransferSession::OnTypeTLogout(const std::string& str)
     LI("%s was called\n", __FUNCTION__);
 }
 
+void MRTTransferSession::OnTypeError(const std::string& str)
+{
+    LI("%s was called\n", __FUNCTION__);
+}
 
 void MRTTransferSession::ConnectionDisconnected()
 {

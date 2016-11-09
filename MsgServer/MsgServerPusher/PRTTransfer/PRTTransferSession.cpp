@@ -742,6 +742,11 @@ void PRTTransferSession::OnTypeTLogout(const std::string& str)
     LI("%s was called\n", __FUNCTION__);
 }
 
+void PRTTransferSession::OnTypeError(const std::string& str)
+{
+    LI("%s was called\n", __FUNCTION__);
+}
+
 // this is get msg data
 void PRTTransferSession::OnPGetData(int code, const std::string& cont)
 {

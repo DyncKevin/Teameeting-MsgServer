@@ -33,6 +33,7 @@ public:
     virtual void OnTypePush(const std::string& str) = 0;
     virtual void OnTypeTLogin(const std::string& str) = 0;
     virtual void OnTypeTLogout(const std::string& str) = 0;
+    virtual void OnTypeError(const std::string& str) = 0;
 
 private:
 

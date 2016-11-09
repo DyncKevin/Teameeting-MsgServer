@@ -421,6 +421,10 @@ void DRTTransferSession::OnTypeTLogout(const std::string& str)
     DRTConnManager::Instance().OnTLogout(rmsg.touser().users(0), rmsg.content(), rmsg.connector());
 }
 
+void DRTTransferSession::OnTypeError(const std::string& str)
+{
+    LI("%s was called\n", __FUNCTION__);
+}
 
 void DRTTransferSession::ConnectionDisconnected()
 {

@@ -204,6 +204,11 @@ SInt64 RTTcpNoTimeout::Run()
 			OnTickEvent("", 0);
 			events -= Task::kIdleEvent;
 		}
+		else if(events&Task::kErrorEvent)
+		{
+			OnErrorEvent("", 0);
+			events -= Task::kErrorEvent;
+		}
 		else
 		{
 			return fTickTime;
