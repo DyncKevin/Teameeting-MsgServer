@@ -534,12 +534,17 @@ void LRTTransferSession::OnTypeTrans(const std::string& str)
             recver.set_module(pms::EModuleType::TLIVE);
             // store the Entity to redis
             recver.set_content(r_msg.content());
-            LRTConnManager::Instance().PushNewMsg2Queue(recver.SerializeAsString());
+            // relay msg to server logical
+            if (!LRTConnManager::Instance().PushNewMsg2Queue(recver.SerializeAsString()))
+            {
+                LRTConnManager::Instance().ReportError(pms::ETransferModule::MLOGICAL, e_msg.usr_from(), ERR_STR_SVR_NOT_EXISTS, ERR_CODE_SVR_NOT_EXISTS);
+            }
 
         } else if (e_msg.msg_flag()==pms::EMsgFlag::FSINGLE)
         {
             if (e_msg.usr_toto().users_size()!=1) return;
 
+            bool isSvrOk = true;
             pms::StorageMsg sender;
             sender.set_rsvrcmd(pms::EServerCmd::CNEWMSG);
             sender.set_tsvrcmd(pms::EServerCmd::CNEWMSGSEQN);
@@ -553,7 +558,11 @@ void LRTTransferSession::OnTypeTrans(const std::string& str)
             sender.set_module(pms::EModuleType::TLIVE);
             // store the Entity to redis
             sender.set_content(r_msg.content());
-            LRTConnManager::Instance().PushNewMsg2Queue(sender.SerializeAsString());
+            // relay msg to server logical
+            if (!LRTConnManager::Instance().PushNewMsg2Queue(sender.SerializeAsString()))
+            {
+                isSvrOk = false;
+            }
 
             pms::StorageMsg recver;
             recver.set_rsvrcmd(pms::EServerCmd::CNEWMSG);
@@ -568,11 +577,20 @@ void LRTTransferSession::OnTypeTrans(const std::string& str)
             recver.set_module(pms::EModuleType::TLIVE);
             // store the Entity to redis
             recver.set_content(r_msg.content());
-            LRTConnManager::Instance().PushNewMsg2Queue(recver.SerializeAsString());
+            // relay msg to server logical
+            if (!LRTConnManager::Instance().PushNewMsg2Queue(recver.SerializeAsString()))
+            {
+                isSvrOk = false;
+            }
+            if (!isSvrOk)
+            {
+                LRTConnManager::Instance().ReportError(pms::ETransferModule::MLOGICAL, e_msg.usr_from(), ERR_STR_SVR_NOT_EXISTS, ERR_CODE_SVR_NOT_EXISTS);
+            }
         } else if (e_msg.msg_flag()==pms::EMsgFlag::FMULTI)
         {
             if (e_msg.usr_toto().users_size()<1) return;
 
+            bool isSvrOk = true;
             pms::StorageMsg sender;
             sender.set_rsvrcmd(pms::EServerCmd::CNEWMSG);
             sender.set_tsvrcmd(pms::EServerCmd::CNEWMSGSEQN);
@@ -586,7 +604,11 @@ void LRTTransferSession::OnTypeTrans(const std::string& str)
             sender.set_module(pms::EModuleType::TLIVE);
             // store the Entity to redis
             sender.set_content(r_msg.content());
-            LRTConnManager::Instance().PushNewMsg2Queue(sender.SerializeAsString());
+            // relay msg to server logical
+            if (!LRTConnManager::Instance().PushNewMsg2Queue(sender.SerializeAsString()))
+            {
+                isSvrOk = false;
+            }
 
             for (int i=0;i<e_msg.usr_toto().users_size();++i) {
                 pms::StorageMsg recver;
@@ -602,29 +624,72 @@ void LRTTransferSession::OnTypeTrans(const std::string& str)
                 recver.set_module(pms::EModuleType::TLIVE);
                 // store the Entity to redis
                 recver.set_content(r_msg.content());
-                LRTConnManager::Instance().PushNewMsg2Queue(recver.SerializeAsString());
+                // relay msg to server logical
+                if (!LRTConnManager::Instance().PushNewMsg2Queue(recver.SerializeAsString()));
+                {
+                    isSvrOk = false;
+                }
+            }
+            if (!isSvrOk)
+            {
+                LRTConnManager::Instance().ReportError(pms::ETransferModule::MLOGICAL, e_msg.usr_from(), ERR_STR_SVR_NOT_EXISTS, ERR_CODE_SVR_NOT_EXISTS);
             }
         } else {
             LE("LRTTransferSession::OnTypeTrans Entity msg flag:%d not handle\n\n", e_msg.msg_flag());
         }
     } else if (r_msg.svr_cmds() == pms::EServerCmd::CCREATESEQN)
     {
-        LRTConnManager::Instance().PushNewMsg2Queue(r_msg.content());
+        pms::StorageMsg s_msg;
+        if (!s_msg.ParseFromString(r_msg.content()))
+        {
+            LE("LRTTransferSession::OnTypeTrans ParseFromString error\n");
+            return;
+        }
+        // relay msg to server logical
+        if (!LRTConnManager::Instance().PushNewMsg2Queue(r_msg.content()))
+        {
+            LRTConnManager::Instance().ReportError(pms::ETransferModule::MLOGICAL, s_msg.ruserid(), ERR_STR_SVR_NOT_EXISTS, ERR_CODE_SVR_NOT_EXISTS);
+        }
     } else if (r_msg.svr_cmds() == pms::EServerCmd::CDELETESEQN)
     {
-        LRTConnManager::Instance().PushNewMsg2Queue(r_msg.content());
+        pms::StorageMsg s_msg;
+        if (!s_msg.ParseFromString(r_msg.content()))
+        {
+            LE("LRTTransferSession::OnTypeTrans ParseFromString error\n");
+            return;
+        }
+        // relay msg to server logical
+        if (!LRTConnManager::Instance().PushNewMsg2Queue(r_msg.content()))
+        {
+            LRTConnManager::Instance().ReportError(pms::ETransferModule::MLOGICAL, s_msg.ruserid(), ERR_STR_SVR_NOT_EXISTS, ERR_CODE_SVR_NOT_EXISTS);
+        }
     } else if (r_msg.svr_cmds() == pms::EServerCmd::CSYNCSEQN)
     {
         pms::StorageMsg s_msg;
-        if (!s_msg.ParseFromString(r_msg.content())) return;
-        LRTConnManager::Instance().PushSeqnReq2Queue(r_msg.content());
+        if (!s_msg.ParseFromString(r_msg.content()))
+        {
+            LE("LRTTransferSession::OnTypeTrans ParseFromString error\n");
+            return;
+        }
+        // relay msg to server logical
+        if (!LRTConnManager::Instance().PushSeqnReq2Queue(r_msg.content()))
+        {
+            LRTConnManager::Instance().ReportError(pms::ETransferModule::MLOGICAL, s_msg.ruserid(), ERR_STR_SVR_NOT_EXISTS, ERR_CODE_SVR_NOT_EXISTS);
+        }
     } else if (r_msg.svr_cmds() == pms::EServerCmd::CSYNCDATA)
     {
         pms::StorageMsg s_msg;
-        if (!s_msg.ParseFromString(r_msg.content())) return;
-
+        if (!s_msg.ParseFromString(r_msg.content()))
+        {
+            LE("LRTTransferSession::OnTypeTrans ParseFromString error\n");
+            return;
+        }
         // first set sync seqn for data cmd, send to sync seqn
-        LRTConnManager::Instance().PushDataReq2Queue(r_msg.content());
+        // relay msg to server logical
+        if (!LRTConnManager::Instance().PushDataReq2Queue(r_msg.content()))
+        {
+            LRTConnManager::Instance().ReportError(pms::ETransferModule::MLOGICAL, s_msg.ruserid(), ERR_STR_SVR_NOT_EXISTS, ERR_CODE_SVR_NOT_EXISTS);
+        }
     } else if (r_msg.svr_cmds() == pms::EServerCmd::CUPDATESETTING)
     {
         pms::Setting s_set;
@@ -693,11 +758,11 @@ void LRTTransferSession::OnTypeQueue(const std::string& str)
                     //how to let others server connect to here, find the special group users relayer
                     //send to
                     const std::string sn("wensiwensi");
-					LI("LRTTransferSession::OnTypeQueue newmsg group recver sendtoGroup\n");
-                    if (LRTConnManager::Instance().SendToGroupModule(sn, s))
+                    // relay msg to server grouper
+                    if (!LRTConnManager::Instance().SendToGroupModule(sn, s))
                     {
-                    } else {
-                         LE("LRTTransferSession::OnTypeQueue noooooooooot dispatch msg ok\n");
+                        LE("LRTTransferSession::OnTypeQueue noooooooooot dispatch msg ok\n");
+                        LRTConnManager::Instance().ReportError(pms::ETransferModule::MGRPNOTIFY, "", ERR_STR_SVR_NOT_EXISTS, ERR_CODE_SVR_NOT_EXISTS);
                     }
 
                     continue;
@@ -768,7 +833,11 @@ void LRTTransferSession::OnTypeQueue(const std::string& str)
             t_msg.set_type(pms::ETransferType::TQUEUE);
             t_msg.set_content(r_msg.SerializeAsString());
             std::string response = t_msg.SerializeAsString();
-            LRTConnManager::Instance().Transfer2Dispatcher("", "", response);
+            // relay msg to server dispatcher
+            if (!LRTConnManager::Instance().Transfer2Dispatcher("", "", response))
+            {
+                LRTConnManager::Instance().ReportError(pms::ETransferModule::MMSGQUEUE, "", ERR_STR_SVR_NOT_EXISTS, ERR_CODE_SVR_NOT_EXISTS);
+            }
         } else if (store.msgs(i).rsvrcmd()==pms::EServerCmd::CCREATESEQN)
         {
             resp.set_svr_cmds(store.msgs(i).rsvrcmd());
@@ -784,10 +853,11 @@ void LRTTransferSession::OnTypeQueue(const std::string& str)
             //how to let others server connect to here, find the special group users relayer
             //send to
             const std::string sn("wensiwensi");
-            if (LRTConnManager::Instance().SendToGroupModule(sn, s))
+            // relay msg to server grouper
+            if (!LRTConnManager::Instance().SendToGroupModule(sn, s))
             {
-            } else {
                 LE("LRTTransferSession::OnTypeQueue cmd create noooooooooot dispatch msg ok\n");
+                LRTConnManager::Instance().ReportError(pms::ETransferModule::MGRPNOTIFY, "", ERR_STR_SVR_NOT_EXISTS, ERR_CODE_SVR_NOT_EXISTS);
             }
         } else if (store.msgs(i).rsvrcmd()==pms::EServerCmd::CDELETESEQN)
         {
@@ -806,10 +876,11 @@ void LRTTransferSession::OnTypeQueue(const std::string& str)
             //how to let others server connect to here, find the special group users relayer
             //send to
             const std::string sn("wensiwensi");
-            if (LRTConnManager::Instance().SendToGroupModule(sn, s))
+            // relay msg to server grouper
+            if (!LRTConnManager::Instance().SendToGroupModule(sn, s))
             {
-            } else {
                 LE("LRTTransferSession::OnTypeQueue cmd delete noooooooooot dispatch msg ok\n");
+                LRTConnManager::Instance().ReportError(pms::ETransferModule::MGRPNOTIFY, "", ERR_STR_SVR_NOT_EXISTS, ERR_CODE_SVR_NOT_EXISTS);
             }
         } else {
             LI("LRTTransferSession::OnTypeQueue store.srv:cmd:%d not handle\n", store.msgs(i).rsvrcmd());
@@ -862,7 +933,11 @@ void LRTTransferSession::OnTypeDispatch(const std::string& str)
                     t_msg.set_type(pms::ETransferType::TQUEUE);
                     t_msg.set_content(r_msg.SerializeAsString());
                     std::string response = t_msg.SerializeAsString();
-                    LRTConnManager::Instance().Transfer2Dispatcher("", "", response);
+                    // relay msg to server dispatcher
+                    if (!LRTConnManager::Instance().Transfer2Dispatcher("", "", response))
+                    {
+                        LRTConnManager::Instance().ReportError(pms::ETransferModule::MMSGQUEUE, "", ERR_STR_SVR_NOT_EXISTS, ERR_CODE_SVR_NOT_EXISTS);
+                    }
 
                 }
                 break;
@@ -895,7 +970,11 @@ void LRTTransferSession::OnTypeDispatch(const std::string& str)
                     t_msg.set_type(pms::ETransferType::TQUEUE);
                     t_msg.set_content(r_msg.SerializeAsString());
                     std::string response = t_msg.SerializeAsString();
-                    LRTConnManager::Instance().Transfer2Dispatcher("", "", response);
+                    // relay msg to server dispatcher
+                    if (!LRTConnManager::Instance().Transfer2Dispatcher("", "", response))
+                    {
+                        LRTConnManager::Instance().ReportError(pms::ETransferModule::MMSGQUEUE, "", ERR_STR_SVR_NOT_EXISTS, ERR_CODE_SVR_NOT_EXISTS);
+                    }
                 }
                 break;
             case pms::EServerCmd::CPGETDATA:
@@ -921,10 +1000,11 @@ void LRTTransferSession::OnTypeDispatch(const std::string& str)
                     //how to let others server connect to here, find the special group users relayer
                     //send to
                     const std::string sn("wensiwensi");
-                    if (LRTConnManager::Instance().SendToPushModule(sn, s))
+                    // relay msg to server pusher
+                    if (!LRTConnManager::Instance().SendToPushModule(sn, s))
                     {
-                    } else {
                         LE("LRTTransferSession::OnTypeDispatch noooooooooot dispatch msg ok\n");
+                        LRTConnManager::Instance().ReportError(pms::ETransferModule::MPUSHER, "", ERR_STR_SVR_NOT_EXISTS, ERR_CODE_SVR_NOT_EXISTS);
                     }
                     continue;
 
@@ -956,6 +1036,13 @@ void LRTTransferSession::OnTypeTLogout(const std::string& str)
 void LRTTransferSession::OnTypeError(const std::string& str)
 {
     LI("%s was called\n", __FUNCTION__);
+    pms::ErrorMsg emsg;
+    if (!emsg.ParseFromString(str))
+    {
+        return;
+    }
+    LI("LRTTransferSession::OnTypeError emodule:%d, userid:%s, reason:%s, errcode:%d\n", emsg.emodule(), emsg.userid().c_str(), emsg.reason().c_str(), emsg.errcode());
+
 }
 
 // from LRTModuleConnTcp
@@ -1010,7 +1097,11 @@ void LRTTransferSession::OnGroupNotify(pms::EServerCmd cmd, pms::EModuleType mod
         t_msg.set_type(pms::ETransferType::TQUEUE);
         t_msg.set_content(r_msg.SerializeAsString());
         std::string response = t_msg.SerializeAsString();
-        LRTConnManager::Instance().Transfer2Dispatcher("", "", response);
+        // relay msg to server dispatcher
+        if (!LRTConnManager::Instance().Transfer2Dispatcher("", "", response))
+        {
+            LRTConnManager::Instance().ReportError(pms::ETransferModule::MMSGQUEUE, "", ERR_STR_SVR_NOT_EXISTS, ERR_CODE_SVR_NOT_EXISTS);
+        }
     }
 }
 
@@ -1027,25 +1118,37 @@ void LRTTransferSession::OnPGetData(pms::EServerCmd cmd, pms::EModuleType module
     for(int i=0;i<packed.msgs_size();++i)
     {
         if (packed.msgs(i).ruserid().length()==0) break;
-        LRTConnManager::Instance().PushDataReq2Queue(packed.msgs(i).SerializeAsString());
+        // relay msg to server logical
+        if (!LRTConnManager::Instance().PushDataReq2Queue(packed.msgs(i).SerializeAsString()))
+        {
+            LRTConnManager::Instance().ReportError(pms::ETransferModule::MLOGICAL, "", ERR_STR_SVR_NOT_EXISTS, ERR_CODE_SVR_NOT_EXISTS);
+        }
     }
 }
 
 
 void LRTTransferSession::OnCreateGroupSeqn(pms::EServerCmd cmd, pms::EModuleType module, const std::string& msg)
 {
-    // this request is coming from group module client
-    LRTConnManager::Instance().PushNewMsg2Queue(msg);
     pms::StorageMsg store;
     if (!store.ParseFromString(msg)) return;
+    // this request is coming from group module client
+    // relay msg to server logical
+    if (!LRTConnManager::Instance().PushNewMsg2Queue(msg))
+    {
+        LRTConnManager::Instance().ReportError(pms::ETransferModule::MLOGICAL, "", ERR_STR_SVR_NOT_EXISTS, ERR_CODE_SVR_NOT_EXISTS);
+    }
 }
 
 void LRTTransferSession::OnDeleteGroupSeqn(pms::EServerCmd cmd, pms::EModuleType module, const std::string& msg)
 {
-    // this request is coming from group module client
-    LRTConnManager::Instance().PushNewMsg2Queue(msg);
     pms::StorageMsg store;
     if (!store.ParseFromString(msg)) return;
+    // this request is coming from group module client
+    // relay msg to server logical
+    if (!LRTConnManager::Instance().PushNewMsg2Queue(msg))
+    {
+        LRTConnManager::Instance().ReportError(pms::ETransferModule::MLOGICAL, "", ERR_STR_SVR_NOT_EXISTS, ERR_CODE_SVR_NOT_EXISTS);
+    }
 }
 
 void LRTTransferSession::OnResponse(const char*pData, int nLen)

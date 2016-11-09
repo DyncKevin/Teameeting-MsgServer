@@ -2667,6 +2667,776 @@ public final class SysMsg {
     }
   }
 
+  public interface ErrorMsgOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:pms.ErrorMsg)
+      com.google.protobuf.MessageLiteOrBuilder {
+
+    /**
+     * <pre>
+     * which module has error
+     * </pre>
+     *
+     * <code>optional .pms.ETransferModule emodule = 1;</code>
+     */
+    int getEmoduleValue();
+    /**
+     * <pre>
+     * which module has error
+     * </pre>
+     *
+     * <code>optional .pms.ETransferModule emodule = 1;</code>
+     */
+    pms.SysMsgType.ETransferModule getEmodule();
+
+    /**
+     * <pre>
+     * which user meet this error
+     * </pre>
+     *
+     * <code>optional string userid = 2;</code>
+     */
+    java.lang.String getUserid();
+    /**
+     * <pre>
+     * which user meet this error
+     * </pre>
+     *
+     * <code>optional string userid = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getUseridBytes();
+
+    /**
+     * <pre>
+     * what reason for error
+     * </pre>
+     *
+     * <code>optional string reason = 3;</code>
+     */
+    java.lang.String getReason();
+    /**
+     * <pre>
+     * what reason for error
+     * </pre>
+     *
+     * <code>optional string reason = 3;</code>
+     */
+    com.google.protobuf.ByteString
+        getReasonBytes();
+
+    /**
+     * <pre>
+     * err code
+     * </pre>
+     *
+     * <code>optional int32 errcode = 4;</code>
+     */
+    int getErrcode();
+  }
+  /**
+   * <pre>
+   * this is for system error msg, report to higher level
+   * </pre>
+   *
+   * Protobuf type {@code pms.ErrorMsg}
+   */
+  public  static final class ErrorMsg extends
+      com.google.protobuf.GeneratedMessageLite<
+          ErrorMsg, ErrorMsg.Builder> implements
+      // @@protoc_insertion_point(message_implements:pms.ErrorMsg)
+      ErrorMsgOrBuilder {
+    private ErrorMsg() {
+      emodule_ = 0;
+      userid_ = "";
+      reason_ = "";
+      errcode_ = 0;
+    }
+    public static final int EMODULE_FIELD_NUMBER = 1;
+    private int emodule_;
+    /**
+     * <pre>
+     * which module has error
+     * </pre>
+     *
+     * <code>optional .pms.ETransferModule emodule = 1;</code>
+     */
+    public int getEmoduleValue() {
+      return emodule_;
+    }
+    /**
+     * <pre>
+     * which module has error
+     * </pre>
+     *
+     * <code>optional .pms.ETransferModule emodule = 1;</code>
+     */
+    public pms.SysMsgType.ETransferModule getEmodule() {
+      pms.SysMsgType.ETransferModule result = pms.SysMsgType.ETransferModule.forNumber(emodule_);
+      return result == null ? pms.SysMsgType.ETransferModule.UNRECOGNIZED : result;
+    }
+    /**
+     * <pre>
+     * which module has error
+     * </pre>
+     *
+     * <code>optional .pms.ETransferModule emodule = 1;</code>
+     */
+    private void setEmoduleValue(int value) {
+        emodule_ = value;
+    }
+    /**
+     * <pre>
+     * which module has error
+     * </pre>
+     *
+     * <code>optional .pms.ETransferModule emodule = 1;</code>
+     */
+    private void setEmodule(pms.SysMsgType.ETransferModule value) {
+      if (value == null) {
+        throw new NullPointerException();
+      }
+      
+      emodule_ = value.getNumber();
+    }
+    /**
+     * <pre>
+     * which module has error
+     * </pre>
+     *
+     * <code>optional .pms.ETransferModule emodule = 1;</code>
+     */
+    private void clearEmodule() {
+      
+      emodule_ = 0;
+    }
+
+    public static final int USERID_FIELD_NUMBER = 2;
+    private java.lang.String userid_;
+    /**
+     * <pre>
+     * which user meet this error
+     * </pre>
+     *
+     * <code>optional string userid = 2;</code>
+     */
+    public java.lang.String getUserid() {
+      return userid_;
+    }
+    /**
+     * <pre>
+     * which user meet this error
+     * </pre>
+     *
+     * <code>optional string userid = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getUseridBytes() {
+      return com.google.protobuf.ByteString.copyFromUtf8(userid_);
+    }
+    /**
+     * <pre>
+     * which user meet this error
+     * </pre>
+     *
+     * <code>optional string userid = 2;</code>
+     */
+    private void setUserid(
+        java.lang.String value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  
+      userid_ = value;
+    }
+    /**
+     * <pre>
+     * which user meet this error
+     * </pre>
+     *
+     * <code>optional string userid = 2;</code>
+     */
+    private void clearUserid() {
+      
+      userid_ = getDefaultInstance().getUserid();
+    }
+    /**
+     * <pre>
+     * which user meet this error
+     * </pre>
+     *
+     * <code>optional string userid = 2;</code>
+     */
+    private void setUseridBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+      
+      userid_ = value.toStringUtf8();
+    }
+
+    public static final int REASON_FIELD_NUMBER = 3;
+    private java.lang.String reason_;
+    /**
+     * <pre>
+     * what reason for error
+     * </pre>
+     *
+     * <code>optional string reason = 3;</code>
+     */
+    public java.lang.String getReason() {
+      return reason_;
+    }
+    /**
+     * <pre>
+     * what reason for error
+     * </pre>
+     *
+     * <code>optional string reason = 3;</code>
+     */
+    public com.google.protobuf.ByteString
+        getReasonBytes() {
+      return com.google.protobuf.ByteString.copyFromUtf8(reason_);
+    }
+    /**
+     * <pre>
+     * what reason for error
+     * </pre>
+     *
+     * <code>optional string reason = 3;</code>
+     */
+    private void setReason(
+        java.lang.String value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  
+      reason_ = value;
+    }
+    /**
+     * <pre>
+     * what reason for error
+     * </pre>
+     *
+     * <code>optional string reason = 3;</code>
+     */
+    private void clearReason() {
+      
+      reason_ = getDefaultInstance().getReason();
+    }
+    /**
+     * <pre>
+     * what reason for error
+     * </pre>
+     *
+     * <code>optional string reason = 3;</code>
+     */
+    private void setReasonBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+      
+      reason_ = value.toStringUtf8();
+    }
+
+    public static final int ERRCODE_FIELD_NUMBER = 4;
+    private int errcode_;
+    /**
+     * <pre>
+     * err code
+     * </pre>
+     *
+     * <code>optional int32 errcode = 4;</code>
+     */
+    public int getErrcode() {
+      return errcode_;
+    }
+    /**
+     * <pre>
+     * err code
+     * </pre>
+     *
+     * <code>optional int32 errcode = 4;</code>
+     */
+    private void setErrcode(int value) {
+      
+      errcode_ = value;
+    }
+    /**
+     * <pre>
+     * err code
+     * </pre>
+     *
+     * <code>optional int32 errcode = 4;</code>
+     */
+    private void clearErrcode() {
+      
+      errcode_ = 0;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (emodule_ != pms.SysMsgType.ETransferModule.MCONNECTOR.getNumber()) {
+        output.writeEnum(1, emodule_);
+      }
+      if (!userid_.isEmpty()) {
+        output.writeString(2, getUserid());
+      }
+      if (!reason_.isEmpty()) {
+        output.writeString(3, getReason());
+      }
+      if (errcode_ != 0) {
+        output.writeInt32(4, errcode_);
+      }
+    }
+
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (emodule_ != pms.SysMsgType.ETransferModule.MCONNECTOR.getNumber()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(1, emodule_);
+      }
+      if (!userid_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeStringSize(2, getUserid());
+      }
+      if (!reason_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeStringSize(3, getReason());
+      }
+      if (errcode_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(4, errcode_);
+      }
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    public static pms.SysMsg.ErrorMsg parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return com.google.protobuf.GeneratedMessageLite.parseFrom(
+          DEFAULT_INSTANCE, data);
+    }
+    public static pms.SysMsg.ErrorMsg parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return com.google.protobuf.GeneratedMessageLite.parseFrom(
+          DEFAULT_INSTANCE, data, extensionRegistry);
+    }
+    public static pms.SysMsg.ErrorMsg parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return com.google.protobuf.GeneratedMessageLite.parseFrom(
+          DEFAULT_INSTANCE, data);
+    }
+    public static pms.SysMsg.ErrorMsg parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return com.google.protobuf.GeneratedMessageLite.parseFrom(
+          DEFAULT_INSTANCE, data, extensionRegistry);
+    }
+    public static pms.SysMsg.ErrorMsg parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageLite.parseFrom(
+          DEFAULT_INSTANCE, input);
+    }
+    public static pms.SysMsg.ErrorMsg parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageLite.parseFrom(
+          DEFAULT_INSTANCE, input, extensionRegistry);
+    }
+    public static pms.SysMsg.ErrorMsg parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return parseDelimitedFrom(DEFAULT_INSTANCE, input);
+    }
+    public static pms.SysMsg.ErrorMsg parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return parseDelimitedFrom(DEFAULT_INSTANCE, input, extensionRegistry);
+    }
+    public static pms.SysMsg.ErrorMsg parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageLite.parseFrom(
+          DEFAULT_INSTANCE, input);
+    }
+    public static pms.SysMsg.ErrorMsg parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageLite.parseFrom(
+          DEFAULT_INSTANCE, input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(pms.SysMsg.ErrorMsg prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+
+    /**
+     * <pre>
+     * this is for system error msg, report to higher level
+     * </pre>
+     *
+     * Protobuf type {@code pms.ErrorMsg}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageLite.Builder<
+          pms.SysMsg.ErrorMsg, Builder> implements
+        // @@protoc_insertion_point(builder_implements:pms.ErrorMsg)
+        pms.SysMsg.ErrorMsgOrBuilder {
+      // Construct using pms.SysMsg.ErrorMsg.newBuilder()
+      private Builder() {
+        super(DEFAULT_INSTANCE);
+      }
+
+
+      /**
+       * <pre>
+       * which module has error
+       * </pre>
+       *
+       * <code>optional .pms.ETransferModule emodule = 1;</code>
+       */
+      public int getEmoduleValue() {
+        return instance.getEmoduleValue();
+      }
+      /**
+       * <pre>
+       * which module has error
+       * </pre>
+       *
+       * <code>optional .pms.ETransferModule emodule = 1;</code>
+       */
+      public Builder setEmoduleValue(int value) {
+        copyOnWrite();
+        instance.setEmoduleValue(value);
+        return this;
+      }
+      /**
+       * <pre>
+       * which module has error
+       * </pre>
+       *
+       * <code>optional .pms.ETransferModule emodule = 1;</code>
+       */
+      public pms.SysMsgType.ETransferModule getEmodule() {
+        return instance.getEmodule();
+      }
+      /**
+       * <pre>
+       * which module has error
+       * </pre>
+       *
+       * <code>optional .pms.ETransferModule emodule = 1;</code>
+       */
+      public Builder setEmodule(pms.SysMsgType.ETransferModule value) {
+        copyOnWrite();
+        instance.setEmodule(value);
+        return this;
+      }
+      /**
+       * <pre>
+       * which module has error
+       * </pre>
+       *
+       * <code>optional .pms.ETransferModule emodule = 1;</code>
+       */
+      public Builder clearEmodule() {
+        copyOnWrite();
+        instance.clearEmodule();
+        return this;
+      }
+
+      /**
+       * <pre>
+       * which user meet this error
+       * </pre>
+       *
+       * <code>optional string userid = 2;</code>
+       */
+      public java.lang.String getUserid() {
+        return instance.getUserid();
+      }
+      /**
+       * <pre>
+       * which user meet this error
+       * </pre>
+       *
+       * <code>optional string userid = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getUseridBytes() {
+        return instance.getUseridBytes();
+      }
+      /**
+       * <pre>
+       * which user meet this error
+       * </pre>
+       *
+       * <code>optional string userid = 2;</code>
+       */
+      public Builder setUserid(
+          java.lang.String value) {
+        copyOnWrite();
+        instance.setUserid(value);
+        return this;
+      }
+      /**
+       * <pre>
+       * which user meet this error
+       * </pre>
+       *
+       * <code>optional string userid = 2;</code>
+       */
+      public Builder clearUserid() {
+        copyOnWrite();
+        instance.clearUserid();
+        return this;
+      }
+      /**
+       * <pre>
+       * which user meet this error
+       * </pre>
+       *
+       * <code>optional string userid = 2;</code>
+       */
+      public Builder setUseridBytes(
+          com.google.protobuf.ByteString value) {
+        copyOnWrite();
+        instance.setUseridBytes(value);
+        return this;
+      }
+
+      /**
+       * <pre>
+       * what reason for error
+       * </pre>
+       *
+       * <code>optional string reason = 3;</code>
+       */
+      public java.lang.String getReason() {
+        return instance.getReason();
+      }
+      /**
+       * <pre>
+       * what reason for error
+       * </pre>
+       *
+       * <code>optional string reason = 3;</code>
+       */
+      public com.google.protobuf.ByteString
+          getReasonBytes() {
+        return instance.getReasonBytes();
+      }
+      /**
+       * <pre>
+       * what reason for error
+       * </pre>
+       *
+       * <code>optional string reason = 3;</code>
+       */
+      public Builder setReason(
+          java.lang.String value) {
+        copyOnWrite();
+        instance.setReason(value);
+        return this;
+      }
+      /**
+       * <pre>
+       * what reason for error
+       * </pre>
+       *
+       * <code>optional string reason = 3;</code>
+       */
+      public Builder clearReason() {
+        copyOnWrite();
+        instance.clearReason();
+        return this;
+      }
+      /**
+       * <pre>
+       * what reason for error
+       * </pre>
+       *
+       * <code>optional string reason = 3;</code>
+       */
+      public Builder setReasonBytes(
+          com.google.protobuf.ByteString value) {
+        copyOnWrite();
+        instance.setReasonBytes(value);
+        return this;
+      }
+
+      /**
+       * <pre>
+       * err code
+       * </pre>
+       *
+       * <code>optional int32 errcode = 4;</code>
+       */
+      public int getErrcode() {
+        return instance.getErrcode();
+      }
+      /**
+       * <pre>
+       * err code
+       * </pre>
+       *
+       * <code>optional int32 errcode = 4;</code>
+       */
+      public Builder setErrcode(int value) {
+        copyOnWrite();
+        instance.setErrcode(value);
+        return this;
+      }
+      /**
+       * <pre>
+       * err code
+       * </pre>
+       *
+       * <code>optional int32 errcode = 4;</code>
+       */
+      public Builder clearErrcode() {
+        copyOnWrite();
+        instance.clearErrcode();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:pms.ErrorMsg)
+    }
+    protected final Object dynamicMethod(
+        com.google.protobuf.GeneratedMessageLite.MethodToInvoke method,
+        Object arg0, Object arg1) {
+      switch (method) {
+        case NEW_MUTABLE_INSTANCE: {
+          return new pms.SysMsg.ErrorMsg();
+        }
+        case IS_INITIALIZED: {
+          return DEFAULT_INSTANCE;
+        }
+        case MAKE_IMMUTABLE: {
+          return null;
+        }
+        case NEW_BUILDER: {
+          return new Builder();
+        }
+        case VISIT: {
+          Visitor visitor = (Visitor) arg0;
+          pms.SysMsg.ErrorMsg other = (pms.SysMsg.ErrorMsg) arg1;
+          emodule_ = visitor.visitInt(emodule_ != 0, emodule_,    other.emodule_ != 0, other.emodule_);
+          userid_ = visitor.visitString(!userid_.isEmpty(), userid_,
+              !other.userid_.isEmpty(), other.userid_);
+          reason_ = visitor.visitString(!reason_.isEmpty(), reason_,
+              !other.reason_.isEmpty(), other.reason_);
+          errcode_ = visitor.visitInt(errcode_ != 0, errcode_,
+              other.errcode_ != 0, other.errcode_);
+          if (visitor == com.google.protobuf.GeneratedMessageLite.MergeFromVisitor
+              .INSTANCE) {
+          }
+          return this;
+        }
+        case MERGE_FROM_STREAM: {
+          com.google.protobuf.CodedInputStream input =
+              (com.google.protobuf.CodedInputStream) arg0;
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry =
+              (com.google.protobuf.ExtensionRegistryLite) arg1;
+          try {
+            boolean done = false;
+            while (!done) {
+              int tag = input.readTag();
+              switch (tag) {
+                case 0:
+                  done = true;
+                  break;
+                default: {
+                  if (!input.skipField(tag)) {
+                    done = true;
+                  }
+                  break;
+                }
+                case 8: {
+                  int rawValue = input.readEnum();
+
+                  emodule_ = rawValue;
+                  break;
+                }
+                case 18: {
+                  String s = input.readStringRequireUtf8();
+
+                  userid_ = s;
+                  break;
+                }
+                case 26: {
+                  String s = input.readStringRequireUtf8();
+
+                  reason_ = s;
+                  break;
+                }
+                case 32: {
+
+                  errcode_ = input.readInt32();
+                  break;
+                }
+              }
+            }
+          } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+            throw new RuntimeException(e.setUnfinishedMessage(this));
+          } catch (java.io.IOException e) {
+            throw new RuntimeException(
+                new com.google.protobuf.InvalidProtocolBufferException(
+                    e.getMessage()).setUnfinishedMessage(this));
+          } finally {
+          }
+        }
+        case GET_DEFAULT_INSTANCE: {
+          return DEFAULT_INSTANCE;
+        }
+        case GET_PARSER: {
+          if (PARSER == null) {    synchronized (pms.SysMsg.ErrorMsg.class) {
+              if (PARSER == null) {
+                PARSER = new DefaultInstanceBasedParser(DEFAULT_INSTANCE);
+              }
+            }
+          }
+          return PARSER;
+        }
+      }
+      throw new UnsupportedOperationException();
+    }
+
+
+    // @@protoc_insertion_point(class_scope:pms.ErrorMsg)
+    private static final pms.SysMsg.ErrorMsg DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new ErrorMsg();
+      DEFAULT_INSTANCE.makeImmutable();
+    }
+
+    public static pms.SysMsg.ErrorMsg getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static volatile com.google.protobuf.Parser<ErrorMsg> PARSER;
+
+    public static com.google.protobuf.Parser<ErrorMsg> parser() {
+      return DEFAULT_INSTANCE.getParserForType();
+    }
+  }
+
 
   static {
   }

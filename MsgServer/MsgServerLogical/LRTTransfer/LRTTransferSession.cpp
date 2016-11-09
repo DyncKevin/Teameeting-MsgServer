@@ -511,7 +511,10 @@ void LRTTransferSession::OnTypeWriteRequest(const std::string& str)
                         sprintf(msgid, "wm:%u", m_tmpWMsgId++);
                         store.mutable_msgs(i)->set_msgid(msgid);
                     }
-                    assert(store.mutable_msgs(i)->msgid().length()!=0);
+                    if(store.mutable_msgs(i)->msgid().length()==0)
+                    {
+                         break;
+                    }
                     LRTLogicalManager::Instance().InsertDataWrite(this, store.mutable_msgs(i));
                 }
                 pms::TransferMsg tmsg;
@@ -520,7 +523,10 @@ void LRTTransferSession::OnTypeWriteRequest(const std::string& str)
                 tmsg.set_priority(pms::ETransferPriority::PNORMAL);
                 tmsg.set_content(store.SerializeAsString());
                 // send to sequence
-                LRTConnManager::Instance().PushSeqnWriteMsg(tmsg.SerializeAsString());
+                if (!LRTConnManager::Instance().PushSeqnWriteMsg(tmsg.SerializeAsString()))
+                {
+                    LRTConnManager::Instance().ReportError(pms::ETransferModule::MSEQUENCE, "", ERR_STR_SVR_NOT_EXISTS, ERR_CODE_SVR_NOT_EXISTS);
+                }
             }
             break;
         default:
@@ -573,7 +579,10 @@ void LRTTransferSession::OnTypeWriteResponse(const std::string& str)
             tmsg.set_priority(pms::ETransferPriority::PNORMAL);
             tmsg.set_content(newmsg_store.SerializeAsString());
             // send to storage
-            LRTConnManager::Instance().PushStoreWriteMsg(tmsg.SerializeAsString());
+            if (!LRTConnManager::Instance().PushStoreWriteMsg(tmsg.SerializeAsString()))
+            {
+                LRTConnManager::Instance().ReportError(pms::ETransferModule::MSTORAGE, "", ERR_STR_SVR_NOT_EXISTS, ERR_CODE_SVR_NOT_EXISTS);
+            }
         }
     // this means data write
     } else if (rmsg.svr_cmds()==pms::EServerCmd::CDATA)
@@ -646,7 +655,10 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
             tmsg.set_priority(pms::ETransferPriority::PNORMAL);
             tmsg.set_content(s_store.SerializeAsString());
             // send to sequnce
-            LRTConnManager::Instance().PushSeqnReadMsg(tmsg.SerializeAsString());
+            if (!LRTConnManager::Instance().PushSeqnReadMsg(tmsg.SerializeAsString()))
+            {
+                LRTConnManager::Instance().ReportError(pms::ETransferModule::MSEQUENCE, "", ERR_STR_SVR_NOT_EXISTS, ERR_CODE_SVR_NOT_EXISTS);
+            }
         }
     } else if (rmsg.svr_cmds()==pms::EServerCmd::CSYNCDATA) {
         // first get cur seqn
@@ -710,7 +722,10 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
             tmsg.set_priority(pms::ETransferPriority::PNORMAL);
             tmsg.set_content(d_store.SerializeAsString());
             // send to storage
-            LRTConnManager::Instance().PushStoreReadMsg(tmsg.SerializeAsString());
+            if (!LRTConnManager::Instance().PushStoreReadMsg(tmsg.SerializeAsString()))
+            {
+                LRTConnManager::Instance().ReportError(pms::ETransferModule::MSTORAGE, "", ERR_STR_SVR_NOT_EXISTS, ERR_CODE_SVR_NOT_EXISTS);
+            }
         }
 
         if (s_store.msgs_size()>0)
@@ -721,7 +736,10 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
             tmsg.set_priority(pms::ETransferPriority::PNORMAL);
             tmsg.set_content(s_store.SerializeAsString());
             // send to sequence
-            LRTConnManager::Instance().PushSeqnReadMsg(tmsg.SerializeAsString());
+            if (!LRTConnManager::Instance().PushSeqnReadMsg(tmsg.SerializeAsString()))
+            {
+                LRTConnManager::Instance().ReportError(pms::ETransferModule::MSEQUENCE, "", ERR_STR_SVR_NOT_EXISTS, ERR_CODE_SVR_NOT_EXISTS);
+            }
         }
 
     } else if (rmsg.svr_cmds()==pms::EServerCmd::CPGETDATA) {
@@ -755,7 +773,10 @@ void LRTTransferSession::OnTypeReadRequest(const std::string& str)
             tmsg.set_priority(pms::ETransferPriority::PNORMAL);
             tmsg.set_content(d_store.SerializeAsString());
             // send to storage
-            LRTConnManager::Instance().PushStoreReadMsg(tmsg.SerializeAsString());
+            if (!LRTConnManager::Instance().PushStoreReadMsg(tmsg.SerializeAsString()))
+            {
+                LRTConnManager::Instance().ReportError(pms::ETransferModule::MSTORAGE, "", ERR_STR_SVR_NOT_EXISTS, ERR_CODE_SVR_NOT_EXISTS);
+            }
         }
     } else {
          LE("OnTypeReadRequest not handle svr_cmd:%d\n", rmsg.svr_cmds());
@@ -810,7 +831,10 @@ void LRTTransferSession::OnTypeReadResponse(const std::string& str)
             tmsg.set_priority(pms::ETransferPriority::PNORMAL);
             tmsg.set_content(d_store.SerializeAsString());
             // send to storage
-            LRTConnManager::Instance().PushStoreReadMsg(tmsg.SerializeAsString());
+            if (!LRTConnManager::Instance().PushStoreReadMsg(tmsg.SerializeAsString()))
+            {
+                LRTConnManager::Instance().ReportError(pms::ETransferModule::MSTORAGE, "", ERR_STR_SVR_NOT_EXISTS, ERR_CODE_SVR_NOT_EXISTS);
+            }
         }
     } else if (rmsg.svr_cmds()==pms::EServerCmd::CDATA)
     {

@@ -35,3 +35,11 @@ message TransferMsg{
     ETransferPriority priority = 3;
     bytes   content            = 4; // the message to transfer
 }
+
+// this is for system error msg, report to higher level
+message ErrorMsg{
+    ETransferModule emodule     = 1; // which module has error
+    string          userid      = 2; // which user meet this error
+    string          reason      = 3; // what reason for error
+    int32           errcode     = 4; // err code
+}

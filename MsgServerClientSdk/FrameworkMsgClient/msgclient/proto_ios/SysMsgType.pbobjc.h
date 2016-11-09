@@ -63,6 +63,7 @@ typedef GPB_ENUM(ETransferType) {
   ETransferType_TwriteResponse = 8,
   ETransferType_TreadRequest = 9,
   ETransferType_TreadResponse = 10,
+  ETransferType_Terror = 11,
 };
 
 GPBEnumDescriptor *ETransferType_EnumDescriptor(void);

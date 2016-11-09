@@ -422,6 +422,94 @@ void SetTransferMsg_Priority_RawValue(TransferMsg *message, int32_t value) {
   GPBSetInt32IvarWithFieldInternal(message, field, value, descriptor.file.syntax);
 }
 
+#pragma mark - ErrorMsg
+
+@implementation ErrorMsg
+
+@dynamic emodule;
+@dynamic userid;
+@dynamic reason;
+@dynamic errcode;
+
+typedef struct ErrorMsg__storage_ {
+  uint32_t _has_storage_[1];
+  ETransferModule emodule;
+  int32_t errcode;
+  NSString *userid;
+  NSString *reason;
+} ErrorMsg__storage_;
+
+// This method is threadsafe because it is initially called
+// in +initialize for each subclass.
++ (GPBDescriptor *)descriptor {
+  static GPBDescriptor *descriptor = nil;
+  if (!descriptor) {
+    static GPBMessageFieldDescription fields[] = {
+      {
+        .name = "emodule",
+        .dataTypeSpecific.enumDescFunc = ETransferModule_EnumDescriptor,
+        .number = ErrorMsg_FieldNumber_Emodule,
+        .hasIndex = 0,
+        .offset = (uint32_t)offsetof(ErrorMsg__storage_, emodule),
+        .flags = GPBFieldOptional | GPBFieldHasEnumDescriptor,
+        .dataType = GPBDataTypeEnum,
+      },
+      {
+        .name = "userid",
+        .dataTypeSpecific.className = NULL,
+        .number = ErrorMsg_FieldNumber_Userid,
+        .hasIndex = 1,
+        .offset = (uint32_t)offsetof(ErrorMsg__storage_, userid),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "reason",
+        .dataTypeSpecific.className = NULL,
+        .number = ErrorMsg_FieldNumber_Reason,
+        .hasIndex = 2,
+        .offset = (uint32_t)offsetof(ErrorMsg__storage_, reason),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "errcode",
+        .dataTypeSpecific.className = NULL,
+        .number = ErrorMsg_FieldNumber_Errcode,
+        .hasIndex = 3,
+        .offset = (uint32_t)offsetof(ErrorMsg__storage_, errcode),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
+      },
+    };
+    GPBDescriptor *localDescriptor =
+        [GPBDescriptor allocDescriptorForClass:[ErrorMsg class]
+                                     rootClass:[SysMsgRoot class]
+                                          file:SysMsgRoot_FileDescriptor()
+                                        fields:fields
+                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
+                                   storageSize:sizeof(ErrorMsg__storage_)
+                                         flags:0];
+    NSAssert(descriptor == nil, @"Startup recursed!");
+    descriptor = localDescriptor;
+  }
+  return descriptor;
+}
+
+@end
+
+int32_t ErrorMsg_Emodule_RawValue(ErrorMsg *message) {
+  GPBDescriptor *descriptor = [ErrorMsg descriptor];
+  GPBFieldDescriptor *field = [descriptor fieldWithNumber:ErrorMsg_FieldNumber_Emodule];
+  return GPBGetMessageInt32Field(message, field);
+}
+
+void SetErrorMsg_Emodule_RawValue(ErrorMsg *message, int32_t value) {
+  GPBDescriptor *descriptor = [ErrorMsg descriptor];
+  GPBFieldDescriptor *field = [descriptor fieldWithNumber:ErrorMsg_FieldNumber_Emodule];
+  GPBSetInt32IvarWithFieldInternal(message, field, value, descriptor.file.syntax);
+}
+
 
 #pragma clang diagnostic pop
 

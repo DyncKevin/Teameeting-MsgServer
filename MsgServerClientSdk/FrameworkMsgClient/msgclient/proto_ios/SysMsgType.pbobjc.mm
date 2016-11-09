@@ -78,7 +78,7 @@ GPBEnumDescriptor *ETransferType_EnumDescriptor(void) {
     static const char *valueNames =
         "Tconn\000Ttrans\000Tqueue\000Tdispatch\000Tpush\000Tlog"
         "in\000Tlogout\000TwriteRequest\000TwriteResponse\000"
-        "TreadRequest\000TreadResponse\000";
+        "TreadRequest\000TreadResponse\000Terror\000";
     static const int32_t values[] = {
         ETransferType_Tconn,
         ETransferType_Ttrans,
@@ -91,6 +91,7 @@ GPBEnumDescriptor *ETransferType_EnumDescriptor(void) {
         ETransferType_TwriteResponse,
         ETransferType_TreadRequest,
         ETransferType_TreadResponse,
+        ETransferType_Terror,
     };
     GPBEnumDescriptor *worker =
         [GPBEnumDescriptor allocDescriptorForName:GPBNSStringifySymbol(ETransferType)
@@ -118,6 +119,7 @@ BOOL ETransferType_IsValidValue(int32_t value__) {
     case ETransferType_TwriteResponse:
     case ETransferType_TreadRequest:
     case ETransferType_TreadResponse:
+    case ETransferType_Terror:
       return YES;
     default:
       return NO;

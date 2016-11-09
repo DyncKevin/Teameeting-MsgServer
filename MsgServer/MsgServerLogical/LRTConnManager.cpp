@@ -176,39 +176,51 @@ bool LRTConnManager::DoConnectStorage(const std::string ip, unsigned short port)
     return true;
 }
 
-void LRTConnManager::PushSeqnReadMsg(const std::string& smsg)
+bool LRTConnManager::PushSeqnReadMsg(const std::string& smsg)
 {
     LRTConnManager::ModuleInfo* pInfo = findModuleInfoBySid(m_sequenceReadSessId);
     if (pInfo && pInfo->pModule && pInfo->pModule->IsLiveSession())
     {
         pInfo->pModule->SendTransferData(smsg);
+        return true;
+    } else {
+        return false;
     }
 }
 
-void LRTConnManager::PushSeqnWriteMsg(const std::string& smsg)
+bool LRTConnManager::PushSeqnWriteMsg(const std::string& smsg)
 {
     LRTConnManager::ModuleInfo* pInfo = findModuleInfoBySid(m_sequenceWriteSessId);
     if (pInfo && pInfo->pModule && pInfo->pModule->IsLiveSession())
     {
         pInfo->pModule->SendTransferData(smsg);
+        return true;
+    } else {
+        return false;
     }
 }
 
-void LRTConnManager::PushStoreReadMsg(const std::string& srmsg)
+bool LRTConnManager::PushStoreReadMsg(const std::string& srmsg)
 {
     LRTConnManager::ModuleInfo* pInfo = findModuleInfoBySid(m_storageReadSessId);
     if (pInfo && pInfo->pModule && pInfo->pModule->IsLiveSession())
     {
         pInfo->pModule->SendTransferData(srmsg);
+        return true;
+    } else {
+        return false;
     }
 }
 
-void LRTConnManager::PushStoreWriteMsg(const std::string& swmsg)
+bool LRTConnManager::PushStoreWriteMsg(const std::string& swmsg)
 {
     LRTConnManager::ModuleInfo* pInfo = findModuleInfoBySid(m_storageWriteSessId);
     if (pInfo && pInfo->pModule && pInfo->pModule->IsLiveSession())
     {
         pInfo->pModule->SendTransferData(swmsg);
+        return true;
+    } else {
+         return false;
     }
 }
 
@@ -228,6 +240,30 @@ void LRTConnManager::RefreshConnection()
         }
     }
 }
+
+void LRTConnManager::ReportError(pms::ETransferModule module, const std::string& uid, const std::string& err, int code)
+{
+    ModuleInfo* pInfo = findModuleInfo(uid, pms::ETransferModule::MLIVE);
+    // toModule, errModule, uid, errStr, errCode
+    pms::ErrorMsg emsg;
+    emsg.set_emodule(module);
+    emsg.set_userid(uid);
+    emsg.set_reason(err);
+    emsg.set_errcode(code);
+
+    pms::TransferMsg tmsg;
+    tmsg.set_type(pms::ETransferType::TERROR);
+    tmsg.set_flag(pms::ETransferFlag::FNOACK);
+    tmsg.set_priority(pms::ETransferPriority::PHIGH);
+    tmsg.set_content(emsg.SerializeAsString());
+
+    if (pInfo && pInfo->pModule && pInfo->pModule->IsLiveSession())
+    {
+        pInfo->pModule->SendTransferData(tmsg.SerializeAsString());
+    }
+
+}
+
 
 bool LRTConnManager::SignalKill()
 {

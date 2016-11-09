@@ -79,13 +79,13 @@ public:
 
     void TransferSessionLostNotify(const std::string& sid);
 
-    bool    ConnectSequence();
-    bool    ConnectStorage();
+    bool ConnectSequence();
+    bool ConnectStorage();
 
-    void PushSeqnReadMsg(const std::string& smsg);
-    void PushSeqnWriteMsg(const std::string& smsg);
-    void PushStoreReadMsg(const std::string& srmsg);
-    void PushStoreWriteMsg(const std::string& swmsg);
+    bool PushSeqnReadMsg(const std::string& smsg);
+    bool PushSeqnWriteMsg(const std::string& smsg);
+    bool PushStoreReadMsg(const std::string& srmsg);
+    bool PushStoreWriteMsg(const std::string& swmsg);
 
     std::list<std::string>* GetSequenceAddrList() { return &m_sequenceAddrList; }
     std::list<std::string>* GetStorageAddrList() { return &m_storageAddrList; }
@@ -99,12 +99,13 @@ public:
     void SetStorageReadSessId(const std::string& sid) { m_storageReadSessId = sid; }
     void SetStorageWriteSessId(const std::string& sid) { m_storageWriteSessId = sid; }
 
-    void    RefreshConnection();
+    void RefreshConnection();
+    void ReportError(pms::ETransferModule module, const std::string& uid, const std::string& err, int code);
 
     void SetLogicalId(const std::string& mid) { m_logicalId = mid; }
     std::string& LogicalId() { return m_logicalId; }
-    bool    SignalKill();
-    bool    ClearAll();
+    bool SignalKill();
+    bool ClearAll();
 
     void OnTLogin(const std::string& uid, const std::string& token, const std::string& connector);
     void OnTLogout(const std::string& uid, const std::string& token, const std::string& connector);
@@ -112,9 +113,12 @@ public:
 protected:
     LRTConnManager() { }
     ~LRTConnManager() { }
+
 private:
     bool DoConnectSequence(const std::string ip, unsigned short port);
     bool DoConnectStorage(const std::string ip, unsigned short port);
+
+private:
     bool                      m_isSvrSequenceOk;
     bool                      m_isSvrStorageOk;
     std::list<std::string>    m_sequenceAddrList;

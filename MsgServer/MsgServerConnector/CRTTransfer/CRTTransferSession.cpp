@@ -319,6 +319,13 @@ void CRTTransferSession::OnTypeTLogout(const std::string& str)
 void CRTTransferSession::OnTypeError(const std::string& str)
 {
     LI("%s was called\n", __FUNCTION__);
+    pms::ErrorMsg emsg;
+    if (!emsg.ParseFromString(str))
+    {
+        return;
+    }
+    LI("CRTTransferSession::OnTypeError emodule:%d, userid:%s, reason:%s, errcode:%d\n", emsg.emodule(), emsg.userid().c_str(), emsg.reason().c_str(), emsg.errcode());
+
 }
 
 void CRTTransferSession::ConnectionDisconnected()

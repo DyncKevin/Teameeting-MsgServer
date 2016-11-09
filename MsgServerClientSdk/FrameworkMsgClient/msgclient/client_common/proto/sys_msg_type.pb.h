@@ -67,12 +67,13 @@ enum ETransferType {
   TWRITE_RESPONSE = 8,
   TREAD_REQUEST = 9,
   TREAD_RESPONSE = 10,
+  TERROR = 11,
   ETransferType_INT_MIN_SENTINEL_DO_NOT_USE_ = ::google::protobuf::kint32min,
   ETransferType_INT_MAX_SENTINEL_DO_NOT_USE_ = ::google::protobuf::kint32max
 };
 bool ETransferType_IsValid(int value);
 const ETransferType ETransferType_MIN = TCONN;
-const ETransferType ETransferType_MAX = TREAD_RESPONSE;
+const ETransferType ETransferType_MAX = TERROR;
 const int ETransferType_ARRAYSIZE = ETransferType_MAX + 1;
 
 enum ETransferPriority {

@@ -37,6 +37,7 @@ void protobuf_AssignDesc_sys_5fmsg_2eproto();
 void protobuf_ShutdownFile_sys_5fmsg_2eproto();
 
 class ConnMsg;
+class ErrorMsg;
 class RelayMsg;
 class TransferMsg;
 
@@ -456,6 +457,129 @@ class TransferMsg : public ::google::protobuf::MessageLite {
 
   void InitAsDefaultInstance();
   static TransferMsg* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class ErrorMsg : public ::google::protobuf::MessageLite {
+ public:
+  ErrorMsg();
+  virtual ~ErrorMsg();
+
+  ErrorMsg(const ErrorMsg& from);
+
+  inline ErrorMsg& operator=(const ErrorMsg& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  static const ErrorMsg& default_instance();
+
+  #ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
+  // Returns the internal default instance pointer. This function can
+  // return NULL thus should not be used by the user. This is intended
+  // for Protobuf internal code. Please use default_instance() declared
+  // above instead.
+  static inline const ErrorMsg* internal_default_instance() {
+    return default_instance_;
+  }
+  #endif
+
+  void Swap(ErrorMsg* other);
+
+  // implements Message ----------------------------------------------
+
+  inline ErrorMsg* New() const { return New(NULL); }
+
+  ErrorMsg* New(::google::protobuf::Arena* arena) const;
+  void CheckTypeAndMergeFrom(const ::google::protobuf::MessageLite& from);
+  void CopyFrom(const ErrorMsg& from);
+  void MergeFrom(const ErrorMsg& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  void DiscardUnknownFields();
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  void InternalSwap(ErrorMsg* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return _arena_ptr_;
+  }
+  inline ::google::protobuf::Arena* MaybeArenaPtr() const {
+    return _arena_ptr_;
+  }
+  public:
+
+  ::std::string GetTypeName() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional .pms.ETransferModule emodule = 1;
+  void clear_emodule();
+  static const int kEmoduleFieldNumber = 1;
+  ::pms::ETransferModule emodule() const;
+  void set_emodule(::pms::ETransferModule value);
+
+  // optional string userid = 2;
+  void clear_userid();
+  static const int kUseridFieldNumber = 2;
+  const ::std::string& userid() const;
+  void set_userid(const ::std::string& value);
+  void set_userid(const char* value);
+  void set_userid(const char* value, size_t size);
+  ::std::string* mutable_userid();
+  ::std::string* release_userid();
+  void set_allocated_userid(::std::string* userid);
+
+  // optional string reason = 3;
+  void clear_reason();
+  static const int kReasonFieldNumber = 3;
+  const ::std::string& reason() const;
+  void set_reason(const ::std::string& value);
+  void set_reason(const char* value);
+  void set_reason(const char* value, size_t size);
+  ::std::string* mutable_reason();
+  ::std::string* release_reason();
+  void set_allocated_reason(::std::string* reason);
+
+  // optional int32 errcode = 4;
+  void clear_errcode();
+  static const int kErrcodeFieldNumber = 4;
+  ::google::protobuf::int32 errcode() const;
+  void set_errcode(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:pms.ErrorMsg)
+ private:
+
+  ::google::protobuf::internal::ArenaStringPtr _unknown_fields_;
+  ::google::protobuf::Arena* _arena_ptr_;
+
+  bool _is_default_instance_;
+  ::google::protobuf::internal::ArenaStringPtr userid_;
+  int emodule_;
+  ::google::protobuf::int32 errcode_;
+  ::google::protobuf::internal::ArenaStringPtr reason_;
+  mutable int _cached_size_;
+  #ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
+  friend void  protobuf_AddDesc_sys_5fmsg_2eproto_impl();
+  #else
+  friend void  protobuf_AddDesc_sys_5fmsg_2eproto();
+  #endif
+  friend void protobuf_AssignDesc_sys_5fmsg_2eproto();
+  friend void protobuf_ShutdownFile_sys_5fmsg_2eproto();
+
+  void InitAsDefaultInstance();
+  static ErrorMsg* default_instance_;
 };
 // ===================================================================
 
@@ -979,7 +1103,129 @@ inline void TransferMsg::set_allocated_content(::std::string* content) {
   // @@protoc_insertion_point(field_set_allocated:pms.TransferMsg.content)
 }
 
+// -------------------------------------------------------------------
+
+// ErrorMsg
+
+// optional .pms.ETransferModule emodule = 1;
+inline void ErrorMsg::clear_emodule() {
+  emodule_ = 0;
+}
+inline ::pms::ETransferModule ErrorMsg::emodule() const {
+  // @@protoc_insertion_point(field_get:pms.ErrorMsg.emodule)
+  return static_cast< ::pms::ETransferModule >(emodule_);
+}
+inline void ErrorMsg::set_emodule(::pms::ETransferModule value) {
+  
+  emodule_ = value;
+  // @@protoc_insertion_point(field_set:pms.ErrorMsg.emodule)
+}
+
+// optional string userid = 2;
+inline void ErrorMsg::clear_userid() {
+  userid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& ErrorMsg::userid() const {
+  // @@protoc_insertion_point(field_get:pms.ErrorMsg.userid)
+  return userid_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ErrorMsg::set_userid(const ::std::string& value) {
+  
+  userid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:pms.ErrorMsg.userid)
+}
+inline void ErrorMsg::set_userid(const char* value) {
+  
+  userid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:pms.ErrorMsg.userid)
+}
+inline void ErrorMsg::set_userid(const char* value, size_t size) {
+  
+  userid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:pms.ErrorMsg.userid)
+}
+inline ::std::string* ErrorMsg::mutable_userid() {
+  
+  // @@protoc_insertion_point(field_mutable:pms.ErrorMsg.userid)
+  return userid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* ErrorMsg::release_userid() {
+  // @@protoc_insertion_point(field_release:pms.ErrorMsg.userid)
+  
+  return userid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ErrorMsg::set_allocated_userid(::std::string* userid) {
+  if (userid != NULL) {
+    
+  } else {
+    
+  }
+  userid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), userid);
+  // @@protoc_insertion_point(field_set_allocated:pms.ErrorMsg.userid)
+}
+
+// optional string reason = 3;
+inline void ErrorMsg::clear_reason() {
+  reason_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& ErrorMsg::reason() const {
+  // @@protoc_insertion_point(field_get:pms.ErrorMsg.reason)
+  return reason_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ErrorMsg::set_reason(const ::std::string& value) {
+  
+  reason_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:pms.ErrorMsg.reason)
+}
+inline void ErrorMsg::set_reason(const char* value) {
+  
+  reason_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:pms.ErrorMsg.reason)
+}
+inline void ErrorMsg::set_reason(const char* value, size_t size) {
+  
+  reason_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:pms.ErrorMsg.reason)
+}
+inline ::std::string* ErrorMsg::mutable_reason() {
+  
+  // @@protoc_insertion_point(field_mutable:pms.ErrorMsg.reason)
+  return reason_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* ErrorMsg::release_reason() {
+  // @@protoc_insertion_point(field_release:pms.ErrorMsg.reason)
+  
+  return reason_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ErrorMsg::set_allocated_reason(::std::string* reason) {
+  if (reason != NULL) {
+    
+  } else {
+    
+  }
+  reason_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), reason);
+  // @@protoc_insertion_point(field_set_allocated:pms.ErrorMsg.reason)
+}
+
+// optional int32 errcode = 4;
+inline void ErrorMsg::clear_errcode() {
+  errcode_ = 0;
+}
+inline ::google::protobuf::int32 ErrorMsg::errcode() const {
+  // @@protoc_insertion_point(field_get:pms.ErrorMsg.errcode)
+  return errcode_;
+}
+inline void ErrorMsg::set_errcode(::google::protobuf::int32 value) {
+  
+  errcode_ = value;
+  // @@protoc_insertion_point(field_set:pms.ErrorMsg.errcode)
+}
+
 #endif  // !PROTOBUF_INLINE_NOT_IN_HEADERS
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

@@ -109,34 +109,26 @@ LRTConnManager::ConnectionInfo* LRTConnManager::findConnectionInfoById(const std
 bool LRTConnManager::SendToGroupModule(const std::string& userid, const std::string& msg)
 {
     LRTConnManager::ModuleInfo *pmi = findModuleInfo(userid, pms::ETransferModule::MGRPNOTIFY);
-    if (!pmi) {
-        LE("LRTConnManager::SendToGroupModule not find user:%s module MGRPNOTIFY\n", userid.c_str());
+    if (pmi && pmi->pModule && pmi->pModule->IsLiveSession())
+    {
+        pmi->pModule->SendTransferData(msg);
+        return true;
+    } else {
+        LE("LRTConnManager::SendToGroupModule pmi or pModule is null or sess not live module MGRPNOTIFY\n");
         return false;
-    } else { //!pmi
-        if (pmi->pModule) {
-             pmi->pModule->SendTransferData(msg);
-             return true;
-        } else {
-            LE("LRTConnManager::SendToGroupModule pmi->pModule is null module MGRPNOTIFY, userid:%s\n", userid.c_str());
-             return false;
-        }
     }
 }
 
 bool LRTConnManager::SendToPushModule(const std::string& userid, const std::string& msg)
 {
     LRTConnManager::ModuleInfo *pmi = findModuleInfo(userid, pms::ETransferModule::MPUSHER);
-    if (!pmi) {
-        LE("LRTConnManager::SendToPushModule not find user:%s module MPUSHER\n", userid.c_str());
+    if (pmi && pmi->pModule && pmi->pModule->IsLiveSession())
+    {
+        pmi->pModule->SendTransferData(msg);
+        return true;
+    } else {
+        LE("LRTConnManager::SendToPushModule pmi or pModule is null or sess not live module MPUSHER\n");
         return false;
-    } else { //!pmi
-        if (pmi->pModule) {
-             pmi->pModule->SendTransferData(msg);
-             return true;
-        } else {
-            LE("LRTConnManager::SendToPUSHModule pmi->pModule is null module MPUSHER, userid:%s\n", userid.c_str());
-             return false;
-        }
     }
 }
 
@@ -230,39 +222,81 @@ void LRTConnManager::RefreshConnection()
     }
 }
 
-void LRTConnManager::Transfer2Dispatcher(const std::string mid, const std::string uid, const std::string msg)
+void LRTConnManager::ReportError(pms::ETransferModule module, const std::string& uid, const std::string& err, int code)
+{
+    ModuleInfo* pInfo = findModuleInfo(uid, pms::ETransferModule::MCONNECTOR);
+    // toModule, errModule, uid, errStr, errCode
+    pms::ErrorMsg emsg;
+    emsg.set_emodule(module);
+    emsg.set_userid(uid);
+    emsg.set_reason(err);
+    emsg.set_errcode(code);
+
+    pms::TransferMsg tmsg;
+    tmsg.set_type(pms::ETransferType::TERROR);
+    tmsg.set_flag(pms::ETransferFlag::FNOACK);
+    tmsg.set_priority(pms::ETransferPriority::PHIGH);
+    tmsg.set_content(emsg.SerializeAsString());
+
+    if (pInfo && pInfo->pModule && pInfo->pModule->IsLiveSession())
+    {
+        pInfo->pModule->SendTransferData(tmsg.SerializeAsString());
+    }
+}
+
+// send msg to server dispatcher
+bool LRTConnManager::Transfer2Dispatcher(const std::string mid, const std::string uid, const std::string msg)
 {
     LRTConnManager::ModuleInfo* pInfo = findModuleInfoBySid(m_dispatcherSessId);
     if (pInfo && pInfo->pModule && pInfo->pModule->IsLiveSession())
     {
         pInfo->pModule->SendTransferData(msg);
+        return true;
+    } else {
+        LE("LRTConnManager::Transfer2Dispatcher pInfo or pModule is null or sess not live module MDISPATCHER\n");
+        return false;
     }
 }
 
-void LRTConnManager::PushNewMsg2Queue(const std::string& str)
+// send msg to server logical
+bool LRTConnManager::PushNewMsg2Queue(const std::string& str)
 {
     LRTConnManager::ModuleInfo* pInfo = findModuleInfoBySid(m_logicalSessId);
     if (pInfo && pInfo->pModule && pInfo->pModule->IsLiveSession())
     {
         pInfo->pModule->PushNewMsg2Queue(str);
+        return true;
+    } else {
+        LE("LRTConnManager::PushNewMsg2Queue pInfo or pModule is null or sess not live module MLOGICAL\n");
+        return false;
     }
 }
 
-void LRTConnManager::PushSeqnReq2Queue(const std::string& str)
+// send msg to server logical
+bool LRTConnManager::PushSeqnReq2Queue(const std::string& str)
 {
     LRTConnManager::ModuleInfo* pInfo = findModuleInfoBySid(m_logicalSessId);
     if (pInfo && pInfo->pModule && pInfo->pModule->IsLiveSession())
     {
         pInfo->pModule->PushSeqnReq2Queue(str);
+        return true;
+    } else {
+        LE("LRTConnManager::PushSeqnReq2Queue pInfo or pModule is null or sess not live module MLOGICAL\n");
+        return false;
     }
 }
 
-void LRTConnManager::PushDataReq2Queue(const std::string& str)
+// send msg to server logical
+bool LRTConnManager::PushDataReq2Queue(const std::string& str)
 {
     LRTConnManager::ModuleInfo* pInfo = findModuleInfoBySid(m_logicalSessId);
     if (pInfo && pInfo->pModule && pInfo->pModule->IsLiveSession())
     {
         pInfo->pModule->PushDataReq2Queue(str);
+        return true;
+    } else {
+        LE("LRTConnManager::PushDataReq2Queue pInfo or pModule is null or sess not live module MLOGICAL\n");
+        return false;
     }
 }
 

@@ -214,6 +214,10 @@ public final class SysMsgType {
      * <code>TREAD_RESPONSE = 10;</code>
      */
     TREAD_RESPONSE(10),
+    /**
+     * <code>TERROR = 11;</code>
+     */
+    TERROR(11),
     UNRECOGNIZED(-1),
     ;
 
@@ -261,6 +265,10 @@ public final class SysMsgType {
      * <code>TREAD_RESPONSE = 10;</code>
      */
     public static final int TREAD_RESPONSE_VALUE = 10;
+    /**
+     * <code>TERROR = 11;</code>
+     */
+    public static final int TERROR_VALUE = 11;
 
 
     public final int getNumber() {
@@ -288,6 +296,7 @@ public final class SysMsgType {
         case 8: return TWRITE_RESPONSE;
         case 9: return TREAD_REQUEST;
         case 10: return TREAD_RESPONSE;
+        case 11: return TERROR;
         default: return null;
       }
     }

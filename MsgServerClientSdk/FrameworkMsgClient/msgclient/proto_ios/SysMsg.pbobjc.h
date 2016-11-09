@@ -193,6 +193,40 @@ int32_t TransferMsg_Priority_RawValue(TransferMsg *message);
 /// was generated.
 void SetTransferMsg_Priority_RawValue(TransferMsg *message, int32_t value);
 
+#pragma mark - ErrorMsg
+
+typedef GPB_ENUM(ErrorMsg_FieldNumber) {
+  ErrorMsg_FieldNumber_Emodule = 1,
+  ErrorMsg_FieldNumber_Userid = 2,
+  ErrorMsg_FieldNumber_Reason = 3,
+  ErrorMsg_FieldNumber_Errcode = 4,
+};
+
+/// this is for system error msg, report to higher level
+@interface ErrorMsg : GPBMessage
+
+/// which module has error
+@property(nonatomic, readwrite) enum ETransferModule emodule;
+
+/// which user meet this error
+@property(nonatomic, readwrite, copy, null_resettable) NSString *userid;
+
+/// what reason for error
+@property(nonatomic, readwrite, copy, null_resettable) NSString *reason;
+
+/// err code
+@property(nonatomic, readwrite) int32_t errcode;
+
+@end
+
+/// Fetches the raw value of a @c ErrorMsg's @c emodule property, even
+/// if the value was not defined by the enum at the time the code was generated.
+int32_t ErrorMsg_Emodule_RawValue(ErrorMsg *message);
+/// Sets the raw value of an @c ErrorMsg's @c emodule property, allowing
+/// it to be set to a value that was not defined by the enum at the time the code
+/// was generated.
+void SetErrorMsg_Emodule_RawValue(ErrorMsg *message, int32_t value);
+
 NS_ASSUME_NONNULL_END
 
 CF_EXTERN_C_END

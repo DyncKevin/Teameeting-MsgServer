@@ -114,15 +114,14 @@ public:
     bool SendToGroupModule(const std::string& userid, const std::string& msg);
     bool SendToPushModule(const std::string& userid, const std::string& msg);
 
-
     void TransferSessionLostNotify(const std::string& sid);
 
     void InitManager();
     void UninManager();
 
-    bool    ConnectLogical();
-    bool    ConnectConnector();
-    bool    ConnectDispatcher();
+    bool ConnectLogical();
+    bool ConnectConnector();
+    bool ConnectDispatcher();
 
     std::list<std::string>* GetLogicalAddrList() { return &m_logicalAddrList; }
     std::list<std::string>* GetConnectorAddrList() { return &m_connectorAddrList; }
@@ -138,17 +137,18 @@ public:
     void SetDispatcherSessId(const std::string& sid) { m_dispatcherSessId = sid; }
     void SetLogicalSessId(const std::string& sid) {m_logicalSessId = sid; }
 
-    void    RefreshConnection();
-    void    Transfer2Dispatcher(const std::string mid, const std::string uid, const std::string msg);
+    void RefreshConnection();
+    void ReportError(pms::ETransferModule module, const std::string& uid, const std::string& err, int code);
+    bool Transfer2Dispatcher(const std::string mid, const std::string uid, const std::string msg);
 
-    void PushNewMsg2Queue(const std::string& str);
-    void PushSeqnReq2Queue(const std::string& str);
-    void PushDataReq2Queue(const std::string& str);
+    bool PushNewMsg2Queue(const std::string& str);
+    bool PushSeqnReq2Queue(const std::string& str);
+    bool PushDataReq2Queue(const std::string& str);
 
     void SetRTLiveId(const std::string& mid) { m_rtliveId = mid; }
     std::string& RTLiveId() { return m_rtliveId; }
-    bool    SignalKill();
-    bool    ClearAll();
+    bool SignalKill();
+    bool ClearAll();
 
     void OnTLogin(const std::string& uid, const std::string& token, const std::string& connector);
     void OnTLogout(const std::string& uid, const std::string& token, const std::string& connector);
@@ -161,6 +161,7 @@ private:
     bool DoConnectConnector(const std::string ip, unsigned short port);
     bool DoConnectDispatcher(const std::string ip, unsigned short port);
 
+private:
     bool                      m_isSvrLogicalOk;
     bool                      m_isSvrConnectorOk;
     bool                      m_isSvrDispatcherOk;
