@@ -13,6 +13,7 @@
 #include "RTUtils.hpp"
 #include "MRTModuleManager.h"
 #include "MRTConnManager.h"
+#include "RTZKClient.hpp"
 
 
 static bool		g_inited = false;
@@ -104,6 +105,14 @@ MRTModule* MRTModule::Inst()
 	return g_pModule;
 }
 
+void MRTModule::NodeAddCb(const std::string& nodePath)
+{
+}
+
+void MRTModule::NodeDelCb(const std::string& nodePath)
+{
+}
+
 MRTModule::MRTModule(void)
 : m_pModuleListener(NULL)
 {
@@ -191,6 +200,9 @@ int	MRTModule::Start(const RTConfigParser& conf)
         LI("Start Module service:(%d) ok...,socketFD:%d\n", nModulePort, m_pModuleListener->GetSocketFD());
         m_pModuleListener->RequestEvent(EV_RE);
     }
+
+    RTZKClient::Instance().SetNodeCallback(MRTModule::NodeAddCb, MRTModule::NodeDelCb);
+    mServerSession.Init();
 	return 0;
 }
 
@@ -203,6 +215,7 @@ void MRTModule::DoTick()
 
 void MRTModule::Stop()
 {
+    mServerSession.Unin();
     MRTModuleManager::Instance().SignalKill();
     MRTModuleManager::Instance().ClearAll();
     MRTModuleManager::Instance().UninManager();

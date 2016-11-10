@@ -14,6 +14,7 @@
 #include "SRTSequenceManager.h"
 #include "SRTSequenceRedis.h"
 #include "SRTConnManager.h"
+#include "RTZKClient.hpp"
 
 
 static bool		g_inited = false;
@@ -105,6 +106,14 @@ SRTSequence* SRTSequence::Inst()
 	return g_pSequence;
 }
 
+void SRTSequence::NodeAddCb(const std::string& nodePath)
+{
+}
+
+void SRTSequence::NodeDelCb(const std::string& nodePath)
+{
+}
+
 SRTSequence::SRTSequence(void)
 : m_pSequenceListener(NULL)
 {
@@ -175,6 +184,9 @@ int	SRTSequence::Start(const RTConfigParser& conf)
         LI("Start Sequence service:(%d) ok...,socketFD:%d\n", nSequencePort, m_pSequenceListener->GetSocketFD());
         m_pSequenceListener->RequestEvent(EV_RE);
     }
+
+    RTZKClient::Instance().SetNodeCallback(SRTSequence::NodeAddCb, SRTSequence::NodeDelCb);
+    mServerSession.Init();
 	return 0;
 }
 
@@ -187,6 +199,7 @@ void SRTSequence::DoTick()
 
 void SRTSequence::Stop()
 {
+    mServerSession.Unin();
     SRTSequenceManager::Instance().SignalKill();
     SRTSequenceManager::Instance().ClearAll();
     SRTSequenceManager::Instance().UninManager();

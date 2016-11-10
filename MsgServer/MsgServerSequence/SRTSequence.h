@@ -3,6 +3,7 @@
 #include "TCPListenerSocket.h"
 #include "SRTSequenceListener.h"
 #include "RTConfigParser.h"
+#include "RTServerSession.h"
 
 #include <iostream>
 #include <map>
@@ -16,24 +17,13 @@ public:
 
 	virtual ~SRTSequence(void);
 
-	/* 打印服务版本号
-	 * 参数:	无
-	 */
 	static void PrintVersion();
-	/* 系统初始化
-	 * 参数:	evTbSize - 系统的Hash表大小，根据系统的设计容量而变化
-	 */
 	static void Initialize(int evTbSize);
-	/* 系统注销
-	 * 参数:	无
-	 */
 	static void DeInitialize();
-
-	/*
-	 *
-	 */
 	static SRTSequence* Inst();
 
+    static void NodeAddCb(const std::string& nodePath);
+    static void NodeDelCb(const std::string& nodePath);
 public:
 	int		Start(const RTConfigParser& conf);
 	void	DoTick();
@@ -42,6 +32,7 @@ public:
 private:
 
     SRTSequenceListener    *m_pSequenceListener;
+    RTServerSession                mServerSession;
 
 };
 

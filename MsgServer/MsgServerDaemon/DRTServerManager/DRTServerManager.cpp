@@ -20,8 +20,8 @@ DRTServerManager::DRTServerManager(const std::string& svrSh, const std::string& 
       , mIsNodesOk(true)
       , mIsShutdown(false)
 {
-    //Split(delim, svrSh, mVecSvrShells);
-    //Split(delim, svrNm, mVecSvrNames);
+    Split(delim, svrSh, mVecSvrShells);
+    Split(delim, svrNm, mVecSvrNames);
     for (std::string item : mVecSvrShells)
     {
          LI("mVecSvrShells item:%s\n", item.c_str());
@@ -97,6 +97,10 @@ int DRTServerManager::CmdAllServer(const std::string& cmd)
 bool DRTServerManager::LoopCheckServer()
 {
     LI("DRTServerManager::LoopCheckServer mIsNodesOk:%d, msSetNodePath.size:%d\n", mIsNodesOk, msSetNodePath.size());
+    for(auto item : msSetNodePath)
+    {
+        LI("DRTServerManager::LoopCheckServer node path:%s\n", item.c_str());
+    }
     if (mIsShutdown) return mIsShutdown;
     if (mIsNodesOk)
     {

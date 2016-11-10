@@ -4,6 +4,7 @@
 #include "DRTModuleListener.h"
 #include "DRTTransferSession.h"
 #include "RTConfigParser.h"
+#include "RTServerSession.h"
 
 #include <iostream>
 
@@ -19,6 +20,8 @@ public:
 	static void DeInitialize();
 	static DRTDispatcher* Inst();
 
+    static void NodeAddCb(const std::string& nodePath);
+    static void NodeDelCb(const std::string& nodePath);
 
 public:
 	int		Start(const RTConfigParser& conf);
@@ -29,6 +32,7 @@ private:
     DRTModuleListener                *m_pModuleListener;
     DRTTransferSession               *m_pTransferSession;
 
+    RTServerSession                mServerSession;
 };
 
 #endif	// __MsgServerDispatcher_DRTDISPATCHER_H__

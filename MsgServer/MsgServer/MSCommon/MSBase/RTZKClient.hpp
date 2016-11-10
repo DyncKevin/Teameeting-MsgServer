@@ -50,7 +50,14 @@ public:
 
     void SetNodeData(const std::string& path, const std::string& data);
 
-    // <nodePath, node>
+	int CreateEphemeralNode(const std::string& path, const std::string& data);
+	int CreatePersistentNode(const std::string& path, const std::string& data);
+	int DeleteNode(const std::string& path);
+
+    int ParseAndCreateNode(const std::string& zkUrl);
+    bool ZkCheckNodeExists(const std::string& path);
+
+
     typedef std::unordered_map< std::string, gim::ListWatcher<RTZKClient>* > ChildrenWatcherMap;
     typedef ChildrenWatcherMap::iterator ChildrenWatcherMapIt;
 

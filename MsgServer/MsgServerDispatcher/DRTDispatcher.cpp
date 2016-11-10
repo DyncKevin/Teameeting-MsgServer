@@ -13,10 +13,11 @@
 #include "rapidjson/stringbuffer.h"
 #include "DRTConnManager.h"
 #include "RTUtils.hpp"
+#include "RTZKClient.hpp"
 
 
-static bool         g_inited = false;
-static const char*	g_pVersion = "0.01.20150810";
+static bool             g_inited = false;
+static const char*	    g_pVersion = "0.01.20150810";
 static DRTDispatcher*	g_pDispatcher = NULL;
 
 void DRTDispatcher::PrintVersion()
@@ -104,6 +105,14 @@ DRTDispatcher* DRTDispatcher::Inst()
 	return g_pDispatcher;
 }
 
+void DRTDispatcher::NodeAddCb(const std::string& nodePath)
+{
+}
+
+void DRTDispatcher::NodeDelCb(const std::string& nodePath)
+{
+}
+
 DRTDispatcher::DRTDispatcher(void)
 : m_pModuleListener(NULL)
 , m_pTransferSession(NULL)
@@ -189,6 +198,8 @@ int	DRTDispatcher::Start(const RTConfigParser& conf)
         m_pModuleListener->RequestEvent(EV_RE);
 	}
 
+    RTZKClient::Instance().SetNodeCallback(DRTDispatcher::NodeAddCb, DRTDispatcher::NodeDelCb);
+    mServerSession.Init();
    return 0;
 }
 
@@ -210,6 +221,7 @@ void DRTDispatcher::DoTick()
 
 void DRTDispatcher::Stop()
 {
+    mServerSession.Unin();
     DRTConnManager::Instance().SignalKill();
     DRTConnManager::Instance().ClearAll();
 }

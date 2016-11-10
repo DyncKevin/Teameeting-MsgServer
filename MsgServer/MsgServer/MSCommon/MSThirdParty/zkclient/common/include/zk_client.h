@@ -69,6 +69,8 @@ public:
 	}
 	void srvNodeRebuild();
 
+    bool checkNodeExists(const std::string& path);
+
 public:
 	struct WatchCtx{
 		WatchCtx(ZKClient* c, int i)

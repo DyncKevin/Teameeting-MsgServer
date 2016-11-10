@@ -21,10 +21,9 @@
 #include "RTProcessInfo.h"
 
 
-static bool		g_inited = false;
-static char*	g_pVersion = (char*)"0.01.20150810";
+static bool		        g_inited = false;
+static char*	        g_pVersion = (char*)"0.01.20150810";
 static CRTConnector*	g_pConnector = NULL;
-static int g_count = 0;
 
 void CRTConnector::PrintVersion()
 {
@@ -109,6 +108,14 @@ CRTConnector* CRTConnector::Inst()
 {
 	Assert(g_pConnector != NULL);
 	return g_pConnector;
+}
+
+void CRTConnector::NodeAddCb(const std::string& nodePath)
+{
+}
+
+void CRTConnector::NodeDelCb(const std::string& nodePath)
+{
 }
 
 CRTConnector::CRTConnector(void)
@@ -222,23 +229,8 @@ int	CRTConnector::Start(const RTConfigParser& conf)
         m_pConnTcpListener->RequestEvent(EV_RE);
     }
 
-#if 0
-    if(nWebSvrPort > 0)
-	{
-		m_pWebSvrListener = new CRTWebServerListener();
-		OS_Error err = m_pWebSvrListener->Initialize(INADDR_ANY, nWebSvrPort);
-		if (err!=OS_NoErr)
-		{
-			LE("Create WebServerListener error port=%d \n", nWebSvrPort);
-			delete m_pWebSvrListener;
-			m_pWebSvrListener=NULL;
-
-			return -1;
-		}
-		LI("Start Connector WebServer service:(%d) ok...,socketFD:%d\n", nWebSvrPort, m_pWebSvrListener->GetSocketFD());
-		m_pWebSvrListener->RequestEvent(EV_RE);
-	}
-#endif
+    RTZKClient::Instance().SetNodeCallback(CRTConnector::NodeAddCb, CRTConnector::NodeDelCb);
+    mServerSession.Init();
 
 	return 0;
 }
@@ -257,6 +249,7 @@ void CRTConnector::DoTick()
 
 void CRTConnector::Stop()
 {
+    mServerSession.Unin();
     CRTConnManager::Instance().SignalKill();
     CRTConnManager::Instance().ClearAll();
     CRTConnManager::Instance().Unin();

@@ -13,6 +13,7 @@
 #include "RTUtils.hpp"
 #include "LRTRTLiveManager.h"
 #include "LRTConnManager.h"
+#include "RTZKClient.hpp"
 
 
 static bool		g_inited = false;
@@ -102,6 +103,14 @@ LRTRTLive* LRTRTLive::Inst()
 {
 	Assert(g_pRTLive != NULL);
 	return g_pRTLive;
+}
+
+void LRTRTLive::NodeAddCb(const std::string& nodePath)
+{
+}
+
+void LRTRTLive::NodeDelCb(const std::string& nodePath)
+{
 }
 
 LRTRTLive::LRTRTLive(void)
@@ -242,6 +251,9 @@ int	LRTRTLive::Start(const RTConfigParser& conf)
         LI("Start RTLive pusher service:(%d) ok...,socketFD:%d\n", nPusherPort, m_pPushListener->GetSocketFD());
         m_pPushListener->RequestEvent(EV_RE);
     }
+
+    RTZKClient::Instance().SetNodeCallback(LRTRTLive::NodeAddCb, LRTRTLive::NodeDelCb);
+    mServerSession.Init();
 	return 0;
 }
 
@@ -279,6 +291,7 @@ void LRTRTLive::DoTick()
 
 void LRTRTLive::Stop()
 {
+    mServerSession.Unin();
     if (m_pRTLiveListener)
     {
          delete m_pRTLiveListener;

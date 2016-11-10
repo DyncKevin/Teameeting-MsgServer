@@ -14,6 +14,7 @@
 #include "SRTStorageManager.h"
 #include "SRTStorageRedis.h"
 #include "SRTConnManager.h"
+#include "RTZKClient.hpp"
 
 
 static bool		g_inited = false;
@@ -105,6 +106,14 @@ SRTStorage* SRTStorage::Inst()
 	return g_pStorage;
 }
 
+void SRTStorage::NodeAddCb(const std::string& nodePath)
+{
+}
+
+void SRTStorage::NodeDelCb(const std::string& nodePath)
+{
+}
+
 SRTStorage::SRTStorage(void)
 : m_pStorageListener(NULL)
 {
@@ -168,6 +177,9 @@ int	SRTStorage::Start(const RTConfigParser& conf)
         LI("Start Storage service:(%d) ok...,socketFD:%d\n", nStoragePort, m_pStorageListener->GetSocketFD());
         m_pStorageListener->RequestEvent(EV_RE);
     }
+
+    RTZKClient::Instance().SetNodeCallback(SRTStorage::NodeAddCb, SRTStorage::NodeDelCb);
+    mServerSession.Init();
 	return 0;
 }
 
@@ -180,6 +192,7 @@ void SRTStorage::DoTick()
 
 void SRTStorage::Stop()
 {
+    mServerSession.Unin();
     SRTStorageManager::Instance().SignalKill();
     SRTStorageManager::Instance().ClearAll();
     SRTStorageManager::Instance().UninManager();

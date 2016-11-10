@@ -541,4 +541,14 @@ namespace gim{
 			}
 		}
 	}
+
+    bool ZKClient::checkNodeExists(const string& path){
+        struct Stat stat;
+        if (ZOK==zoo_exists(m_zkhandle, path.c_str(), 0, &stat))
+        {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

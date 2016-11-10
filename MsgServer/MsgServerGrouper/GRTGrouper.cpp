@@ -15,8 +15,8 @@
 #include "GRTConnManager.h"
 #include "GRTChannelManager.h"
 #include "GRTSubChannel.h"
-
 #include "GRTTransferSession.h"
+#include "RTZKClient.hpp"
 
 static bool		g_inited = false;
 static char*	g_pVersion = (char*)"0.01.20150810";
@@ -105,6 +105,14 @@ GRTGrouper* GRTGrouper::Inst()
 {
 	Assert(g_pGrouper != NULL);
 	return g_pGrouper;
+}
+
+void GRTGrouper::NodeAddCb(const std::string& nodePath)
+{
+}
+
+void GRTGrouper::NodeDelCb(const std::string& nodePath)
+{
 }
 
 GRTGrouper::GRTGrouper(void)
@@ -206,7 +214,8 @@ int	GRTGrouper::Start(const RTConfigParser& conf)
         GRTConnManager::Instance().SetSvrRTLive(true);
 	}
 
-    LI("Start Grouper Service success...\n");
+    RTZKClient::Instance().SetNodeCallback(GRTGrouper::NodeAddCb, GRTGrouper::NodeDelCb);
+    mServerSession.Init();
 	return 0;
 }
 
@@ -227,6 +236,7 @@ void GRTGrouper::DoTick()
 
 void GRTGrouper::Stop()
 {
+    mServerSession.Unin();
     GRTGrouperManager::Instance().SignalKill();
     GRTGrouperManager::Instance().ClearAll();
     GRTChannelManager::Instance().UninManager();

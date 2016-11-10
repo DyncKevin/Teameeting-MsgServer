@@ -14,6 +14,7 @@
 #include "PRTPusherManager.h"
 #include "PRTConnManager.h"
 #include "IosPusher.h"
+#include "RTZKClient.hpp"
 
 
 static bool		g_inited = false;
@@ -103,6 +104,14 @@ PRTPusher* PRTPusher::Inst()
 {
 	Assert(g_pModule != NULL);
 	return g_pModule;
+}
+
+void PRTPusher::NodeAddCb(const std::string& nodePath)
+{
+}
+
+void PRTPusher::NodeDelCb(const std::string& nodePath)
+{
 }
 
 PRTPusher::PRTPusher(void)
@@ -203,6 +212,8 @@ int	PRTPusher::Start(const RTConfigParser& conf)
         PRTConnManager::Instance().SetSvrRTLivePusher(true);
 	}
 
+    RTZKClient::Instance().SetNodeCallback(PRTPusher::NodeAddCb, PRTPusher::NodeDelCb);
+    mServerSession.Init();
 	return 0;
 }
 
@@ -232,6 +243,7 @@ void PRTPusher::DoTick()
 
 void PRTPusher::Stop()
 {
+    mServerSession.Unin();
     if (m_apnsPusher)
     {
          m_apnsPusher->Stop();

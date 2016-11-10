@@ -5,8 +5,8 @@
 #include <vector>
 #include <set>
 #include "RTZKClient.hpp"
-#include "DRTServerSession.h"
-#include "DRTServerLauncher.h"
+#include "RTServerSession.h"
+#include "RTServerLauncher.h"
 
 class DRTServerManager{
     public:
@@ -30,8 +30,8 @@ class DRTServerManager{
         std::vector<std::string> mVecSvrNames;
         static std::set<std::string>    msSetNodePath;
 
-        DRTServerSession                mServerSession;
-        DRTServerLauncher               mServerLauncher;
+        RTServerSession                mServerSession;
+        RTServerLauncher               mServerLauncher;
         std::string                     mOfflineNodePath;
         bool                            mIsNodesOk;
         bool                            mIsShutdown;

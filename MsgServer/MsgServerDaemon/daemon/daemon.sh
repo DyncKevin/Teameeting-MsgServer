@@ -72,6 +72,14 @@ Stop()
 {
 	echo -n "Stopping Daemon Server(MsgServerDaemon): "
 	killproc MsgServerDaemon
+    killproc MsgServerConnector
+    killproc MsgServerDispatcher
+    killproc MsgServerRTLive
+    killproc MsgServerLogical
+    killproc MsgServerSequence
+    killproc MsgServerStorage
+    killproc MsgServerGrouper
+    killproc MsgServerPusher
 	echo
 	return 0
 }

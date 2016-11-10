@@ -67,18 +67,6 @@ void CreateDaemon(void)
     dup2(fd0, 2);
 }
 
-void handler(int num)
-{
-     int status;
-     int pid = waitpid(-1, &status, WNOHANG);
-     if (WIFEXITED(status))
-     {
-         printf("-----------the child %d exit with code :%d\n", pid, WEXITSTATUS(status));
-     } else {
-         printf("-----------111111 the child %d not exit with code :%d\n", pid, WEXITSTATUS(status));
-     }
-}
-
 int main(int argc, const char * argv[]) {
     printf("Hello, MsgServerDaemon!!!\n");
 
@@ -89,10 +77,6 @@ int main(int argc, const char * argv[]) {
         exit(0);
     }
 
-    printf("hahahaha 1\n");
-    //signal(SIGCHLD, handler);
-    //daemon(0, 0);
-    printf("hahahaha 2\n");
 #if _TEST_
     if (RTZKClient::Instance().InitOnly(argv[1])!=0) {
 #else
@@ -139,14 +123,9 @@ int main(int argc, const char * argv[]) {
     }
         sleep(1);
 EXIT:
-    LI("DRTDaemon exit 1\n");
     pDaemon->Stop();
-    LI("DRTDaemon exit 2\n");
     L_Deinit();
-    printf("DRTDaemon exit 3\n");
     RTZKClient::Instance().Unin();
-    printf("DRTDaemon exit 4\n");
     google::protobuf::ShutdownProtobufLibrary();
-    printf("DRTDaemon exit 5\n");
     return 0;
 }

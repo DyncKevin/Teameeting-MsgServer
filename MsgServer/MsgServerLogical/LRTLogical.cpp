@@ -14,6 +14,7 @@
 #include "LRTLogicalManager.h"
 #include "LRTConnManager.h"
 #include "StatusCode.h"
+#include "RTZKClient.hpp"
 
 
 static bool		g_inited = false;
@@ -104,6 +105,15 @@ LRTLogical* LRTLogical::Inst()
 	Assert(g_pLogical != NULL);
 	return g_pLogical;
 }
+
+void LRTLogical::NodeAddCb(const std::string& nodePath)
+{
+}
+
+void LRTLogical::NodeDelCb(const std::string& nodePath)
+{
+}
+
 
 LRTLogical::LRTLogical(void)
 : m_pLogicalListener(NULL)
@@ -196,6 +206,9 @@ int	LRTLogical::Start(const RTConfigParser& conf)
         LI("Start Logical service:(%d) ok...,socketFD:%d\n", nLogicalPort, m_pLogicalListener->GetSocketFD());
         m_pLogicalListener->RequestEvent(EV_RE);
     }
+
+    RTZKClient::Instance().SetNodeCallback(LRTLogical::NodeAddCb, LRTLogical::NodeDelCb);
+    mServerSession.Init();
 	return 0;
 }
 
@@ -226,6 +239,7 @@ void LRTLogical::DoTick()
 
 void LRTLogical::Stop()
 {
+    mServerSession.Unin();
     LRTLogicalManager::Instance().SignalKill();
     LRTLogicalManager::Instance().ClearAll();
     LRTLogicalManager::Instance().UninManager();

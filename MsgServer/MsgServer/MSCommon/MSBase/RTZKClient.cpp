@@ -8,7 +8,9 @@
 
 #include "RTZKClient.hpp"
 #include <iostream>
+#include <vector>
 #include "rtklog.h"
+#include "RTUtils.hpp"
 
 
 RTZKClient::RTZKClient()
@@ -43,7 +45,9 @@ int RTZKClient::InitZKClient(const std::string& conf)
     }
 
     m_client =  new gim::ZKClient();
+    if (!m_client) return -1;
     res = m_client->init(m_conf.ZkUrl);
+    if (-1==ParseAndCreateNode(m_conf.ModulePath)) return -1;
 
     res = InitStatusNode(m_conf);
     if (res == ZOK) {
@@ -232,5 +236,74 @@ void RTZKClient::SetNodeData(const std::string& path, const std::string& data)
     {
         m_client->setNodeData(path, data);
     }
+}
+
+int RTZKClient::CreateEphemeralNode(const std::string& path, const std::string& data)
+{
+    if (m_client)
+    {
+        m_client->createEphemeralNode(path, data);
+    }
+}
+
+int RTZKClient::CreatePersistentNode(const std::string& path, const std::string& data)
+{
+    if (m_client)
+    {
+        m_client->createPersistentNode(path, data);
+    }
+}
+
+int RTZKClient::DeleteNode(const std::string& path)
+{
+    if (m_client)
+    {
+        m_client->deleteNode(path);
+    }
+}
+
+int RTZKClient::ParseAndCreateNode(const std::string& zkUrl)
+{
+    std::vector<std::string> nodes;
+    if (zkUrl.at(0)=='/')
+    {
+        Split("/", zkUrl.substr(1, zkUrl.length()), nodes);
+        for(auto item : nodes)
+        {
+            printf("item :%s\n", item.c_str());
+        }
+        int countSlash = 0;
+        int countNodes = nodes.size();
+        while(countSlash<nodes.size())
+        {
+            countSlash++;
+            std::string p("");
+            for(int i=0;i<countSlash;i++)
+            {
+                p.append("/");
+                p.append(nodes[i]);
+            }
+            if (ZkCheckNodeExists(p))
+            {
+                 continue;
+            } else {
+                if (countSlash>3)
+                {
+                    CreateEphemeralNode(p, nodes[countSlash-1]);
+                } else {
+                    CreatePersistentNode(p, nodes[countSlash-1]);
+                }
+            }
+        }
+        return 0;
+    } else {
+        LE("RTZKClient::ParseAndCreateNode zkUrl:%s, error\n", zkUrl.c_str());
+         return -1;
+    }
+}
+
+bool RTZKClient::ZkCheckNodeExists(const std::string& path)
+{
+     return m_client->checkNodeExists(path);
 }
 

@@ -22,8 +22,6 @@ AM_CPPFLAGS+= -I$(top_srcdir)/../ \
 		   -I$(top_srcdir)/../MsgServer/MSCommon/MSThirdParty/rtklog/
 
 MsgServerDaemon_SOURCES=$(top_srcdir)/DRTServerManager/DRTServerManager.cpp \
-						$(top_srcdir)/DRTServerManager/DRTServerLauncher.cpp \
-						$(top_srcdir)/DRTServerManager/DRTServerSession.cpp \
 						$(top_srcdir)/DRTDaemon.cpp \
 						$(top_srcdir)/main.cpp
 
