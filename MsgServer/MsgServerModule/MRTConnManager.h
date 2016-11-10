@@ -58,14 +58,11 @@ public:
 
     typedef std::unordered_map< std::string, ModuleInfo* >      ModuleInfoMaps;
     typedef ModuleInfoMaps::iterator                            ModuleInfoMapsIt;
-
     //<user_id, UserModuleTypeInfo>
-    typedef std::list<TypeModuleSessionInfo*> TypeModuleSessionInfoLists;
-
-    typedef std::unordered_multimap<std::string, std::string>        UserConnectorMaps;
-    typedef UserConnectorMaps::iterator UserConnectorMapsIt;
-
-    typedef std::list< MRTTransferSession* > ConnectingSessList;
+    typedef std::list<TypeModuleSessionInfo*>                   TypeModuleSessionInfoLists;
+    typedef std::unordered_multimap<std::string, std::string>   UserConnectorMaps;
+    typedef UserConnectorMaps::iterator                         UserConnectorMapsIt;
+    typedef std::list< MRTTransferSession* >                    ConnectingSessList;
 
     ///////////////////////////////////////////////////////////////////////////////////
 
@@ -81,30 +78,33 @@ public:
 
     void TransferSessionLostNotify(const std::string& sid);
 
-    bool    ConnectSequence();
+    ///////////////////////////////////////////////////////////////////////////////////
 
-    bool    ConnectStorage();
+    bool ConnectSequence();
+    bool ConnectStorage();
 
-    std::list<std::string>* GetSequenceAddrList() { return &m_sequenceAddrList; }
-    std::list<std::string>* GetStorageAddrList() { return &m_storageAddrList; }
-
-    void    RefreshConnection();
-    void    SendTransferData(const std::string mid, const std::string uid, const std::string msg);
-
-    void SetModuleId(const std::string& mid) { m_logicalId = mid; }
-    std::string& ModuleId() { return m_logicalId; }
-    bool    SignalKill();
-    bool    ClearAll();
+    void RefreshConnection();
 
     void OnTLogin(const std::string& uid, const std::string& token, const std::string& connector);
     void OnTLogout(const std::string& uid, const std::string& token, const std::string& connector);
 
+    bool SignalKill();
+    bool ClearAll();
+
+    void SetModuleId(const std::string& mid) { m_logicalId = mid; }
+    std::string& ModuleId() { return m_logicalId; }
+    std::list<std::string>* GetSequenceAddrList() { return &m_sequenceAddrList; }
+    std::list<std::string>* GetStorageAddrList() { return &m_storageAddrList; }
+
 protected:
     MRTConnManager() { }
     ~MRTConnManager() { }
+
 private:
     bool DoConnectSequence(const std::string ip, unsigned short port);
     bool DoConnectStorage(const std::string ip, unsigned short port);
+
+private:
     std::list<std::string>    m_sequenceAddrList;
     std::list<std::string>    m_storageAddrList;
     std::string               m_logicalId;

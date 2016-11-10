@@ -56,21 +56,18 @@ public:
 
     typedef std::unordered_map< std::string, ModuleInfo* >      ModuleInfoMaps;
     typedef ModuleInfoMaps::iterator                            ModuleInfoMapsIt;
-
     //<user_id, UserModuleTypeInfo>
-    typedef std::list<TypeModuleSessionInfo*> TypeModuleSessionInfoLists;
-
-    typedef std::unordered_multimap<std::string, std::string>        UserConnectorMaps;
-    typedef UserConnectorMaps::iterator UserConnectorMapsIt;
-
-    typedef std::list< LRTTransferSession* > ConnectingSessList;
+    typedef std::list<TypeModuleSessionInfo*>                   TypeModuleSessionInfoLists;
+    typedef std::unordered_multimap<std::string, std::string>   UserConnectorMaps;
+    typedef UserConnectorMaps::iterator                         UserConnectorMapsIt;
+    typedef std::list< LRTTransferSession* >                    ConnectingSessList;
 
     ///////////////////////////////////////////////////////////////////////////////////
 
-    ModuleInfo*       findConnectorInfo(const std::string& userid);
-    ModuleInfo*       findModuleInfo(const std::string& userid, pms::ETransferModule module);
-    ModuleInfo*       findModuleInfoBySid(const std::string& sid);
-    ModuleInfo*       findConnectorInfoById(const std::string& userid, const std::string& connector);
+    ModuleInfo* findConnectorInfo(const std::string& userid);
+    ModuleInfo* findModuleInfo(const std::string& userid, pms::ETransferModule module);
+    ModuleInfo* findModuleInfoBySid(const std::string& sid);
+    ModuleInfo* findConnectorInfoById(const std::string& userid, const std::string& connector);
 
     bool AddModuleInfo(ModuleInfo* pmi, const std::string& sid);
     bool DelModuleInfo(const std::string& sid, EventData& data);
@@ -78,6 +75,8 @@ public:
     bool DelTypeModuleSession(const std::string& sid);
 
     void TransferSessionLostNotify(const std::string& sid);
+
+    ///////////////////////////////////////////////////////////////////////////////////
 
     bool ConnectSequence();
     bool ConnectStorage();
@@ -87,8 +86,20 @@ public:
     bool PushStoreReadMsg(const std::string& srmsg);
     bool PushStoreWriteMsg(const std::string& swmsg);
 
+    void RefreshConnection();
+    void ReportError(pms::ETransferModule module, const std::string& uid, const std::string& err, int code);
+
+    void OnTLogin(const std::string& uid, const std::string& token, const std::string& connector);
+    void OnTLogout(const std::string& uid, const std::string& token, const std::string& connector);
+
+    bool SignalKill();
+    bool ClearAll();
+
+    void SetLogicalId(const std::string& mid) { m_logicalId = mid; }
+    std::string& LogicalId() { return m_logicalId; }
     std::list<std::string>* GetSequenceAddrList() { return &m_sequenceAddrList; }
     std::list<std::string>* GetStorageAddrList() { return &m_storageAddrList; }
+
     void SetSvrSequence(bool ok) { m_isSvrSequenceOk = ok; }
     void SetSvrStorage(bool ok) { m_isSvrStorageOk = ok; }
     bool IsSvrSequence() { return m_isSvrSequenceOk; }
@@ -98,17 +109,6 @@ public:
     void SetSequenceWriteSessId(const std::string& sid) { m_sequenceWriteSessId = sid; }
     void SetStorageReadSessId(const std::string& sid) { m_storageReadSessId = sid; }
     void SetStorageWriteSessId(const std::string& sid) { m_storageWriteSessId = sid; }
-
-    void RefreshConnection();
-    void ReportError(pms::ETransferModule module, const std::string& uid, const std::string& err, int code);
-
-    void SetLogicalId(const std::string& mid) { m_logicalId = mid; }
-    std::string& LogicalId() { return m_logicalId; }
-    bool SignalKill();
-    bool ClearAll();
-
-    void OnTLogin(const std::string& uid, const std::string& token, const std::string& connector);
-    void OnTLogout(const std::string& uid, const std::string& token, const std::string& connector);
 
 protected:
     LRTConnManager() { }
@@ -127,10 +127,10 @@ private:
     OSMutex                   m_mutexMembers;
     UserConnectorMaps         m_userConnectors;
 
-    std::string                 m_sequenceWriteSessId;
-    std::string                 m_sequenceReadSessId;
-    std::string                 m_storageWriteSessId;
-    std::string                 m_storageReadSessId;
+    std::string               m_sequenceWriteSessId;
+    std::string               m_sequenceReadSessId;
+    std::string               m_storageWriteSessId;
+    std::string               m_storageReadSessId;
 };
 
 #endif /* defined(__MsgServerLogical__LRTConnManager__) */

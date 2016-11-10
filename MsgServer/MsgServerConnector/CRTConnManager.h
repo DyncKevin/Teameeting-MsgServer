@@ -23,9 +23,6 @@
 
 #include "ProtoCommon.h"
 
-#define HR_USERID       "hr_userid"
-#define HR_CONNECTORID  "hr_connectorid"
-
 class CRTConnManager : public RTSingleton< CRTConnManager >{
     friend class RTSingleton< CRTConnManager >;
 public:
@@ -99,39 +96,31 @@ public:
     }UserSessionInfo;
 
     //<transfer_session_id, module_info>
-    typedef std::unordered_map< std::string, ModuleInfo* >      ModuleInfoMaps;
-    typedef ModuleInfoMaps::iterator                            ModuleInfoMapsIt;
+    typedef std::unordered_map< std::string, ModuleInfo* >                  ModuleInfoMaps;
+    typedef ModuleInfoMaps::iterator                                        ModuleInfoMapsIt;
     //<user_id, connection_info>
-    typedef std::unordered_map< std::string, ConnectionInfo* >  ConnectionInfoMaps;
-    typedef ConnectionInfoMaps::iterator                        ConnectionInfoMapsIt;
+    typedef std::unordered_map< std::string, ConnectionInfo* >              ConnectionInfoMaps;
+    typedef ConnectionInfoMaps::iterator                                    ConnectionInfoMapsIt;
     //<user_id, UserModuleTypeInfo>
-    typedef std::list<TypeModuleSessionInfo*>                   TypeModuleSessionInfoLists;
-
+    typedef std::list<TypeModuleSessionInfo*>                               TypeModuleSessionInfoLists;
     //check list and map which is better
-    typedef std::list<UserSessionInfo*>                         UserSessionInfoLists;
-
+    typedef std::list<UserSessionInfo*>                                     UserSessionInfoLists;
     typedef std::unordered_map<std::string, std::list<TypeSessionInfo*> >   UserSessionInfoMaps;
     typedef UserSessionInfoMaps::iterator                                   UserSessionInfoMapsIt;
 
+    ///////////////////////////////////////////////////////////////////////////////////
 
-    void    SetConnectorInfo(const std::string& Ip, unsigned short port, const std::string& Id) { m_connectorIp = Ip;
-        m_connectorPort = port;
-        m_connectorId = Id;
-    }
-
-    ModuleInfo*       findModuleInfo(const std::string& userid, pms::ETransferModule module);
-    ConnectionInfo*   findConnectionInfoById(const std::string& uid);
+    ModuleInfo*     findModuleInfo(const std::string& userid, pms::ETransferModule module);
+    ConnectionInfo* findConnectionInfoById(const std::string& uid);
 
     bool AddModuleInfo(ModuleInfo* pmi, const std::string& sid);
     bool DelModuleInfo(const std::string& sid);
     bool AddTypeModuleSession(pms::ETransferModule module, const std::string& mid, const std::string& sid);
-
-    //if session lost, del session
-    //if programer lost, del module
+    //if session lost, del session; if programer lost, del module
     bool DelTypeModuleSession(const std::string& sid);
+
     bool AddUser(pms::EConnType type, const std::string& uid, ConnectionInfo* pInfo);
-    // return true means delete one
-    // return false means not delete
+    // return true means delete one, false means not delete
     bool DelUser(pms::EConnType type, const std::string& uid, std::string& token);
 
     void ConnectionLostNotify(const std::string& uid, const std::string& token);
@@ -141,23 +130,33 @@ public:
     void TransferMsg(pms::EServerCmd cmd, pms::EModuleType type, const std::string& uid, const std::string& msg);
     void TransferToPusher(pms::EServerCmd cmd, pms::EModuleType type, const std::string& uid, const std::string& msg);
 
+    ///////////////////////////////////////////////////////////////////////////////////
+
     void Init(const std::string redisIP, int redisPort);
     void Unin();
     bool GetEnablePush(const std::string& userid, pms::EModuleType type);
     bool CouldPush(const std::string& userid, pms::EModuleType type);
 
-    bool    SignalKill();
-    bool    ClearAll();
+    bool SignalKill();
+    bool ClearAll();
 
     std::string& ConnectorIp() { return m_connectorIp; }
     std::string& ConnectorPort() { return m_connectorPort; }
     std::string& ConnectorId() { return m_connectorId; }
+    void SetConnectorInfo(const std::string& Ip, unsigned short port, const std::string& Id)
+    {
+        m_connectorIp = Ip;
+        m_connectorPort = port;
+        m_connectorId = Id;
+    }
 
 protected:
-    CRTConnManager() : m_connectorIp(""),
-                            m_connectorPort(""),
-                            m_connectorId("") { }
+    CRTConnManager():
+        m_connectorIp(""),
+        m_connectorPort(""),
+        m_connectorId("") { }
     ~CRTConnManager() { }
+
 private:
     std::string m_connectorIp;
     std::string m_connectorPort;

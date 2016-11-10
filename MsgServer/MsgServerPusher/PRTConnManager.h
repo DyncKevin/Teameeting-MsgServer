@@ -56,21 +56,18 @@ public:
 
     typedef std::unordered_map< std::string, ModuleInfo* >      ModuleInfoMaps;
     typedef ModuleInfoMaps::iterator                            ModuleInfoMapsIt;
-
     //<user_id, UserModuleTypeInfo>
-    typedef std::list<TypeModuleSessionInfo*> TypeModuleSessionInfoLists;
-
-    typedef std::unordered_multimap<std::string, std::string>        UserConnectorMaps;
-    typedef UserConnectorMaps::iterator UserConnectorMapsIt;
-
-    typedef std::list< PRTTransferSession* > ConnectingSessList;
+    typedef std::list<TypeModuleSessionInfo*>                   TypeModuleSessionInfoLists;
+    typedef std::unordered_multimap<std::string, std::string>   UserConnectorMaps;
+    typedef UserConnectorMaps::iterator                         UserConnectorMapsIt;
+    typedef std::list< PRTTransferSession* >                    ConnectingSessList;
 
     ///////////////////////////////////////////////////////////////////////////////////
 
-    ModuleInfo*       findConnectorInfo(const std::string& userid);
-    ModuleInfo*       findModuleInfo(const std::string& userid, pms::ETransferModule module);
-    ModuleInfo*       findModuleInfoBySid(const std::string& sid);
-    ModuleInfo*       findConnectorInfoById(const std::string& userid, const std::string& connector);
+    ModuleInfo* findConnectorInfo(const std::string& userid);
+    ModuleInfo* findModuleInfo(const std::string& userid, pms::ETransferModule module);
+    ModuleInfo* findModuleInfoBySid(const std::string& sid);
+    ModuleInfo* findConnectorInfoById(const std::string& userid, const std::string& connector);
 
     bool AddModuleInfo(ModuleInfo* pmi, const std::string& sid);
     bool DelModuleInfo(const std::string& sid, EventData& data);
@@ -79,9 +76,21 @@ public:
 
     void TransferSessionLostNotify(const std::string& sid);
 
-    bool    ConnectConnector();
-    bool    ConnectRtlivePusher();
+    ///////////////////////////////////////////////////////////////////////////////////
 
+    bool ConnectConnector();
+    bool ConnectRtlivePusher();
+
+    void RefreshConnection();
+
+    void OnTLogin(const std::string& uid, const std::string& token, const std::string& connector);
+    void OnTLogout(const std::string& uid, const std::string& token, const std::string& connector);
+
+    bool SignalKill();
+    bool ClearAll();
+
+    void SetModuleId(const std::string& mid) { m_logicalId = mid; }
+    std::string& ModuleId() { return m_logicalId; }
     std::list<std::string>* GetConnectorAddrList() { return &m_connectorAddrList; }
     std::list<std::string>* GetRtlivePusherAddrList() { return &m_rtlivepusherAddrList; }
 
@@ -90,23 +99,15 @@ public:
     bool IsSvrConnector() { return m_isSvrConnectorOk; }
     bool IsSvrRTLivePusher() { return m_isSvrRTLivePusherOk; }
 
-    void    RefreshConnection();
-    void    SendTransferData(const std::string mid, const std::string uid, const std::string msg);
-
-    void SetModuleId(const std::string& mid) { m_logicalId = mid; }
-    std::string& ModuleId() { return m_logicalId; }
-    bool    SignalKill();
-    bool    ClearAll();
-
-    void OnTLogin(const std::string& uid, const std::string& token, const std::string& connector);
-    void OnTLogout(const std::string& uid, const std::string& token, const std::string& connector);
-
 protected:
     PRTConnManager() { }
     ~PRTConnManager() { }
+
 private:
     bool DoConnectConnector(const std::string ip, unsigned short port);
     bool DoConnectRtlivePusher(const std::string ip, unsigned short port);
+
+private:
     bool                      m_isSvrConnectorOk;
     bool                      m_isSvrRTLivePusherOk;
     std::list<std::string>    m_connectorAddrList;

@@ -24,6 +24,7 @@ static DRTConnManager::TypeModuleSessionInfoLists     s_TypeModuleSessionInfoLis
 static DRTConnManager::UserSessionInfoLists           s_UserSessionInfoList(0);
 static DRTConnManager::UserSessionInfoMaps            s_UserSessionInfoMap(0);
 
+///////////////////////////////////////////////////////////////////////////////////
 
 DRTConnManager::ModuleInfo* DRTConnManager::findConnectorInfo(const std::string& userid)
 {
@@ -90,93 +91,6 @@ DRTConnManager::ModuleInfo* DRTConnManager::findConnectorInfoById(const std::str
         LE("findConnectorInfoById sessionid is null\n");
     }
     return pInfo;
-}
-
-bool DRTConnManager::ConnectConnector()
-{
-    if (m_ipList.size() == 0) {
-        return false;
-    }
-    std::list<std::string>::iterator it;
-    for (it=m_ipList.begin(); it!=m_ipList.end(); it++) {
-        std::string s = *it;
-        char ip[16] = {0};
-        unsigned int port = 0;
-        sscanf(s.c_str(), "%s %u", ip, &port);
-        LI("ip:%s, port:%u\n", ip, port);
-        if (strlen(ip)>0 && port > 2048) {
-            DoConnectConnector(ip, port);
-        }
-    }
-    return true;
-}
-
-bool DRTConnManager::DoConnectConnector(const std::string ip, unsigned short port)
-{
-    DRTTransferSession* connectorSession = new DRTTransferSession();
-    connectorSession->Init();
-    // conn to connector
-    while (!connectorSession->Connect(ip, port)) {
-        LI("connecting to connector server %s:%u waiting...\n", ip.c_str(), port);
-        usleep(100*1000);
-    }
-    LI("%s port:%u, socketFD:%d\n", __FUNCTION__, port, connectorSession->GetSocket()->GetSocketFD());
-    connectorSession->EstablishConnection();
-    return true;
-}
-
-void DRTConnManager::RefreshConnection()
-{
-    ModuleInfo* pmi = NULL;
-    {
-        OSMutexLocker locker(&s_mutexModule);
-        ModuleInfoMapsIt it = s_ModuleInfoMap.begin();
-        for (; it!=s_ModuleInfoMap.end(); it++) {
-            pmi = it->second;
-            if (pmi && pmi->othModuleType == pms::ETransferModule::MCONNECTOR) {
-                if (pmi->pModule && pmi->pModule->RefreshTime()) {
-                    pmi->pModule->KeepAlive();
-                }
-            }
-        }
-    }
-}
-
-bool DRTConnManager::SignalKill()
-{
-    {
-        OSMutexLocker mlocker(&s_mutexModule);
-        for (auto & x : s_ModuleInfoMap) {
-            x.second->pModule->Signal(Task::kKillEvent);
-            usleep(100*1000);
-        }
-    }
-
-    return true;
-}
-
-bool DRTConnManager::ClearAll()
-{
-    {
-        OSMutexLocker mlocker(&s_mutexModule);
-        for (auto & x : s_ModuleInfoMap) {
-            delete x.second;
-            x.second = NULL;
-            usleep(100*1000);
-        }
-        s_ModuleInfoMap.clear();
-    }
-
-    {
-        OSMutexLocker tlocker(&s_mutexTypeModule);
-        for (auto & x : s_TypeModuleSessionInfoList) {
-            delete x;
-            x = NULL;
-        }
-        s_TypeModuleSessionInfoList.clear();
-    }
-    m_ipList.clear();
-     return true;
 }
 
 bool DRTConnManager::AddModuleInfo(DRTConnManager::ModuleInfo* pmi, const std::string& sid)
@@ -270,6 +184,44 @@ void DRTConnManager::TransferSessionLostNotify(const std::string& sid)
     {
         m_isSvrConnectorOk = false;
     }
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+
+void DRTConnManager::RefreshConnection()
+{
+    ModuleInfo* pmi = NULL;
+    {
+        OSMutexLocker locker(&s_mutexModule);
+        ModuleInfoMapsIt it = s_ModuleInfoMap.begin();
+        for (; it!=s_ModuleInfoMap.end(); it++) {
+            pmi = it->second;
+            if (pmi && pmi->othModuleType == pms::ETransferModule::MCONNECTOR) {
+                if (pmi->pModule && pmi->pModule->RefreshTime()) {
+                    pmi->pModule->KeepAlive();
+                }
+            }
+        }
+    }
+}
+
+bool DRTConnManager::ConnectConnector()
+{
+    if (m_ipList.size() == 0) {
+        return false;
+    }
+    std::list<std::string>::iterator it;
+    for (it=m_ipList.begin(); it!=m_ipList.end(); it++) {
+        std::string s = *it;
+        char ip[16] = {0};
+        unsigned int port = 0;
+        sscanf(s.c_str(), "%s %u", ip, &port);
+        LI("ip:%s, port:%u\n", ip, port);
+        if (strlen(ip)>0 && port > 2048) {
+            DoConnectConnector(ip, port);
+        }
+    }
+    return true;
 }
 
 void DRTConnManager::AddMemberToOnline(const std::string& uid)
@@ -369,4 +321,54 @@ void DRTConnManager::PushCommonMsg(const std::string& sign, const std::string& t
     } else {
         LE("DRTConnManager::PushCommonMsg error\n");
     }
+}
+
+bool DRTConnManager::SignalKill()
+{
+    {
+        OSMutexLocker mlocker(&s_mutexModule);
+        for (auto & x : s_ModuleInfoMap) {
+            x.second->pModule->Signal(Task::kKillEvent);
+            usleep(100*1000);
+        }
+    }
+    return true;
+}
+
+bool DRTConnManager::ClearAll()
+{
+    {
+        OSMutexLocker mlocker(&s_mutexModule);
+        for (auto & x : s_ModuleInfoMap) {
+            delete x.second;
+            x.second = NULL;
+            usleep(100*1000);
+        }
+        s_ModuleInfoMap.clear();
+    }
+
+    {
+        OSMutexLocker tlocker(&s_mutexTypeModule);
+        for (auto & x : s_TypeModuleSessionInfoList) {
+            delete x;
+            x = NULL;
+        }
+        s_TypeModuleSessionInfoList.clear();
+    }
+    m_ipList.clear();
+     return true;
+}
+
+bool DRTConnManager::DoConnectConnector(const std::string ip, unsigned short port)
+{
+    DRTTransferSession* connectorSession = new DRTTransferSession();
+    connectorSession->Init();
+    // conn to connector
+    while (!connectorSession->Connect(ip, port)) {
+        LI("connecting to connector server %s:%u waiting...\n", ip.c_str(), port);
+        usleep(100*1000);
+    }
+    LI("%s port:%u, socketFD:%d\n", __FUNCTION__, port, connectorSession->GetSocket()->GetSocketFD());
+    connectorSession->EstablishConnection();
+    return true;
 }

@@ -24,9 +24,6 @@
 
 #include "ProtoCommon.h"
 
-#define HR_USERID       "hr_userid"
-#define HR_CONNECTORID  "hr_connectorid"
-
 class SRTTransferSession;
 
 class SRTSequenceManager : public RTSingleton< SRTSequenceManager >{

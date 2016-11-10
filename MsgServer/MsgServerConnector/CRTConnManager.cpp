@@ -22,6 +22,7 @@ static CRTConnManager::TypeModuleSessionInfoLists   s_TypeModuleSessionInfoList(
 static CRTConnManager::UserSessionInfoLists         s_UserSessionInfoList(0);
 static CRTConnManager::UserSessionInfoMaps          s_UserSessionInfoMap(0);
 
+///////////////////////////////////////////////////////////////////////////////////
 
 CRTConnManager::ModuleInfo* CRTConnManager::findModuleInfo(const std::string& userid, pms::ETransferModule module)
 {
@@ -252,6 +253,8 @@ void CRTConnManager::TransferToPusher(pms::EServerCmd cmd, pms::EModuleType type
     return;
 }
 
+///////////////////////////////////////////////////////////////////////////////////
+
 void CRTConnManager::Init(const std::string redisIp, int redisPort)
 {
     m_xRedis.Init(redisIp, redisPort);
@@ -351,5 +354,3 @@ bool CRTConnManager::ClearAll()
     }
      return true;
 }
-
-

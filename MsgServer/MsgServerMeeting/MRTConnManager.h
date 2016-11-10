@@ -72,23 +72,19 @@ public:
         }
     }UserSessionInfo;
 
-    typedef std::unordered_map< std::string, ModuleInfo* >     ModuleInfoMaps;
-    typedef ModuleInfoMaps::iterator ModuleInfoMapsIt;
-
+    typedef std::unordered_map< std::string, ModuleInfo* >                  ModuleInfoMaps;
+    typedef ModuleInfoMaps::iterator                                        ModuleInfoMapsIt;
     //<user_id, UserModuleTypeInfo>
-    typedef std::list<TypeModuleSessionInfo*> TypeModuleSessionInfoLists;
-
+    typedef std::list<TypeModuleSessionInfo*>                               TypeModuleSessionInfoLists;
     //check list and map which is better
-    typedef std::list<UserSessionInfo*> UserSessionInfoLists;
-
-    typedef std::unordered_map<std::string, std::list<TypeSessionInfo*> > UserSessionInfoMaps;
-    typedef UserSessionInfoMaps::iterator UserSessionInfoMapsIt;
-
-    typedef std::list< MRTTransferSession* > ConnectingSessList;
+    typedef std::list<UserSessionInfo*>                                     UserSessionInfoLists;
+    typedef std::unordered_map<std::string, std::list<TypeSessionInfo*> >   UserSessionInfoMaps;
+    typedef UserSessionInfoMaps::iterator                                   UserSessionInfoMapsIt;
+    typedef std::list< MRTTransferSession* >                                ConnectingSessList;
 
     ///////////////////////////////////////////////////////////////////////////////////
 
-    ModuleInfo*  findModuleInfo(const std::string& userid, pms::ETransferModule module);
+    ModuleInfo* findModuleInfo(const std::string& userid, pms::ETransferModule module);
 
     bool AddModuleInfo(ModuleInfo* pmi, const std::string& sid);
     bool DelModuleInfo(const std::string& sid, EventData& data);
@@ -97,10 +93,12 @@ public:
 
     void TransferSessionLostNotify(const std::string& sid);
 
-    bool    ConnectConnector();
-    void    RefreshConnection();
-    bool    SignalKill();
-    bool    ClearAll();
+    ///////////////////////////////////////////////////////////////////////////////////
+
+    bool ConnectConnector();
+    void RefreshConnection();
+    bool SignalKill();
+    bool ClearAll();
 
     void SetMeetingId(const std::string& mid) { m_meetingId = mid; }
     std::string& MeetingId() { return m_meetingId; }
@@ -112,6 +110,8 @@ protected:
 
 private:
     bool DoConnectConnector(const std::string ip, unsigned short port);
+
+private:
     std::list<std::string>    m_ipList;
     std::string               m_meetingId;
 };

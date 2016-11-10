@@ -74,54 +74,39 @@ public:
         }
     }UserSessionInfo;
 
-    typedef std::unordered_map< std::string, ModuleInfo* >      ModuleInfoMaps;
-    typedef ModuleInfoMaps::iterator                            ModuleInfoMapsIt;
-
+    typedef std::unordered_map< std::string, ModuleInfo* >                  ModuleInfoMaps;
+    typedef ModuleInfoMaps::iterator                                        ModuleInfoMapsIt;
     //<user_id, UserModuleTypeInfo>
-    typedef std::list<TypeModuleSessionInfo*> TypeModuleSessionInfoLists;
-
+    typedef std::list<TypeModuleSessionInfo*>                               TypeModuleSessionInfoLists;
     //check list and map which is better
-    typedef std::list<UserSessionInfo*> UserSessionInfoLists;
-
-    typedef std::unordered_map<std::string, std::list<TypeSessionInfo*> > UserSessionInfoMaps;
-    typedef UserSessionInfoMaps::iterator UserSessionInfoMapsIt;
-
-    typedef std::set<std::string>    OnlineMembers;//all the members online
-    typedef OnlineMembers::iterator      OnlineMembersIt;
-    typedef std::set<std::string>    OfflineMembers;//all the members offline
-    typedef OfflineMembers::iterator     OfflineMembersIt;
-
-    typedef std::unordered_multimap<std::string, std::string>        UserConnectorMaps;
-    typedef UserConnectorMaps::iterator UserConnectorMapsIt;
-
-    typedef std::list< DRTTransferSession* > ConnectingSessList;
+    typedef std::list<UserSessionInfo*>                                     UserSessionInfoLists;
+    typedef std::unordered_map<std::string, std::list<TypeSessionInfo*> >   UserSessionInfoMaps;
+    typedef UserSessionInfoMaps::iterator                                   UserSessionInfoMapsIt;
+    typedef std::set<std::string>                                           OnlineMembers;//all the members online
+    typedef OnlineMembers::iterator                                         OnlineMembersIt;
+    typedef std::set<std::string>                                           OfflineMembers;//all the members offline
+    typedef OfflineMembers::iterator                                        OfflineMembersIt;
+    typedef std::unordered_multimap<std::string, std::string>               UserConnectorMaps;
+    typedef UserConnectorMaps::iterator                                     UserConnectorMapsIt;
+    typedef std::list< DRTTransferSession* >                                ConnectingSessList;
 
     ///////////////////////////////////////////////////////////////////////////////////
 
-    ModuleInfo*       findConnectorInfo(const std::string& userid);
-    ModuleInfo*       findModuleInfo(const std::string& userid, pms::ETransferModule module);
-    ModuleInfo*       findModuleInfoBySid(const std::string& sid);
-    ModuleInfo*       findConnectorInfoById(const std::string& userid, const std::string& connector);
+    ModuleInfo* findConnectorInfo(const std::string& userid);
+    ModuleInfo* findModuleInfo(const std::string& userid, pms::ETransferModule module);
+    ModuleInfo* findModuleInfoBySid(const std::string& sid);
+    ModuleInfo* findConnectorInfoById(const std::string& userid, const std::string& connector);
 
     bool AddModuleInfo(ModuleInfo* pmi, const std::string& sid);
     bool DelModuleInfo(const std::string& sid, EventData& data);
     bool AddTypeModuleSession(pms::ETransferModule module, const std::string& mid, const std::string& sid);
     bool DelTypeModuleSession(const std::string& sid);
-
     void TransferSessionLostNotify(const std::string& sid);
 
-    bool    ConnectConnector();
-    std::list<std::string>* GetAddrsList() { return &m_ipList; }
+    ///////////////////////////////////////////////////////////////////////////////////
 
-    void SetSvrConnector(bool ok) { m_isSvrConnectorOk = ok; }
-    bool IsSvrConnector() { return m_isSvrConnectorOk; }
-
-    void    RefreshConnection();
-    void    SendTransferData(const std::string mid, const std::string uid, const std::string msg);
-    void SetDispatcherId(const std::string& did) { m_dispatcherId = did; }
-    std::string& DispatcherId() { return m_dispatcherId; }
-    bool    SignalKill();
-    bool    ClearAll();
+    void RefreshConnection();
+    bool ConnectConnector();
 
     void AddMemberToOnline(const std::string& uid);
     bool IsMemberInOnline(const std::string& uid);
@@ -137,10 +122,18 @@ public:
     void OnTLogout(const std::string& uid, const std::string& token, const std::string& connector);
 
     void GetUserConnectorId(const std::string& uid, std::string& connector);
-
     bool ConnectHttpSvrConn(const std::string& addr, const unsigned short port, const std::string& host);
     void PushMeetingMsg(const std::string& meetingid, const std::string& msgFromId, const std::string& meetingOnlineMembers, const std::string& pushMsg, const std::string& notification, const std::string& extra);
     void PushCommonMsg(const std::string& sign, const std::string& targetid, const std::string& pushMsg, const std::string& notification, const std::string& extra);
+
+    bool SignalKill();
+    bool ClearAll();
+
+    std::list<std::string>* GetAddrsList() { return &m_ipList; }
+    void SetSvrConnector(bool ok) { m_isSvrConnectorOk = ok; }
+    bool IsSvrConnector() { return m_isSvrConnectorOk; }
+    void SetDispatcherId(const std::string& did) { m_dispatcherId = did; }
+    std::string& DispatcherId() { return m_dispatcherId; }
 
 protected:
     DRTConnManager()
@@ -151,8 +144,11 @@ protected:
             m_pHttpSvrConn = NULL;
         }
     }
+
 private:
     bool DoConnectConnector(const std::string ip, unsigned short port);
+
+private:
     bool                      m_isSvrConnectorOk;
     std::list<std::string>    m_ipList;
     std::string               m_dispatcherId;

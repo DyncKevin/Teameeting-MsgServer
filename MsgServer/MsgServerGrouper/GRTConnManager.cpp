@@ -22,6 +22,7 @@ static OSMutex       s_mutexTypeModule;
 static GRTConnManager::ModuleInfoMaps                 s_ModuleInfoMap(0);
 static GRTConnManager::TypeModuleSessionInfoLists     s_TypeModuleSessionInfoList(0);
 
+///////////////////////////////////////////////////////////////////////////////////
 
 GRTConnManager::ModuleInfo* GRTConnManager::findConnectorInfo(const std::string& userid)
 {
@@ -88,99 +89,6 @@ GRTConnManager::ModuleInfo* GRTConnManager::findConnectorInfoById(const std::str
         LE("findConnectorInfoById sessionid is null\n");
     }
     return pInfo;
-}
-
-bool GRTConnManager::ConnectGroupMgr()
-{
-    if (m_groupMgrAddrList.size() == 0) {
-        LE("GRTConnManager::ConnectGroupMgr addr list.size is 0\n");
-        return false;
-    }
-    std::list<std::string>::iterator it;
-    for (it=m_groupMgrAddrList.begin(); it!=m_groupMgrAddrList.end(); it++) {
-        std::string s = *it;
-        char ip[16] = {0};
-        unsigned int port = 0;
-        sscanf(s.c_str(), "%s %u", ip, &port);
-        LI("ip:%s, port:%u\n", ip, port);
-        if (strlen(ip)>0 && port > 2048) {
-            DoConnectGroupMgr(ip, port);
-        }
-    }
-    return true;
-}
-
-bool GRTConnManager::DoConnectGroupMgr(const std::string ip, unsigned short port)
-{
-    GRTTransferSession* groupMgrSession = new GRTTransferSession();
-    groupMgrSession->Init();
-    // conn to connector
-    while (!groupMgrSession->Connect(ip, port)) {
-        LI("connecting to RTLive groupMgr server %s:%u waiting...\n", ip.c_str(), port);
-        usleep(100*1000);
-    }
-    LI("%s port:%u, socketFD:%d\n", __FUNCTION__, port, groupMgrSession->GetSocket()->GetSocketFD());
-    groupMgrSession->EstablishConnection();
-    return true;
-}
-
-void GRTConnManager::RefreshConnection()
-{
-    ModuleInfo* pmi = NULL;
-    {
-        OSMutexLocker locker(&s_mutexModule);
-        ModuleInfoMapsIt it = s_ModuleInfoMap.begin();
-        for (; it!=s_ModuleInfoMap.end(); it++) {
-            pmi = it->second;
-            if (pmi && pmi->othModuleType == pms::ETransferModule::MCONNECTOR) {
-                if (pmi->pModule && pmi->pModule->RefreshTime()) {
-                    pmi->pModule->KeepAlive();
-                }
-            }
-        }
-    }
-}
-
-void GRTConnManager::GetGroupMembers(const std::string& groupid)
-{
-
-}
-
-bool GRTConnManager::SignalKill()
-{
-    {
-        OSMutexLocker mlocker(&s_mutexModule);
-        for (auto & x : s_ModuleInfoMap) {
-            x.second->pModule->Signal(Task::kKillEvent);
-            usleep(100*1000);
-        }
-    }
-
-    return true;
-}
-
-bool GRTConnManager::ClearAll()
-{
-    {
-        OSMutexLocker mlocker(&s_mutexModule);
-        for (auto & x : s_ModuleInfoMap) {
-            delete x.second;
-            x.second = NULL;
-            usleep(100*1000);
-        }
-        s_ModuleInfoMap.clear();
-    }
-
-    {
-        OSMutexLocker tlocker(&s_mutexTypeModule);
-        for (auto & x : s_TypeModuleSessionInfoList) {
-            delete x;
-            x = NULL;
-        }
-        s_TypeModuleSessionInfoList.clear();
-    }
-    m_groupMgrAddrList.clear();
-     return true;
 }
 
 bool GRTConnManager::AddModuleInfo(GRTConnManager::ModuleInfo* pmi, const std::string& sid)
@@ -276,6 +184,45 @@ void GRTConnManager::TransferSessionLostNotify(const std::string& sid)
     }
 }
 
+///////////////////////////////////////////////////////////////////////////////////
+
+bool GRTConnManager::ConnectGroupMgr()
+{
+    if (m_groupMgrAddrList.size() == 0) {
+        LE("GRTConnManager::ConnectGroupMgr addr list.size is 0\n");
+        return false;
+    }
+    std::list<std::string>::iterator it;
+    for (it=m_groupMgrAddrList.begin(); it!=m_groupMgrAddrList.end(); it++) {
+        std::string s = *it;
+        char ip[16] = {0};
+        unsigned int port = 0;
+        sscanf(s.c_str(), "%s %u", ip, &port);
+        LI("ip:%s, port:%u\n", ip, port);
+        if (strlen(ip)>0 && port > 2048) {
+            DoConnectGroupMgr(ip, port);
+        }
+    }
+    return true;
+}
+
+void GRTConnManager::RefreshConnection()
+{
+    ModuleInfo* pmi = NULL;
+    {
+        OSMutexLocker locker(&s_mutexModule);
+        ModuleInfoMapsIt it = s_ModuleInfoMap.begin();
+        for (; it!=s_ModuleInfoMap.end(); it++) {
+            pmi = it->second;
+            if (pmi && pmi->othModuleType == pms::ETransferModule::MCONNECTOR) {
+                if (pmi->pModule && pmi->pModule->RefreshTime()) {
+                    pmi->pModule->KeepAlive();
+                }
+            }
+        }
+    }
+}
+
 void GRTConnManager::OnTLogin(const std::string& uid, const std::string& token, const std::string& connector)
 {
 
@@ -284,4 +231,55 @@ void GRTConnManager::OnTLogin(const std::string& uid, const std::string& token, 
 void GRTConnManager::OnTLogout(const std::string& uid, const std::string& token, const std::string& connector)
 {
 
+}
+
+bool GRTConnManager::SignalKill()
+{
+    {
+        OSMutexLocker mlocker(&s_mutexModule);
+        for (auto & x : s_ModuleInfoMap) {
+            x.second->pModule->Signal(Task::kKillEvent);
+            usleep(100*1000);
+        }
+    }
+
+    return true;
+}
+
+bool GRTConnManager::ClearAll()
+{
+    {
+        OSMutexLocker mlocker(&s_mutexModule);
+        for (auto & x : s_ModuleInfoMap) {
+            delete x.second;
+            x.second = NULL;
+            usleep(100*1000);
+        }
+        s_ModuleInfoMap.clear();
+    }
+
+    {
+        OSMutexLocker tlocker(&s_mutexTypeModule);
+        for (auto & x : s_TypeModuleSessionInfoList) {
+            delete x;
+            x = NULL;
+        }
+        s_TypeModuleSessionInfoList.clear();
+    }
+    m_groupMgrAddrList.clear();
+     return true;
+}
+
+bool GRTConnManager::DoConnectGroupMgr(const std::string ip, unsigned short port)
+{
+    GRTTransferSession* groupMgrSession = new GRTTransferSession();
+    groupMgrSession->Init();
+    // conn to connector
+    while (!groupMgrSession->Connect(ip, port)) {
+        LI("connecting to RTLive groupMgr server %s:%u waiting...\n", ip.c_str(), port);
+        usleep(100*1000);
+    }
+    LI("%s port:%u, socketFD:%d\n", __FUNCTION__, port, groupMgrSession->GetSocket()->GetSocketFD());
+    groupMgrSession->EstablishConnection();
+    return true;
 }

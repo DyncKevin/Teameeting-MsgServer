@@ -56,21 +56,18 @@ public:
 
     typedef std::unordered_map< std::string, ModuleInfo* >      ModuleInfoMaps;
     typedef ModuleInfoMaps::iterator                            ModuleInfoMapsIt;
-
     //<user_id, UserModuleTypeInfo>
-    typedef std::list<TypeModuleSessionInfo*> TypeModuleSessionInfoLists;
-
-    typedef std::unordered_multimap<std::string, std::string>        UserConnectorMaps;
-    typedef UserConnectorMaps::iterator UserConnectorMapsIt;
-
-    typedef std::list< GRTTransferSession* > ConnectingSessList;
+    typedef std::list<TypeModuleSessionInfo*>                   TypeModuleSessionInfoLists;
+    typedef std::unordered_multimap<std::string, std::string>   UserConnectorMaps;
+    typedef UserConnectorMaps::iterator                         UserConnectorMapsIt;
+    typedef std::list< GRTTransferSession* >                    ConnectingSessList;
 
     ///////////////////////////////////////////////////////////////////////////////////
 
-    ModuleInfo*       findConnectorInfo(const std::string& userid);
-    ModuleInfo*       findModuleInfo(const std::string& userid, pms::ETransferModule module);
-    ModuleInfo*       findModuleInfoBySid(const std::string& sid);
-    ModuleInfo*       findConnectorInfoById(const std::string& userid, const std::string& connector);
+    ModuleInfo* findConnectorInfo(const std::string& userid);
+    ModuleInfo* findModuleInfo(const std::string& userid, pms::ETransferModule module);
+    ModuleInfo* findModuleInfoBySid(const std::string& sid);
+    ModuleInfo* findConnectorInfoById(const std::string& userid, const std::string& connector);
 
     bool AddModuleInfo(ModuleInfo* pmi, const std::string& sid);
     bool DelModuleInfo(const std::string& sid, EventData& data);
@@ -79,31 +76,31 @@ public:
 
     void TransferSessionLostNotify(const std::string& sid);
 
+    ///////////////////////////////////////////////////////////////////////////////////
+
     bool    ConnectGroupMgr();
-
-    std::list<std::string>* GetGroupMgrAddrList() { return &m_groupMgrAddrList; }
-
-    void SetSvrRTLive(bool ok) { m_isSvrRTLiveOk = ok; }
-    bool IsSvrRTLive() { return m_isSvrRTLiveOk; }
-
     void    RefreshConnection();
-    void    SendTransferData(const std::string mid, const std::string uid, const std::string msg);
-
-    void SetGrouperId(const std::string& mid) { m_grouperId = mid; }
-    std::string& GrouperId() { return m_grouperId; }
-    bool    SignalKill();
-    bool    ClearAll();
-
-    void GetGroupMembers(const std::string& groupid);
 
     void OnTLogin(const std::string& uid, const std::string& token, const std::string& connector);
     void OnTLogout(const std::string& uid, const std::string& token, const std::string& connector);
 
+    bool    SignalKill();
+    bool    ClearAll();
+
+    std::list<std::string>* GetGroupMgrAddrList() { return &m_groupMgrAddrList; }
+    void SetGrouperId(const std::string& mid) { m_grouperId = mid; }
+    std::string& GrouperId() { return m_grouperId; }
+    void SetSvrRTLive(bool ok) { m_isSvrRTLiveOk = ok; }
+    bool IsSvrRTLive() { return m_isSvrRTLiveOk; }
+
 protected:
     GRTConnManager() { }
     ~GRTConnManager() { }
+
 private:
     bool DoConnectGroupMgr(const std::string ip, unsigned short port);
+
+private:
     bool                      m_isSvrRTLiveOk;
     std::list<std::string>    m_groupMgrAddrList;
     std::string               m_grouperId;

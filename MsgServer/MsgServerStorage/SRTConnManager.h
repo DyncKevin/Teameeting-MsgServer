@@ -56,21 +56,18 @@ public:
 
     typedef std::unordered_map< std::string, ModuleInfo* >      ModuleInfoMaps;
     typedef ModuleInfoMaps::iterator                            ModuleInfoMapsIt;
-
     //<user_id, UserModuleTypeInfo>
-    typedef std::list<TypeModuleSessionInfo*> TypeModuleSessionInfoLists;
-
-    typedef std::unordered_multimap<std::string, std::string>        UserConnectorMaps;
-    typedef UserConnectorMaps::iterator UserConnectorMapsIt;
-
-    typedef std::list< SRTTransferSession* > ConnectingSessList;
+    typedef std::list<TypeModuleSessionInfo*>                   TypeModuleSessionInfoLists;
+    typedef std::unordered_multimap<std::string, std::string>   UserConnectorMaps;
+    typedef UserConnectorMaps::iterator                         UserConnectorMapsIt;
+    typedef std::list< SRTTransferSession* >                    ConnectingSessList;
 
     ///////////////////////////////////////////////////////////////////////////////////
 
-    ModuleInfo*       findConnectorInfo(const std::string& userid);
-    ModuleInfo*       findModuleInfo(const std::string& userid, pms::ETransferModule module);
-    ModuleInfo*       findModuleInfoBySid(const std::string& sid);
-    ModuleInfo*       findConnectorInfoById(const std::string& userid, const std::string& connector);
+    ModuleInfo* findConnectorInfo(const std::string& userid);
+    ModuleInfo* findModuleInfo(const std::string& userid, pms::ETransferModule module);
+    ModuleInfo* findModuleInfoBySid(const std::string& sid);
+    ModuleInfo* findConnectorInfoById(const std::string& userid, const std::string& connector);
 
     bool AddModuleInfo(ModuleInfo* pmi, const std::string& sid);
     bool DelModuleInfo(const std::string& sid, EventData& data);
@@ -79,23 +76,29 @@ public:
 
     void TransferSessionLostNotify(const std::string& sid);
 
-    bool    ConnectConnector();
-    std::list<std::string>* GetAddrsList() { return &m_ipList; }
-    void    RefreshConnection();
-    void    SendTransferData(const std::string mid, const std::string uid, const std::string msg);
-    void SetStorageId(const std::string& mid) { m_sequenceId = mid; }
-    std::string& StorageId() { return m_sequenceId; }
-    bool    SignalKill();
-    bool    ClearAll();
+    ///////////////////////////////////////////////////////////////////////////////////
+
+    bool ConnectConnector();
+    void RefreshConnection();
 
     void OnTLogin(const std::string& uid, const std::string& token, const std::string& connector);
     void OnTLogout(const std::string& uid, const std::string& token, const std::string& connector);
 
+    bool SignalKill();
+    bool ClearAll();
+
+    std::list<std::string>* GetAddrsList() { return &m_ipList; }
+    void SetStorageId(const std::string& mid) { m_sequenceId = mid; }
+    std::string& StorageId() { return m_sequenceId; }
+
 protected:
     SRTConnManager() { }
     ~SRTConnManager() { }
+
 private:
     bool DoConnectConnector(const std::string ip, unsigned short port);
+
+private:
     std::list<std::string>    m_ipList;
     std::string               m_sequenceId;
     OSMutex                   m_mutexMembers;

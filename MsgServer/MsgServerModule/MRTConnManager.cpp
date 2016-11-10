@@ -22,6 +22,7 @@ static OSMutex       s_mutexTypeModule;
 static MRTConnManager::ModuleInfoMaps                 s_ModuleInfoMap(0);
 static MRTConnManager::TypeModuleSessionInfoLists     s_TypeModuleSessionInfoList(0);
 
+///////////////////////////////////////////////////////////////////////////////////
 
 MRTConnManager::ModuleInfo* MRTConnManager::findConnectorInfo(const std::string& userid)
 {
@@ -88,127 +89,6 @@ MRTConnManager::ModuleInfo* MRTConnManager::findConnectorInfoById(const std::str
         LE("findConnectorInfoById sessionid is null\n");
     }
     return pInfo;
-}
-
-bool MRTConnManager::ConnectSequence()
-{
-    if (m_sequenceAddrList.size() == 0) {
-        return false;
-    }
-    std::list<std::string>::iterator it;
-    for (it=m_sequenceAddrList.begin(); it!=m_sequenceAddrList.end(); it++) {
-        std::string s = *it;
-        char ip[16] = {0};
-        unsigned int port = 0;
-        sscanf(s.c_str(), "%s %u", ip, &port);
-        LI("ip:%s, port:%u\n", ip, port);
-        if (strlen(ip)>0 && port > 2048) {
-            DoConnectSequence(ip, port);
-        }
-    }
-    return true;
-}
-
-bool MRTConnManager::ConnectStorage()
-{
-    if (m_storageAddrList.size() == 0) {
-        return false;
-    }
-    std::list<std::string>::iterator it;
-    for (it=m_storageAddrList.begin(); it!=m_storageAddrList.end(); it++) {
-        std::string s = *it;
-        char ip[16] = {0};
-        unsigned int port = 0;
-        sscanf(s.c_str(), "%s %u", ip, &port);
-        LI("ip:%s, port:%u\n", ip, port);
-        if (strlen(ip)>0 && port > 2048) {
-            DoConnectSequence(ip, port);
-        }
-    }
-    return true;
-}
-
-bool MRTConnManager::DoConnectSequence(const std::string ip, unsigned short port)
-{
-    MRTTransferSession* sequenceSession = new MRTTransferSession();
-    sequenceSession->Init();
-    // conn to connector
-    while (!sequenceSession->Connect(ip, port)) {
-        LI("connecting to sequence server %s:%u waiting...\n", ip.c_str(), port);
-        usleep(100*1000);
-    }
-    LI("%s port:%u, socketFD:%d\n", __FUNCTION__, port, sequenceSession->GetSocket()->GetSocketFD());
-    sequenceSession->EstablishConnection();
-    return true;
-}
-
-bool MRTConnManager::DoConnectStorage(const std::string ip, unsigned short port)
-{
-    MRTTransferSession* storageSession = new MRTTransferSession();
-    storageSession->Init();
-    // conn to connector
-    while (!storageSession->Connect(ip, port)) {
-        LI("connecting to sequence server %s:%u waiting...\n", ip.c_str(), port);
-        usleep(100*1000);
-    }
-    LI("%s port:%u, socketFD:%d\n", __FUNCTION__, port, storageSession->GetSocket()->GetSocketFD());
-    storageSession->EstablishConnection();
-    return true;
-}
-
-void MRTConnManager::RefreshConnection()
-{
-    ModuleInfo* pmi = NULL;
-    {
-        OSMutexLocker locker(&s_mutexModule);
-        ModuleInfoMapsIt it = s_ModuleInfoMap.begin();
-        for (; it!=s_ModuleInfoMap.end(); it++) {
-            pmi = it->second;
-            if (pmi && pmi->othModuleType == pms::ETransferModule::MCONNECTOR) {
-                if (pmi->pModule && pmi->pModule->RefreshTime()) {
-                    pmi->pModule->KeepAlive();
-                }
-            }
-        }
-    }
-}
-
-bool MRTConnManager::SignalKill()
-{
-    {
-        OSMutexLocker mlocker(&s_mutexModule);
-        for (auto & x : s_ModuleInfoMap) {
-            x.second->pModule->Signal(Task::kKillEvent);
-            usleep(100*1000);
-        }
-    }
-
-    return true;
-}
-
-bool MRTConnManager::ClearAll()
-{
-    {
-        OSMutexLocker mlocker(&s_mutexModule);
-        for (auto & x : s_ModuleInfoMap) {
-            delete x.second;
-            x.second = NULL;
-            usleep(100*1000);
-        }
-        s_ModuleInfoMap.clear();
-    }
-
-    {
-        OSMutexLocker tlocker(&s_mutexTypeModule);
-        for (auto & x : s_TypeModuleSessionInfoList) {
-            delete x;
-            x = NULL;
-        }
-        s_TypeModuleSessionInfoList.clear();
-    }
-    m_sequenceAddrList.clear();
-    m_storageAddrList.clear();
-     return true;
 }
 
 bool MRTConnManager::AddModuleInfo(MRTConnManager::ModuleInfo* pmi, const std::string& sid)
@@ -297,6 +177,63 @@ void MRTConnManager::TransferSessionLostNotify(const std::string& sid)
     DelTypeModuleSession(sid);
 }
 
+///////////////////////////////////////////////////////////////////////////////////
+
+bool MRTConnManager::ConnectSequence()
+{
+    if (m_sequenceAddrList.size() == 0) {
+        return false;
+    }
+    std::list<std::string>::iterator it;
+    for (it=m_sequenceAddrList.begin(); it!=m_sequenceAddrList.end(); it++) {
+        std::string s = *it;
+        char ip[16] = {0};
+        unsigned int port = 0;
+        sscanf(s.c_str(), "%s %u", ip, &port);
+        LI("ip:%s, port:%u\n", ip, port);
+        if (strlen(ip)>0 && port > 2048) {
+            DoConnectSequence(ip, port);
+        }
+    }
+    return true;
+}
+
+bool MRTConnManager::ConnectStorage()
+{
+    if (m_storageAddrList.size() == 0) {
+        return false;
+    }
+    std::list<std::string>::iterator it;
+    for (it=m_storageAddrList.begin(); it!=m_storageAddrList.end(); it++) {
+        std::string s = *it;
+        char ip[16] = {0};
+        unsigned int port = 0;
+        sscanf(s.c_str(), "%s %u", ip, &port);
+        LI("ip:%s, port:%u\n", ip, port);
+        if (strlen(ip)>0 && port > 2048) {
+            DoConnectSequence(ip, port);
+        }
+    }
+    return true;
+}
+
+void MRTConnManager::RefreshConnection()
+{
+    ModuleInfo* pmi = NULL;
+    {
+        OSMutexLocker locker(&s_mutexModule);
+        ModuleInfoMapsIt it = s_ModuleInfoMap.begin();
+        for (; it!=s_ModuleInfoMap.end(); it++) {
+            pmi = it->second;
+            if (pmi && pmi->othModuleType == pms::ETransferModule::MCONNECTOR) {
+                if (pmi->pModule && pmi->pModule->RefreshTime()) {
+                    pmi->pModule->KeepAlive();
+                }
+            }
+        }
+    }
+}
+
 void MRTConnManager::OnTLogin(const std::string& uid, const std::string& token, const std::string& connector)
 {
 
@@ -305,4 +242,70 @@ void MRTConnManager::OnTLogin(const std::string& uid, const std::string& token, 
 void MRTConnManager::OnTLogout(const std::string& uid, const std::string& token, const std::string& connector)
 {
 
+}
+
+bool MRTConnManager::SignalKill()
+{
+    {
+        OSMutexLocker mlocker(&s_mutexModule);
+        for (auto & x : s_ModuleInfoMap) {
+            x.second->pModule->Signal(Task::kKillEvent);
+            usleep(100*1000);
+        }
+    }
+
+    return true;
+}
+
+bool MRTConnManager::ClearAll()
+{
+    {
+        OSMutexLocker mlocker(&s_mutexModule);
+        for (auto & x : s_ModuleInfoMap) {
+            delete x.second;
+            x.second = NULL;
+            usleep(100*1000);
+        }
+        s_ModuleInfoMap.clear();
+    }
+
+    {
+        OSMutexLocker tlocker(&s_mutexTypeModule);
+        for (auto & x : s_TypeModuleSessionInfoList) {
+            delete x;
+            x = NULL;
+        }
+        s_TypeModuleSessionInfoList.clear();
+    }
+    m_sequenceAddrList.clear();
+    m_storageAddrList.clear();
+     return true;
+}
+
+bool MRTConnManager::DoConnectSequence(const std::string ip, unsigned short port)
+{
+    MRTTransferSession* sequenceSession = new MRTTransferSession();
+    sequenceSession->Init();
+    // conn to connector
+    while (!sequenceSession->Connect(ip, port)) {
+        LI("connecting to sequence server %s:%u waiting...\n", ip.c_str(), port);
+        usleep(100*1000);
+    }
+    LI("%s port:%u, socketFD:%d\n", __FUNCTION__, port, sequenceSession->GetSocket()->GetSocketFD());
+    sequenceSession->EstablishConnection();
+    return true;
+}
+
+bool MRTConnManager::DoConnectStorage(const std::string ip, unsigned short port)
+{
+    MRTTransferSession* storageSession = new MRTTransferSession();
+    storageSession->Init();
+    // conn to connector
+    while (!storageSession->Connect(ip, port)) {
+        LI("connecting to sequence server %s:%u waiting...\n", ip.c_str(), port);
+        usleep(100*1000);
+    }
+    LI("%s port:%u, socketFD:%d\n", __FUNCTION__, port, storageSession->GetSocket()->GetSocketFD());
+    storageSession->EstablishConnection();
+    return true;
 }

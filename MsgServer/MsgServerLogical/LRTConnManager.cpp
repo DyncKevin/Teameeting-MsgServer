@@ -22,6 +22,7 @@ static OSMutex       s_mutexTypeModule;
 static LRTConnManager::ModuleInfoMaps                 s_ModuleInfoMap(0);
 static LRTConnManager::TypeModuleSessionInfoLists     s_TypeModuleSessionInfoList(0);
 
+///////////////////////////////////////////////////////////////////////////////////
 
 LRTConnManager::ModuleInfo* LRTConnManager::findConnectorInfo(const std::string& userid)
 {
@@ -60,7 +61,6 @@ LRTConnManager::ModuleInfo* LRTConnManager::findModuleInfoBySid(const std::strin
 
 LRTConnManager::ModuleInfo* LRTConnManager::findConnectorInfoById(const std::string& userid, const std::string& connector)
 {
-
     if (userid.length()==0 || connector.length()==0) {
         LE("findConnectorInfoById userid or connector is 0\n");
         return NULL;
@@ -88,219 +88,6 @@ LRTConnManager::ModuleInfo* LRTConnManager::findConnectorInfoById(const std::str
         LE("findConnectorInfoById sessionid is null\n");
     }
     return pInfo;
-}
-
-bool LRTConnManager::ConnectSequence()
-{
-    if (m_sequenceAddrList.size() == 0) {
-        return false;
-    }
-    std::list<std::string>::iterator it;
-    for (it=m_sequenceAddrList.begin(); it!=m_sequenceAddrList.end(); it++) {
-        std::string s = *it;
-        char ip[16] = {0};
-        unsigned int port = 0;
-        sscanf(s.c_str(), "%s %u", ip, &port);
-        LI("ip:%s, port:%u\n", ip, port);
-        if (strlen(ip)>0 && port > 2048) {
-            DoConnectSequence(ip, port);
-        }
-    }
-    return true;
-}
-
-bool LRTConnManager::ConnectStorage()
-{
-    if (m_storageAddrList.size() == 0) {
-        return false;
-    }
-    std::list<std::string>::iterator it;
-    for (it=m_storageAddrList.begin(); it!=m_storageAddrList.end(); it++) {
-        std::string s = *it;
-        char ip[16] = {0};
-        unsigned int port = 0;
-        sscanf(s.c_str(), "%s %u", ip, &port);
-        LI("ip:%s, port:%u\n", ip, port);
-        if (strlen(ip)>0 && port > 2048) {
-            DoConnectStorage(ip, port);
-        }
-    }
-    return true;
-}
-
-bool LRTConnManager::DoConnectSequence(const std::string ip, unsigned short port)
-{
-    LRTTransferSession* sequenceWriteSession = new LRTTransferSession(LRTTransferSession::ESequenceWrite);
-    sequenceWriteSession->Init();
-    // conn to sequence for write
-    while (!sequenceWriteSession->Connect(ip, port)) {
-        LI("connecting to sequence server write %s:%u waiting...\n", ip.c_str(), port);
-        usleep(100*1000);
-    }
-    LI("%s port:%u, socketFD:%d\n", __FUNCTION__, port, sequenceWriteSession->GetSocket()->GetSocketFD());
-    sequenceWriteSession->EstablishConnection();
-
-    LRTTransferSession* sequenceReadSession = new LRTTransferSession(LRTTransferSession::ESequenceRead);
-    sequenceReadSession->Init();
-    // conn to sequence for read
-    while (!sequenceReadSession->Connect(ip, port)) {
-        LI("connecting to sequence server read %s:%u waiting...\n", ip.c_str(), port);
-        usleep(100*1000);
-    }
-    LI("%s port:%u, socketFD:%d\n", __FUNCTION__, port, sequenceReadSession->GetSocket()->GetSocketFD());
-    sequenceReadSession->EstablishConnection();
-    return true;
-}
-
-bool LRTConnManager::DoConnectStorage(const std::string ip, unsigned short port)
-{
-    LRTTransferSession* storageWriteSession = new LRTTransferSession(LRTTransferSession::EStorageWrite);
-    storageWriteSession->Init();
-    // conn to storage for write
-    while (!storageWriteSession->Connect(ip, port)) {
-        LI("connecting to storage server %s:%u waiting...\n", ip.c_str(), port);
-        usleep(100*1000);
-    }
-    LI("%s Storage Write port:%u, socketFD:%d\n", __FUNCTION__, port, storageWriteSession->GetSocket()->GetSocketFD());
-    storageWriteSession->EstablishConnection();
-
-    LRTTransferSession* storageReadSession = new LRTTransferSession(LRTTransferSession::EStorageRead);
-    storageReadSession->Init();
-    // conn to storage for read
-    while (!storageReadSession->Connect(ip, port)) {
-        LI("connecting to storage server %s:%u waiting...\n", ip.c_str(), port);
-        usleep(100*1000);
-    }
-    LI("%s Storage Read port:%u, socketFD:%d\n", __FUNCTION__, port, storageReadSession->GetSocket()->GetSocketFD());
-    storageReadSession->EstablishConnection();
-    return true;
-}
-
-bool LRTConnManager::PushSeqnReadMsg(const std::string& smsg)
-{
-    LRTConnManager::ModuleInfo* pInfo = findModuleInfoBySid(m_sequenceReadSessId);
-    if (pInfo && pInfo->pModule && pInfo->pModule->IsLiveSession())
-    {
-        pInfo->pModule->SendTransferData(smsg);
-        return true;
-    } else {
-        return false;
-    }
-}
-
-bool LRTConnManager::PushSeqnWriteMsg(const std::string& smsg)
-{
-    LRTConnManager::ModuleInfo* pInfo = findModuleInfoBySid(m_sequenceWriteSessId);
-    if (pInfo && pInfo->pModule && pInfo->pModule->IsLiveSession())
-    {
-        pInfo->pModule->SendTransferData(smsg);
-        return true;
-    } else {
-        return false;
-    }
-}
-
-bool LRTConnManager::PushStoreReadMsg(const std::string& srmsg)
-{
-    LRTConnManager::ModuleInfo* pInfo = findModuleInfoBySid(m_storageReadSessId);
-    if (pInfo && pInfo->pModule && pInfo->pModule->IsLiveSession())
-    {
-        pInfo->pModule->SendTransferData(srmsg);
-        return true;
-    } else {
-        return false;
-    }
-}
-
-bool LRTConnManager::PushStoreWriteMsg(const std::string& swmsg)
-{
-    LRTConnManager::ModuleInfo* pInfo = findModuleInfoBySid(m_storageWriteSessId);
-    if (pInfo && pInfo->pModule && pInfo->pModule->IsLiveSession())
-    {
-        pInfo->pModule->SendTransferData(swmsg);
-        return true;
-    } else {
-         return false;
-    }
-}
-
-void LRTConnManager::RefreshConnection()
-{
-    ModuleInfo* pmi = NULL;
-    {
-        OSMutexLocker locker(&s_mutexModule);
-        ModuleInfoMapsIt it = s_ModuleInfoMap.begin();
-        for (; it!=s_ModuleInfoMap.end(); it++) {
-            pmi = it->second;
-            if (pmi && pmi->othModuleType == pms::ETransferModule::MCONNECTOR) {
-                if (pmi->pModule && pmi->pModule->RefreshTime()) {
-                    pmi->pModule->KeepAlive();
-                }
-            }
-        }
-    }
-}
-
-void LRTConnManager::ReportError(pms::ETransferModule module, const std::string& uid, const std::string& err, int code)
-{
-    ModuleInfo* pInfo = findModuleInfo(uid, pms::ETransferModule::MLIVE);
-    // toModule, errModule, uid, errStr, errCode
-    pms::ErrorMsg emsg;
-    emsg.set_emodule(module);
-    emsg.set_userid(uid);
-    emsg.set_reason(err);
-    emsg.set_errcode(code);
-
-    pms::TransferMsg tmsg;
-    tmsg.set_type(pms::ETransferType::TERROR);
-    tmsg.set_flag(pms::ETransferFlag::FNOACK);
-    tmsg.set_priority(pms::ETransferPriority::PHIGH);
-    tmsg.set_content(emsg.SerializeAsString());
-
-    if (pInfo && pInfo->pModule && pInfo->pModule->IsLiveSession())
-    {
-        pInfo->pModule->SendTransferData(tmsg.SerializeAsString());
-    }
-
-}
-
-
-bool LRTConnManager::SignalKill()
-{
-    {
-        OSMutexLocker mlocker(&s_mutexModule);
-        for (auto & x : s_ModuleInfoMap) {
-            x.second->pModule->Signal(Task::kKillEvent);
-            usleep(100*1000);
-        }
-    }
-
-    return true;
-}
-
-bool LRTConnManager::ClearAll()
-{
-    {
-        OSMutexLocker mlocker(&s_mutexModule);
-        for (auto & x : s_ModuleInfoMap) {
-            delete x.second;
-            x.second = NULL;
-            usleep(100*1000);
-        }
-        s_ModuleInfoMap.clear();
-    }
-
-    {
-        OSMutexLocker tlocker(&s_mutexTypeModule);
-        for (auto & x : s_TypeModuleSessionInfoList) {
-            delete x;
-            x = NULL;
-        }
-        s_TypeModuleSessionInfoList.clear();
-    }
-    m_sequenceAddrList.clear();
-    m_storageAddrList.clear();
-     return true;
 }
 
 bool LRTConnManager::AddModuleInfo(LRTConnManager::ModuleInfo* pmi, const std::string& sid)
@@ -397,6 +184,134 @@ void LRTConnManager::TransferSessionLostNotify(const std::string& sid)
     }
 }
 
+///////////////////////////////////////////////////////////////////////////////////
+
+bool LRTConnManager::ConnectSequence()
+{
+    if (m_sequenceAddrList.size() == 0) {
+        return false;
+    }
+    std::list<std::string>::iterator it;
+    for (it=m_sequenceAddrList.begin(); it!=m_sequenceAddrList.end(); it++) {
+        std::string s = *it;
+        char ip[16] = {0};
+        unsigned int port = 0;
+        sscanf(s.c_str(), "%s %u", ip, &port);
+        LI("ip:%s, port:%u\n", ip, port);
+        if (strlen(ip)>0 && port > 2048) {
+            DoConnectSequence(ip, port);
+        }
+    }
+    return true;
+}
+
+bool LRTConnManager::ConnectStorage()
+{
+    if (m_storageAddrList.size() == 0) {
+        return false;
+    }
+    std::list<std::string>::iterator it;
+    for (it=m_storageAddrList.begin(); it!=m_storageAddrList.end(); it++) {
+        std::string s = *it;
+        char ip[16] = {0};
+        unsigned int port = 0;
+        sscanf(s.c_str(), "%s %u", ip, &port);
+        LI("ip:%s, port:%u\n", ip, port);
+        if (strlen(ip)>0 && port > 2048) {
+            DoConnectStorage(ip, port);
+        }
+    }
+    return true;
+}
+
+bool LRTConnManager::PushSeqnReadMsg(const std::string& smsg)
+{
+    LRTConnManager::ModuleInfo* pInfo = findModuleInfoBySid(m_sequenceReadSessId);
+    if (pInfo && pInfo->pModule && pInfo->pModule->IsLiveSession())
+    {
+        pInfo->pModule->SendTransferData(smsg);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool LRTConnManager::PushSeqnWriteMsg(const std::string& smsg)
+{
+    LRTConnManager::ModuleInfo* pInfo = findModuleInfoBySid(m_sequenceWriteSessId);
+    if (pInfo && pInfo->pModule && pInfo->pModule->IsLiveSession())
+    {
+        pInfo->pModule->SendTransferData(smsg);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool LRTConnManager::PushStoreReadMsg(const std::string& srmsg)
+{
+    LRTConnManager::ModuleInfo* pInfo = findModuleInfoBySid(m_storageReadSessId);
+    if (pInfo && pInfo->pModule && pInfo->pModule->IsLiveSession())
+    {
+        pInfo->pModule->SendTransferData(srmsg);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool LRTConnManager::PushStoreWriteMsg(const std::string& swmsg)
+{
+    LRTConnManager::ModuleInfo* pInfo = findModuleInfoBySid(m_storageWriteSessId);
+    if (pInfo && pInfo->pModule && pInfo->pModule->IsLiveSession())
+    {
+        pInfo->pModule->SendTransferData(swmsg);
+        return true;
+    } else {
+         return false;
+    }
+}
+
+void LRTConnManager::RefreshConnection()
+{
+    ModuleInfo* pmi = NULL;
+    {
+        OSMutexLocker locker(&s_mutexModule);
+        ModuleInfoMapsIt it = s_ModuleInfoMap.begin();
+        for (; it!=s_ModuleInfoMap.end(); it++) {
+            pmi = it->second;
+            if (pmi && pmi->othModuleType == pms::ETransferModule::MCONNECTOR) {
+                if (pmi->pModule && pmi->pModule->RefreshTime()) {
+                    pmi->pModule->KeepAlive();
+                }
+            }
+        }
+    }
+}
+
+void LRTConnManager::ReportError(pms::ETransferModule module, const std::string& uid, const std::string& err, int code)
+{
+    ModuleInfo* pInfo = findModuleInfo(uid, pms::ETransferModule::MLIVE);
+    // toModule, errModule, uid, errStr, errCode
+    pms::ErrorMsg emsg;
+    emsg.set_emodule(module);
+    emsg.set_userid(uid);
+    emsg.set_reason(err);
+    emsg.set_errcode(code);
+
+    pms::TransferMsg tmsg;
+    tmsg.set_type(pms::ETransferType::TERROR);
+    tmsg.set_flag(pms::ETransferFlag::FNOACK);
+    tmsg.set_priority(pms::ETransferPriority::PHIGH);
+    tmsg.set_content(emsg.SerializeAsString());
+
+    if (pInfo && pInfo->pModule && pInfo->pModule->IsLiveSession())
+    {
+        pInfo->pModule->SendTransferData(tmsg.SerializeAsString());
+    }
+
+}
+
 void LRTConnManager::OnTLogin(const std::string& uid, const std::string& token, const std::string& connector)
 {
 
@@ -405,4 +320,90 @@ void LRTConnManager::OnTLogin(const std::string& uid, const std::string& token, 
 void LRTConnManager::OnTLogout(const std::string& uid, const std::string& token, const std::string& connector)
 {
 
+}
+
+bool LRTConnManager::SignalKill()
+{
+    {
+        OSMutexLocker mlocker(&s_mutexModule);
+        for (auto & x : s_ModuleInfoMap) {
+            x.second->pModule->Signal(Task::kKillEvent);
+            usleep(100*1000);
+        }
+    }
+
+    return true;
+}
+
+bool LRTConnManager::ClearAll()
+{
+    {
+        OSMutexLocker mlocker(&s_mutexModule);
+        for (auto & x : s_ModuleInfoMap) {
+            delete x.second;
+            x.second = NULL;
+            usleep(100*1000);
+        }
+        s_ModuleInfoMap.clear();
+    }
+
+    {
+        OSMutexLocker tlocker(&s_mutexTypeModule);
+        for (auto & x : s_TypeModuleSessionInfoList) {
+            delete x;
+            x = NULL;
+        }
+        s_TypeModuleSessionInfoList.clear();
+    }
+    m_sequenceAddrList.clear();
+    m_storageAddrList.clear();
+     return true;
+}
+
+bool LRTConnManager::DoConnectSequence(const std::string ip, unsigned short port)
+{
+    LRTTransferSession* sequenceWriteSession = new LRTTransferSession(LRTTransferSession::ESequenceWrite);
+    sequenceWriteSession->Init();
+    // conn to sequence for write
+    while (!sequenceWriteSession->Connect(ip, port)) {
+        LI("connecting to sequence server write %s:%u waiting...\n", ip.c_str(), port);
+        usleep(100*1000);
+    }
+    LI("%s port:%u, socketFD:%d\n", __FUNCTION__, port, sequenceWriteSession->GetSocket()->GetSocketFD());
+    sequenceWriteSession->EstablishConnection();
+
+    LRTTransferSession* sequenceReadSession = new LRTTransferSession(LRTTransferSession::ESequenceRead);
+    sequenceReadSession->Init();
+    // conn to sequence for read
+    while (!sequenceReadSession->Connect(ip, port)) {
+        LI("connecting to sequence server read %s:%u waiting...\n", ip.c_str(), port);
+        usleep(100*1000);
+    }
+    LI("%s port:%u, socketFD:%d\n", __FUNCTION__, port, sequenceReadSession->GetSocket()->GetSocketFD());
+    sequenceReadSession->EstablishConnection();
+    return true;
+}
+
+bool LRTConnManager::DoConnectStorage(const std::string ip, unsigned short port)
+{
+    LRTTransferSession* storageWriteSession = new LRTTransferSession(LRTTransferSession::EStorageWrite);
+    storageWriteSession->Init();
+    // conn to storage for write
+    while (!storageWriteSession->Connect(ip, port)) {
+        LI("connecting to storage server %s:%u waiting...\n", ip.c_str(), port);
+        usleep(100*1000);
+    }
+    LI("%s Storage Write port:%u, socketFD:%d\n", __FUNCTION__, port, storageWriteSession->GetSocket()->GetSocketFD());
+    storageWriteSession->EstablishConnection();
+
+    LRTTransferSession* storageReadSession = new LRTTransferSession(LRTTransferSession::EStorageRead);
+    storageReadSession->Init();
+    // conn to storage for read
+    while (!storageReadSession->Connect(ip, port)) {
+        LI("connecting to storage server %s:%u waiting...\n", ip.c_str(), port);
+        usleep(100*1000);
+    }
+    LI("%s Storage Read port:%u, socketFD:%d\n", __FUNCTION__, port, storageReadSession->GetSocket()->GetSocketFD());
+    storageReadSession->EstablishConnection();
+    return true;
 }

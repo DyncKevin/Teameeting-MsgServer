@@ -22,6 +22,7 @@ static OSMutex       s_mutexTypeModule;
 static SRTConnManager::ModuleInfoMaps                 s_ModuleInfoMap(0);
 static SRTConnManager::TypeModuleSessionInfoLists     s_TypeModuleSessionInfoList(0);
 
+///////////////////////////////////////////////////////////////////////////////////
 
 SRTConnManager::ModuleInfo* SRTConnManager::findConnectorInfo(const std::string& userid)
 {
@@ -88,93 +89,6 @@ SRTConnManager::ModuleInfo* SRTConnManager::findConnectorInfoById(const std::str
         LE("findConnectorInfoById sessionid is null\n");
     }
     return pInfo;
-}
-
-bool SRTConnManager::ConnectConnector()
-{
-    if (m_ipList.size() == 0) {
-        return false;
-    }
-    std::list<std::string>::iterator it;
-    for (it=m_ipList.begin(); it!=m_ipList.end(); it++) {
-        std::string s = *it;
-        char ip[16] = {0};
-        unsigned int port = 0;
-        sscanf(s.c_str(), "%s %u", ip, &port);
-        LI("ip:%s, port:%u\n", ip, port);
-        if (strlen(ip)>0 && port > 2048) {
-            DoConnectConnector(ip, port);
-        }
-    }
-    return true;
-}
-
-bool SRTConnManager::DoConnectConnector(const std::string ip, unsigned short port)
-{
-    SRTTransferSession* connectorSession = new SRTTransferSession();
-    connectorSession->Init();
-    // conn to connector
-    while (!connectorSession->Connect(ip, port)) {
-        LI("connecting to connector server %s:%u waiting...\n", ip.c_str(), port);
-        usleep(100*1000);
-    }
-    LI("%s port:%u, socketFD:%d\n", __FUNCTION__, port, connectorSession->GetSocket()->GetSocketFD());
-    connectorSession->EstablishConnection();
-    return true;
-}
-
-void SRTConnManager::RefreshConnection()
-{
-    ModuleInfo* pmi = NULL;
-    {
-        OSMutexLocker locker(&s_mutexModule);
-        ModuleInfoMapsIt it = s_ModuleInfoMap.begin();
-        for (; it!=s_ModuleInfoMap.end(); it++) {
-            pmi = it->second;
-            if (pmi && pmi->othModuleType == pms::ETransferModule::MCONNECTOR) {
-                if (pmi->pModule && pmi->pModule->RefreshTime()) {
-                    pmi->pModule->KeepAlive();
-                }
-            }
-        }
-    }
-}
-
-bool SRTConnManager::SignalKill()
-{
-    {
-        OSMutexLocker mlocker(&s_mutexModule);
-        for (auto & x : s_ModuleInfoMap) {
-            x.second->pModule->Signal(Task::kKillEvent);
-            usleep(100*1000);
-        }
-    }
-
-    return true;
-}
-
-bool SRTConnManager::ClearAll()
-{
-    {
-        OSMutexLocker mlocker(&s_mutexModule);
-        for (auto & x : s_ModuleInfoMap) {
-            delete x.second;
-            x.second = NULL;
-            usleep(100*1000);
-        }
-        s_ModuleInfoMap.clear();
-    }
-
-    {
-        OSMutexLocker tlocker(&s_mutexTypeModule);
-        for (auto & x : s_TypeModuleSessionInfoList) {
-            delete x;
-            x = NULL;
-        }
-        s_TypeModuleSessionInfoList.clear();
-    }
-    m_ipList.clear();
-     return true;
 }
 
 bool SRTConnManager::AddModuleInfo(SRTConnManager::ModuleInfo* pmi, const std::string& sid)
@@ -263,6 +177,44 @@ void SRTConnManager::TransferSessionLostNotify(const std::string& sid)
     DelTypeModuleSession(sid);
 }
 
+///////////////////////////////////////////////////////////////////////////////////
+
+bool SRTConnManager::ConnectConnector()
+{
+    if (m_ipList.size() == 0) {
+        return false;
+    }
+    std::list<std::string>::iterator it;
+    for (it=m_ipList.begin(); it!=m_ipList.end(); it++) {
+        std::string s = *it;
+        char ip[16] = {0};
+        unsigned int port = 0;
+        sscanf(s.c_str(), "%s %u", ip, &port);
+        LI("ip:%s, port:%u\n", ip, port);
+        if (strlen(ip)>0 && port > 2048) {
+            DoConnectConnector(ip, port);
+        }
+    }
+    return true;
+}
+
+void SRTConnManager::RefreshConnection()
+{
+    ModuleInfo* pmi = NULL;
+    {
+        OSMutexLocker locker(&s_mutexModule);
+        ModuleInfoMapsIt it = s_ModuleInfoMap.begin();
+        for (; it!=s_ModuleInfoMap.end(); it++) {
+            pmi = it->second;
+            if (pmi && pmi->othModuleType == pms::ETransferModule::MCONNECTOR) {
+                if (pmi->pModule && pmi->pModule->RefreshTime()) {
+                    pmi->pModule->KeepAlive();
+                }
+            }
+        }
+    }
+}
+
 void SRTConnManager::OnTLogin(const std::string& uid, const std::string& token, const std::string& connector)
 {
 
@@ -271,4 +223,55 @@ void SRTConnManager::OnTLogin(const std::string& uid, const std::string& token, 
 void SRTConnManager::OnTLogout(const std::string& uid, const std::string& token, const std::string& connector)
 {
 
+}
+
+bool SRTConnManager::SignalKill()
+{
+    {
+        OSMutexLocker mlocker(&s_mutexModule);
+        for (auto & x : s_ModuleInfoMap) {
+            x.second->pModule->Signal(Task::kKillEvent);
+            usleep(100*1000);
+        }
+    }
+
+    return true;
+}
+
+bool SRTConnManager::ClearAll()
+{
+    {
+        OSMutexLocker mlocker(&s_mutexModule);
+        for (auto & x : s_ModuleInfoMap) {
+            delete x.second;
+            x.second = NULL;
+            usleep(100*1000);
+        }
+        s_ModuleInfoMap.clear();
+    }
+
+    {
+        OSMutexLocker tlocker(&s_mutexTypeModule);
+        for (auto & x : s_TypeModuleSessionInfoList) {
+            delete x;
+            x = NULL;
+        }
+        s_TypeModuleSessionInfoList.clear();
+    }
+    m_ipList.clear();
+     return true;
+}
+
+bool SRTConnManager::DoConnectConnector(const std::string ip, unsigned short port)
+{
+    SRTTransferSession* connectorSession = new SRTTransferSession();
+    connectorSession->Init();
+    // conn to connector
+    while (!connectorSession->Connect(ip, port)) {
+        LI("connecting to connector server %s:%u waiting...\n", ip.c_str(), port);
+        usleep(100*1000);
+    }
+    LI("%s port:%u, socketFD:%d\n", __FUNCTION__, port, connectorSession->GetSocket()->GetSocketFD());
+    connectorSession->EstablishConnection();
+    return true;
 }

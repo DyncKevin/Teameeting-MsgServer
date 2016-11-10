@@ -76,45 +76,39 @@ public:
         }
     }ConnectionInfo;
 
-
     typedef std::unordered_map< std::string, ModuleInfo* >      ModuleInfoMaps;
     typedef ModuleInfoMaps::iterator                            ModuleInfoMapsIt;
-
     //<user_id, UserModuleTypeInfo>
-    typedef std::list<TypeModuleSessionInfo*> TypeModuleSessionInfoLists;
-
-    typedef std::unordered_multimap<std::string, std::string>        UserConnectorMaps;
-    typedef UserConnectorMaps::iterator UserConnectorMapsIt;
-
-    typedef std::list< LRTTransferSession* > ConnectingSessList;
-
-
+    typedef std::list<TypeModuleSessionInfo*>                   TypeModuleSessionInfoLists;
+    typedef std::unordered_multimap<std::string, std::string>   UserConnectorMaps;
+    typedef UserConnectorMaps::iterator                         UserConnectorMapsIt;
+    typedef std::list< LRTTransferSession* >                    ConnectingSessList;
     //<user_id, connection_info>
     typedef std::unordered_map< std::string, ConnectionInfo* >  ConnectionInfoMaps;
     typedef ConnectionInfoMaps::iterator                        ConnectionInfoMapsIt;
 
     ///////////////////////////////////////////////////////////////////////////////////
 
-    ModuleInfo*       findConnModuleInfo(const std::string& userid);
-    ModuleInfo*       findModuleInfo(const std::string& userid, pms::ETransferModule module);
-    ModuleInfo*       findModuleInfoBySid(const std::string& sid);
-    ModuleInfo*       findModuleInfoByMid(const std::string& userid, const std::string& connector);
+    ModuleInfo* findConnModuleInfo(const std::string& userid);
+    ModuleInfo* findModuleInfo(const std::string& userid, pms::ETransferModule module);
+    ModuleInfo* findModuleInfoBySid(const std::string& sid);
+    ModuleInfo* findModuleInfoByMid(const std::string& userid, const std::string& connector);
+    ConnectionInfo* findConnectionInfoById(const std::string& uid);
 
     bool AddModuleInfo(ModuleInfo* pmi, const std::string& sid);
     bool DelModuleInfo(const std::string& sid, EventData& data);
     bool AddTypeModuleSession(pms::ETransferModule module, const std::string& mid, const std::string& sid);
     bool DelTypeModuleSession(const std::string& sid);
 
-
     bool AddUser(pms::EConnType type, const std::string& uid, ConnectionInfo* pInfo);
-    // return true means delete one
-    // return false means not delete
+    // return true means delete one; false means not delete
     bool DelUser(pms::EConnType type, const std::string& uid, std::string& token);
-    ConnectionInfo*   findConnectionInfoById(const std::string& uid);
     bool SendToGroupModule(const std::string& userid, const std::string& msg);
     bool SendToPushModule(const std::string& userid, const std::string& msg);
 
     void TransferSessionLostNotify(const std::string& sid);
+
+    ///////////////////////////////////////////////////////////////////////////////////
 
     void InitManager();
     void UninManager();
@@ -122,6 +116,20 @@ public:
     bool ConnectLogical();
     bool ConnectConnector();
     bool ConnectDispatcher();
+
+    void RefreshConnection();
+    void ReportError(pms::ETransferModule module, const std::string& uid, const std::string& err, int code);
+    bool Transfer2Dispatcher(const std::string mid, const std::string uid, const std::string msg);
+
+    bool PushNewMsg2Queue(const std::string& str);
+    bool PushSeqnReq2Queue(const std::string& str);
+    bool PushDataReq2Queue(const std::string& str);
+
+    void OnTLogin(const std::string& uid, const std::string& token, const std::string& connector);
+    void OnTLogout(const std::string& uid, const std::string& token, const std::string& connector);
+
+    bool SignalKill();
+    bool ClearAll();
 
     std::list<std::string>* GetLogicalAddrList() { return &m_logicalAddrList; }
     std::list<std::string>* GetConnectorAddrList() { return &m_connectorAddrList; }
@@ -134,7 +142,6 @@ public:
     bool IsSvrConnector() { return m_isSvrConnectorOk; }
     bool IsSvrDispatcher() { return m_isSvrDispatcherOk; }
 
-
     void SetSvrSequence(bool ok) { m_isSvrSequenceOk = ok; }
     void SetSvrStorage(bool ok) { m_isSvrStorageOk = ok; }
     bool IsSvrSequence() { return m_isSvrSequenceOk; }
@@ -143,25 +150,13 @@ public:
     void SetDispatcherSessId(const std::string& sid) { m_dispatcherSessId = sid; }
     void SetLogicalSessId(const std::string& sid) {m_logicalSessId = sid; }
 
-    void RefreshConnection();
-    void ReportError(pms::ETransferModule module, const std::string& uid, const std::string& err, int code);
-    bool Transfer2Dispatcher(const std::string mid, const std::string uid, const std::string msg);
-
-    bool PushNewMsg2Queue(const std::string& str);
-    bool PushSeqnReq2Queue(const std::string& str);
-    bool PushDataReq2Queue(const std::string& str);
-
     void SetRTLiveId(const std::string& mid) { m_rtliveId = mid; }
     std::string& RTLiveId() { return m_rtliveId; }
-    bool SignalKill();
-    bool ClearAll();
-
-    void OnTLogin(const std::string& uid, const std::string& token, const std::string& connector);
-    void OnTLogout(const std::string& uid, const std::string& token, const std::string& connector);
 
 protected:
     LRTConnManager() { }
     ~LRTConnManager() { }
+
 private:
     bool DoConnectLogical(const std::string ip, unsigned short port);
     bool DoConnectConnector(const std::string ip, unsigned short port);
