@@ -16,7 +16,6 @@
 #include "rtklog.h"
 #include "MRTMeetingRoom.h"
 #include "RTUtils.hpp"
-#include "RTZKClient.hpp"
 
 
 void MRTRoomManager::HandleOptRoom(pms::RelayMsg& rmsg, pms::Entity& mmsg)
