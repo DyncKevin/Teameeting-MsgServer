@@ -12,7 +12,6 @@
 #include "OSMutex.h"
 #include "MRTRoomManager.h"
 #include "MRTTransferSession.h"
-#include "RTZKClient.hpp"
 
 OSMutex       s_mutex;
 OSMutex       s_mutexModule;

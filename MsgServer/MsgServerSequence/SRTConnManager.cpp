@@ -12,7 +12,6 @@
 #include <json/json.h>
 #include "OSMutex.h"
 #include "SRTTransferSession.h"
-#include "RTZKClient.hpp"
 #include "ProtoCommon.h"
 
 static OSMutex       s_mutex;
