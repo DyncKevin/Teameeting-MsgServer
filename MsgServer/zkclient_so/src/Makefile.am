@@ -1,0 +1,23 @@
+####dynamic lib and static lib
+lib_LTLIBRARIES=libzksdk.la
+libzksdk_la_LDFLAGS=-shared
+AUTOMAKE_OPTIONS=foreign
+AM_CFLAGS=-g -O0 -std=c++11 -Wall -fPIC -D__PTHREADS__ -D__PTHREADS_MUTEXES__
+AM_CPPFLAGS=$(AM_CFLAGS)
+
+AM_CPPFLAGS+= -I$(top_srcdir)/include \
+			  -I$(top_srcdir)/include/common/include \
+			  -I$(top_srcdir)/include/efnfw \
+			  -I$(top_srcdir)/include/zk_include
+
+include_HEADERS=$(top_srcdir)/include/ZKClt.h
+
+libzksdk_la_SOURCES=$(top_srcdir)/src/RTProcessInfo.cpp \
+					$(top_srcdir)/src/RTSingleton.cpp \
+					$(top_srcdir)/src/RTUtils.cpp \
+					$(top_srcdir)/src/RTZKClient.cpp \
+					$(top_srcdir)/src/ZKClt.cpp
+
+##libzksdk_la_LIBADD=-L$(top_srcdir)/lib -lzkclient -L$(top_srcdir)/lib/zk_lib -lzookeeper_mt
+##libzksdk_la_LIBADD=$(top_srcdir)/lib/libzkclient.a $(top_srcdir)/lib/zk_lib/libzookeeper_mt.a
+libzksdk_la_LIBADD=-lpthread -lrt -ldl
